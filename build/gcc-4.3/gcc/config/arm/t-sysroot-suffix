@@ -1,0 +1,6 @@
+# Generate SYSROOT_SUFFIX_SPEC from MULTILIB_OSDIRNAMES
+
+sysroot-suffix.h: $(srcdir)/config/arm/print-sysroot-suffix.sh
+	$(SHELL) $(srcdir)/config/arm/print-sysroot-suffix.sh \
+	  "$(MULTILIB_ALIASES)" "$(MULTILIB_OSDIRNAMES)" \
+	  "$(MULTILIB_OPTIONS)" "$(MULTILIB_MATCHES)" > $@

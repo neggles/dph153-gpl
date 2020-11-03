@@ -1,0 +1,12 @@
+# Multilibs for powerpc embedded ELF targets.
+
+MULTILIB_OPTIONS	= 
+
+MULTILIB_DIRNAMES	= 
+
+MULTILIB_EXCEPTIONS	= 
+
+MULTILIB_EXTRA_OPTS	= mno-eabi mstrict-align
+
+MULTILIB_MATCHES	= ${MULTILIB_MATCHES_FLOAT} \
+			  ${MULTILIB_MATCHES_ENDIAN}

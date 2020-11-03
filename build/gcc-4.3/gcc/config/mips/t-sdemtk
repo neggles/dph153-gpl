@@ -1,0 +1,7 @@
+
+MULTILIB_OPTIONS = EL/EB mips32/mips32r2/mips64 mips16 fp64/msoft-float/mno-float
+MULTILIB_DIRNAMES = el eb mips32 mips32r2 mips64 mips16 f64 sof nof
+MULTILIB_MATCHES = EL=mel EB=meb
+MULTILIB_EXCLUSIONS = mfp64/!mips32r2 mips16/mips64 mcode-readable=no/!mips16
+MULTILIB_EXCEPTIONS =
+

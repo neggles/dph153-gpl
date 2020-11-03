@@ -1,0 +1,9 @@
+
+EXTRA_MULTILIB_PARTS += crtfastmath.o
+
+EXTRA_PARTS += crtfastmath.o
+
+$(T)crtfastmath.o: $(srcdir)/config/mips/crtfastmath.c $(GCC_PASSES)
+	$(GCC_FOR_TARGET) $(GCC_CFLAGS) $(MULTILIB_CFLAGS) $(INCLUDES) \
+	-c -o $(T)crtfastmath.o $(srcdir)/config/mips/crtfastmath.c
+

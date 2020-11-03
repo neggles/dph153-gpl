@@ -1,0 +1,10 @@
+# Overrides for timesys
+
+MULTILIB_OPTIONS = march=armv5t/march=armv6/mcpu=xscale mbig-endian
+MULTILIB_DIRNAMES = armv5t armv6 xscale be
+MULTILIB_MATCHES = mbig-endian=mbe
+MULTILIB_EXCEPTIONS = mbig-endian march=*/mbig-endian mcpu=xscale
+MULTILIB_OSDIRNAMES  = march.armv5t=!armv5t
+MULTILIB_OSDIRNAMES += march.armv6=!armv6
+MULTILIB_OSDIRNAMES += mcpu.xscale/mbig-endian=!xscale/be
+MULTILIB_ALIASES =

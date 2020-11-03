@@ -1,0 +1,747 @@
+<!-- This file contains a series of release note fragments processed
+     by gnu-notes.  To add a note to it, use "gnu-notes -a
+     $release_config gcc".  The TARGET line should contain a
+     list of shell glob patterns for target names to which the note is
+     relevant; it may be removed if it is relevant to all targets.
+ -->
+
+      <!-- UUID: 290b372a-824f-4104-a5ff-bbdcf6ca35fc -->
+      <!-- TARGET: mips*-sicortex-linux* -->
+      <formalpara>
+        <title>SiCortex ICE9A errata</title>
+        <para>
+          The <option>-mfix-ice9a</option> command-line option is no
+	  longer enable by default, nor are the libraries built with
+	  this option.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 26644180-d1be-4208-822d-6c631136ef4f -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Optimizer bug fix</title>
+        <para>
+          A bug that caused an <literal>unrecognizable insn</literal>
+          internal compiler error when compiling at optimization levels
+          above <option>-O0</option> has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 9bb58538-9692-45f7-afe6-271f0760aed3 -->
+      <!-- TARGET: sparc* -->
+      <formalpara>
+        <title>Vector constant bug fix</title>
+        <para>
+	  A bug that caused an internal compiler error when compiling
+	  code using 64-bit vector constants has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 5e02d799-fdae-4248-afdc-6f522d2eccd6 -->
+      <!-- TARGET: arm*-eabi -->
+      <formalpara>
+        <title>Profiling support added</title>
+        <para>
+          The <option>-pg</option> option is now supported by the
+	  compiler.  You are required to provide a function named
+	  <function>__gnu_mcount_nc</function>.  For more details, see
+	  <xref linkend="arm-mcount"/>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 6c62e8cd-9223-4518-a2e8-6bb8b6037fb2 -->
+      <!-- TARGET: arm*-eabi arm*-uclinux* -->
+      <formalpara>
+        <title>Workaround for Cortex-M3 CPU errata</title>
+        <para>
+	  Errata present in some Cortex-M3 cores can cause data
+	  corruption when overlapping registers are used in
+	  <literal>LDRD</literal> instructions.
+	  The compiler avoids generating these problematic instructions
+	  when the <option>-mfix-cortex-m3-ldrd</option> or
+	  <option>-mcpu=cortex-m3</option> command-line options are used.
+	  The &csl_sgxx; runtime libraries have also been updated to
+	  include this workaround.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 3865a1d5-48e8-496b-b0e0-fa6f6c718aab -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>VFP compiler fix</title>
+        <para>
+	  A compiler bug that resulted in
+	  <literal>internal compiler error: output_operand: invalid expression as operand</literal>
+	  when generating VFP code has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: a38e2a96-4845-410f-ba68-6f1091446123 -->
+      <!-- TARGET: arm* -->
+      <formalpara>
+        <title>Misaligned NEON memory accesses</title>
+        <para>
+	  A bug has been fixed that caused the compiler to use aligned
+	  NEON load/store instructions to access misaligned data when
+	  autovectorizing certain loops.  The bug affected code compiled
+	  with <option>-mfpu=neon</option> and loop vectorization enabled
+	  with <option>-O3</option> or <option>-ftree-vectorize</option>.
+	</para>
+      </formalpara>
+
+      <!-- UUID: 75802745-041d-4357-b48f-31fd30c58adc -->
+      <!-- TARGET: powerpc-* -->
+      <formalpara>
+        <title>Linker script option syntax</title>
+        <para>
+	  GCC now accepts <option>-T <replaceable>script</replaceable></option>
+	  (with whitespace before the <replaceable>script</replaceable>)
+	  as well as <option>-T<replaceable>script</replaceable></option>
+	  (with no whitespace) to specify a linker script on the command line.
+        </para>
+      </formalpara>
+
+      <!-- UUID: e4838603-bc80-40fe-add0-cb5aba3a235d -->
+      <!-- TARGET: arm*-linux* mips*-linux* i?86*-linux* -->
+      <formalpara features="openmp_addon">
+        <title>OpenMP support</title>
+        <para>
+          Support for the OpenMP application programming interface is
+	  now available in &csl_sgxx; Professional Edition.  To
+	  compile programs that use OpenMP features, use the
+	  <option>-fopenmp</option> command-line option.  For more
+	  information about using OpenMP with &csl_sgxx;, see <xref
+	  linkend="sec-openmp"/>.  For more information about the
+	  OpenMP API, see <uri>http://www.openmp.org/</uri>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 934d8fb3-d31c-4051-aad3-f85fc72e7576 -->
+      <!-- TARGET: m68k-*uclinux -->
+      <formalpara>
+        <title>Shared libraries bug fix</title>
+        <para>
+          A bug has been fixed that caused
+          <literal>Invalid instruction</literal> errors in applications
+          compiled with <option>-mid-shared-library</option> for CPUs
+          without hardware floating point.  The problem was caused by
+          incorrect linker attributes on internal compiler-generated
+          symbols in the shared library; you must rebuild both
+          the application and shared libraries to pick up the fix.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 62a77a44-3f36-4d0c-aca2-eb327dce9ca0 -->
+      <!-- TARGET: powerpc-linux-gnu -->
+      <formalpara>
+        <title>Compiling dynamic libraries with <option>-Os</option></title>
+        <para>
+          A bug has been fixed that affected dynamic libraries compiled
+          with <option>-Os</option>.  The bug caused runtime errors such
+          as segmentation faults in applications using the library, as a
+          result of incorrect linker attributes on internal
+          compiler-generated symbols in the library.  You must rebuild
+          both the affected shared libraries and the applications that
+          use them to pick up this fix.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 53bf0593-1f5d-4047-8e74-ad8889a3a1cb -->
+      <!-- TARGET: mips*-sicortex-* -->
+      <formalpara>
+        <title>SiCortex architecture option</title>
+        <para>
+          A new architecture option, <option>-march=ice9</option>, is
+	  now available to target the SiCortex ICE9 architecture.
+        </para>
+      </formalpara>
+
+      <!-- UUID: e2f7a383-48cd-48b3-9a7c-a157f722414f -->
+      <!-- TARGET: m68k-* -->
+      <formalpara>
+        <title>Code generation bug fix</title>
+        <para>
+          A bug has been fixed that caused the compiler to generate
+          invalid code which was rejected by the assembler with
+          an <literal>operands mismatch</literal> error.
+        </para>
+      </formalpara>
+
+      <!-- UUID: f0d8abcb-fc7d-4d4d-a71e-465c0580d6d1 -->
+      <!-- TARGET: arm* -->
+      <formalpara>
+        <title>Half-precision floating point</title>
+        <para>
+          &csl_sgxx; now includes support for half-precision floating point
+          via the <type>__fp16</type> type in C and C++.  The compiler can
+          generate code using either hardware support or library routines.
+          <phrase components="qemu">
+            The included QEMU emulator supports the hardware instructions
+            when invoked with the <literal>any</literal> CPU specifier.
+          </phrase>
+          For more information, see <xref linkend="sec-arm-fp16"/>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: c80d028c-e575-475d-81fa-92b12d249637 -->
+      <!-- TARGET: mips*-sicortex-linux* -->
+      <formalpara>
+        <title>Revised correction for SiCortex ICE9A errata</title>
+        <para>
+          An improved workaround for floating-point errata in the
+          SiCortex ICE9A CPU has been implemented.  The compiler now
+          avoids generating code sequences that can cause incorrect
+          floating-point results, and the assembler now issues
+          diagnostics for such conditions.  The assembler checking is
+          useful for correcting hand-written assembly sequences.  The
+          workaround is controlled by the <option>-mfix-ice9a</option>
+          command-line option, and is enabled by default.
+        </para>
+      </formalpara>
+
+      <!-- UUID: ab117064-8a05-475d-ac05-18aee6b6935e -->
+      <!-- TARGET: arm*-symbianelf i686-mingw32 -->
+      <formalpara>
+        <title>Inline functions declared with <code>dllexport</code></title>
+        <para>
+          The compiler now always emits an out-of-line copy of
+          inline functions declared with the 
+	  <code>__declspec(dllexport)</code> specifier.  This
+	  allows such functions to be referenced from outside
+	  the DLL, just like non-inline functions.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 22ffd26a-db0b-4063-a794-56211092295b -->
+      <!-- TARGET: mips* -->
+      <formalpara>
+	<title>PIE linking fix</title>
+	<para>
+	  A bug in the GCC <option>-fpie</option> and <option>-fPIE</option>
+	  options has been fixed.  The bug caused linker errors referring
+	  to <literal>R_MIPS_HI16</literal>.
+	</para>
+      </formalpara>
+
+      <!-- UUID: c57b7aba-b15a-4673-aa6d-02e821ce4f32 -->
+      <!-- TARGET: arm* -->
+      <formalpara>
+	<title>ARM exception handling bug fix</title>
+	<para>
+	  A bug in the runtime library has been fixed that formerly
+	  caused throwing an unexpected exception in C++ to crash
+	  instead of calling the unexpected exception handler.  The
+	  bug only affected C++ code compiled by non-GNU compilers
+	  such as ARM <trademark
+	  class="registered">RealView</trademark>.
+	</para>
+      </formalpara>
+
+      <!-- UUID: 3791f73d-f14a-4a65-b898-7b6d73e5a49b -->
+      <!-- TARGET: m68k-*elf m68k-*uclinux -->
+      <formalpara>
+        <title>Support for MCF5301x processors</title>
+        <para>
+	  Support has been added for the ColdFire MCF5301x (Longjin)
+	  family of microprocessors.  To compile for the MCF53011,
+	  MCF53012, MCF53013, MCF53014, MCF53015, MCF53016 or MCF53017
+	  processor, use <option>-mcpu=53011</option>,
+	  <option>-mcpu=53012</option>, <option>-mcpu=53013</option>,
+	  <option>-mcpu=53014</option>, <option>-mcpu=53015</option>,
+	  <option>-mcpu=53016</option> or
+	  <option>-mcpu=53017</option>, respectively.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 90860db7-a3ee-4e70-9ed4-2b02ab3202d3 -->
+      <!-- TARGET: m68k-*elf m68k-*uclinux -->
+      <formalpara>
+        <title>Support for MCF5225x processors</title>
+        <para>
+	  Support has been added for the ColdFire MCF5225x
+	  (Kirin3) family of microprocessors.  To compile for the
+	  MCF52252, MCF52254, MCF52255, MCF52256, MCF52258 or MCF52259
+	  processor, use <option>-mcpu=52252</option>,
+	  <option>-mcpu=52254</option>, <option>-mcpu=52255</option>,
+	  <option>-mcpu=52256</option>, <option>-mcpu=52258</option>
+	  or <option>-mcpu=52259</option>, respectively.  
+        </para>
+      </formalpara>
+
+      <!-- UUID: b5288955-bf99-41eb-beeb-047acee870ed -->
+      <!-- TARGET: m68k-*elf m68k-*uclinux -->
+      <formalpara>
+        <title>Support for MCF51AC, MCF51CN and MCF51EM processors</title>
+        <para>
+          Support has been added for the ColdFire MCF51ACnn (Celis),
+	  MCF51CNnn (Lasko) and MCF51EM (Nucleus) families of
+	  microprocessors. To compile for these processors use
+	  <option>-mcpu=51ac</option>, <option>-mcpu=51cn</option> or
+	  <option>-mcpu=51em</option> options respectively.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 3c792cf9-5890-42bd-a9f5-9c336eaaa141 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>NEON improvements</title>
+        <para>
+          Several improvements and bug fixes have been made to the
+          NEON Advanced SIMD Extension support in GCC.  A problem that
+          caused the autovectorizer to fail in some circumstances has
+          been fixed.  Also, many of the intrinsics available via the
+          <filename class="headerfile">arm_neon.h</filename> header file
+          now have improved error checking for out-of-bounds arguments,
+          and the <code>vget_lane</code> intrinsics that return signed
+          values now produce improved code.
+        </para>
+      </formalpara>
+
+      <!-- UUID: babe886a-b070-4d1e-9bc9-c3b03d79d6bc -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Janus 2CC support</title>
+        <para>
+          GCC now includes a work-around for a hardware bug in Avalent
+	  Janus 2CC cores.  To compile and link for these cores, use
+	  the <option>-mfix-janus-2cc</option> compiler option.  If
+	  you are using the linker directly use the
+          <option>--fix-janus-2cc</option> linker option.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 0165b171-1cf4-4530-8bbf-a963b3275a44 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Definition of <type>va_list</type></title>
+        <para>
+          In order to conform to the ABI for the ARM Architecture, the
+	  definition of the type of <type>va_list</type> (defined in
+	  <filename class="headerfile">stdarg.h</filename>) has been
+	  changed.  This change impacts only the mangled names of C++
+	  entities.  For example, the mangled name of a C++ function
+	  taking an argument of type <type>va_list</type>, or
+	  <type>va_list *</type>, or another type involving
+	  <type>va_list</type> has changed.  Since this is an
+	  incompatible change, you must recompile and relink any
+	  modules defining or using affected
+	  <type>va_list</type>-typed entities.
+        </para>
+      </formalpara>
+
+      <!-- UUID: d6ff2406-a405-4364-8b2c-f7e7b82da1f0 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Mangling of NEON type names</title>
+        <para>
+	  A bug in the algorithm used by the C++ compiler for mangling
+	  the names of NEON types, such as <type>int8x16_t</type>, has
+	  been fixed.  These mangled names are used internally in
+	  object files to encode type information in addition to the
+	  programmer-visible names of the C++ variables and functions.
+	  The new mangled name encoding is more compact and conforms
+	  to the ARM C++ ABI.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 4725985d-84f3-45ec-a04f-2ea46c924327 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>NEON compiler fix</title>
+        <para>
+	  A compiler bug that resulted in incorrect NEON code being
+	  generated has been fixed.  Typically the incorrect code
+	  occurred when NEON intrinsics were used inside small
+	  <code>if</code> statements.
+        </para>
+      </formalpara>
+
+      <!-- UUID: cd48ac09-beca-4c53-9881-0f83e2f7ee53 -->
+      <!-- TARGET: powerpc-eabi -->
+      <formalpara>
+        <title><option>-msim</option> build fix</title>
+        <para>
+          <option>-msim</option> is now an alias
+          for <option>-Tsim-hosted.ld</option>.  Please see
+          <xref linkend="sec-cs3-supported-boards"/> for more
+          information about compiling for this target.
+        </para>
+      </formalpara>
+
+      <!-- UUID: c68711d8-15a1-48e8-9c1b-0a66d571b7b6 -->
+      <!-- TARGET: powerpc*-linux-gnu -->
+      <formalpara>
+        <title>OpenMP support</title>
+        <para>
+          Support for the OpenMP application programming interface has
+          been added.  To compile programs that use OpenMP features, use
+          the <option>-fopenmp</option> command-line option.  For more
+          information about OpenMP, see <uri>http://www.openmp.org/</uri>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: f822f68d-2006-4b4c-9608-6b0620c5e890 -->
+      <!-- TARGET: m68k-*elf m68k-*uclinux -->
+      <formalpara>
+        <title>Support for MCF5227x processors</title>
+        <para>
+	  Support has been added for the ColdFire MCF5227x
+	  (DragonFire0) family of microprocessors.  To compile for the
+	  MCF52274 or MCF52277 processor, use
+	  <option>-mcpu=52274</option> or
+	  <option>-mcpu=52277</option>, respectively.  
+        </para>
+      </formalpara>
+
+      <!-- UUID: 63cf9291-2a1c-4b6e-94de-e6fa74993506 -->
+      <!-- TARGET: i686-* -->
+      <formalpara>
+        <title>Target architecture defaults to i686</title>
+        <para>
+          The compiler now defaults to optimizing for the i686
+          instruction set (<option>-march=i686</option>), rather than
+          i386.  Additionally, the included libraries are now
+          optimized for the i686.  This change provides better
+          performance on modern processors, and additionally allows
+          the libraries to be upgraded to more current and
+          full-featured versions.
+        </para>
+      </formalpara>
+
+       <!-- UUID: 4f712f11-beea-4e47-8415-2da3e6db8c82 -->
+       <!-- TARGET: mips* -->
+       <formalpara>
+         <title>FPU defaults</title>
+         <para>
+ 	  The <option>-ffast-math</option> option now causes subnormal
+ 	  numbers to be immediately flushed to zero.  It also sets the
+ 	  rounding mode to round-to-nearest.
+         </para>
+       </formalpara>
+
+      <!-- UUID: 1ed8df1e-b08b-42cb-a118-bfa75f29691f -->
+      <!-- TARGET: mips* -->
+      <formalpara>
+	<title>DSP support</title>
+  	<para>
+	  The compiler now automatically enables support for the DSP ASE when the
+	  <option>-march</option> option is used to specify a core in the 24KE, 34K,
+	  or 74K families.  It is no longer necessary to provide the
+	  <option>-mdsp</option> option explicitly.
+	</para>
+      </formalpara> 
+
+      <!-- UUID: b362865d-0a15-4b8e-b6a1-2036a3fa3bf7 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Smaller Thumb-2 code</title>
+        <para>
+          When optimizing for size (i.e., when <option>-Os</option> is
+	  in use), GCC now generates the 16-bit <code>MULS</code>
+	  Thumb-2 multiply instruction instead of the 32-bit
+	  <code>MUL</code> instruction.
+        </para>
+      </formalpara>
+
+      <!-- UUID: cc2823ea-3f1f-4064-8e3e-ed2ee6c7756e -->
+      <!-- TARGET: mips64el-st-linux-gnu -->
+      <formalpara>
+        <title><option>-mwarn-framesize=<replaceable>size</replaceable></option> option fix</title>
+        <para>
+          When
+          <option>-mwarn-framesize=<replaceable>size</replaceable></option>
+          is used, GCC no longer produces a warning if the function's
+          stack frame size is equal to <replaceable>size</replaceable>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 781fc110-deb4-4f2b-acf8-e0c4e2cd289e -->
+      <!-- TARGET: mips* -->
+      <formalpara>
+        <title><option>-mwarn-framesize=<replaceable>size</replaceable></option> option</title>
+        <para>
+          GCC has a new command-line option,
+          <option>-mwarn-framesize=<replaceable>size</replaceable></option>,
+          which causes warnings if any function's stack frame exceeds
+          the given <replaceable>size</replaceable>.  This option is useful
+          when generating code for environments with limited or absent
+          stack, e.g., BIOS.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 63079e29-4961-4ff3-aed7-2fef240ad6c0 -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>Output files removed on error</title>
+        <para>
+	  When GCC encounters an error, it now consistently removes
+	  any incomplete output files that it may have created.
+        </para>
+      </formalpara>
+
+      <!-- UUID: aaf7087c-c550-4ad2-a3bd-9349c0eb4e53 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>ARM C++ ABI utility functions</title>
+        <para>
+          Vector utility functions required by the ARM C++ ABI no
+          longer crash when passed null pointers.  The affected
+          functions are <function>__aeabi_vec_dtor_cookie</function>,
+          <function>__aeabi_vec_delete</function>,
+          <function>__aeabi_vec_delete3</function>, and
+          <function>__aeabi_vec_delete3_nodtor</function>.  
+          <phrase target-os="linux">
+	   In addition, on GNU/Linux systems, the ARM C++ ABI utility
+	   functions are now exported from the
+	   <filename>libstdc++.so</filename> shared library.  
+          </phrase>
+	  These functions are not intended for use by application
+	  programmers; they are only called by compiler-generated
+	  code.  They are not presently used by the GNU C++ compiler,
+	  but are used by some other compilers, including ARM's
+	  <trademark class="registered">RealView</trademark>
+	  compiler.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 68634034-ca61-43a7-a16d-9dd211bdfb83 -->
+      <!-- TARGET: m68k-*uclinux -->
+      <formalpara>
+        <title>ColdFire M54455 support</title>
+        <para>
+          &csl_sgxx; now includes optimized libraries for the ColdFire
+          M54455 family of processors.  To select these libraries use
+	  the <option>-mcpu=54455</option> or related options.
+        </para>
+      </formalpara>
+
+      <!-- UUID: d8054e10-1802-4408-b43e-62e5578cd765 -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>Alignment bug fix</title>
+        <para>
+          A bug has been fixed that formerly caused incorrect code to be
+          generated in some situations for copying structure arguments
+          being passed by value.  The incorrect code caused alignment 
+          errors on stack accesses on some targets.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 735e7569-aeeb-4b8d-a355-a8fceea5e2ce -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Invalid load instructions</title>
+        <para>
+	  A bug in the compiler which caused it to generate invalid
+	  assembly (e.g. <literal>ldrd r0, [#0, r2]</literal>)
+	  has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 31f80799-2b54-4776-96db-8b5c0ef57539 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+	<title>NEON autovectorizer fix</title>
+        <para>
+	  A compiler bug that caused generation of bad <code>VLD1</code>
+	  instructions has been fixed. The bug affected code compiled with
+	  <option>-mfpu=neon -ftree-vectorize</option>.
+        </para>
+      </formalpara>
+
+      <!-- UUID: d1915124-72bd-4a08-a1b7-5807356d7865 -->
+      <!-- TARGET: powerpc-linux-gnu -->
+      <formalpara>
+        <title>E500mc support</title>
+        <para>
+	  &csl_sgxx; now supports the Power E500mc processor.  To
+	  generate code for this processor use the <option>-te500mc</option>
+	  command-line option.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 44684494-0439-4670-be37-e3fc449d2ec9 -->
+      <!-- TARGET: powerpc* -->
+      <formalpara>
+        <title>E500 size optimization compiler crash</title>
+        <para>
+          A bug that caused the compiler to crash when optimizing for
+          size on E500 targets has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 9213356e-398d-4ff5-9413-5d71e5036050 -->
+      <!-- TARGET: m68k-* -->
+      <formalpara>
+        <title>Building large PIC object files</title>
+        <para>
+          A new compiler option, <option>-mxgot</option>,
+          has been added that removes a restriction on the number
+          of external symbols that can be referenced
+          in a PIC object file.  If you see 'relocation truncated to fit:
+          R_68K_GOT16O' errors from the linker, you should recompile
+          the relevant object files with this option. However,
+          since <option>-mxgot</option> carries both a speed and size
+          penalty, you should use it only on files that otherwise
+          result in link errors.
+        </para>
+      </formalpara>
+
+      <!-- UUID: dd69fa32-e57e-4c95-a25a-b9fdf96ab281 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Marvell Feroceon compiler bug fix</title>
+        <para>
+	  A bug that caused an internal compiler error when optimizing
+	  for Marvell Feroceon CPUs has been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: e9e244c2-c9c1-4b4b-9e3b-ef9168e892be -->
+      <!-- TARGET: arm* mips* powerpc* -->
+      <formalpara>
+        <title>Misaligned accesses to packed structures fix</title>
+        <para>
+          A bug that caused GCC to generate misaligned accesses to
+          packed structures has been fixed.  
+        </para>
+      </formalpara>
+
+      <!-- UUID: d8c3c74f-9a33-4544-8ef2-c8af8d217631 -->
+      <!-- TARGET: arm*-linux* -->
+      <formalpara>
+        <title>Thumb-2 runtime libraries</title>
+        <para>
+	  &csl_sgxx; now includes runtime libraries built as Thumb-2 code
+	  for use on ARMv7 systems.  These can be found in the
+	  <filename>libc/thumb2/</filename> directory.
+        </para>
+      </formalpara>
+
+      <!-- UUID: d26da450-9f29-44a3-b96a-b7d333dc7d30 -->
+      <!-- TARGET: arm*-eabi arm*-uclinuxeabi -->
+      <formalpara>
+        <title>ARMv6-M support</title>
+        <para>
+	  &csl_prod; can now generate code for the ARMv6-M
+	  architecture profile, including Cortex-M1 CPUs.  This can be
+	  selected with the <option>-march=armv6-m</option> or
+	  <option>-mcpu=cortex-m1</option> command-line options.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 9e7c0f58-3301-478f-9203-ec1044b44ef7 -->
+      <!-- TARGET: arm*-* -->
+      <formalpara>
+        <title>Naked functions</title>
+        <para>
+          Functions marked with <code>__attribute__((naked))</code>
+          no longer contain prologue and epilogue code.
+          Please refer to the GCC manual for the proper use of this
+          attribute.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 100d09f4-06d8-4354-a1a5-c7630be3ba97 -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>Register allocation bug fix</title>
+        <para>
+	  A register allocation bug has been fixed.  Under rare 
+	  circumstances, the bug caused incorrect code generation.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 18f603c8-e5a7-4a51-bfb2-8dc1093e2489 -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>Forced alignment of array variables</title>
+        <para>
+	  A new option <option>-falign-arrays</option> has been added to
+	  the compiler.  Specifying this option sets the minimum alignment
+	  for array variables to be the largest power of two less than or
+	  equal to their total storage size, or the biggest alignment used
+	  on the machine, whichever is smaller.  This option may be helpful
+	  when compiling legacy code that uses type punning on arrays that
+	  does not strictly conform to the C standard.
+	</para>
+      </formalpara>
+
+      <!-- UUID: 175bf37c-c129-4909-9b8f-f5f3a233ebfc -->
+      <!-- TARGET: i686-mingw32 -->
+      <formalpara>
+        <title>Large function arguments bug fix</title>
+        <para>
+          A bug has been fixed that formerly caused crashes in
+          programs that pass more than 4Kb of arguments to a
+          function.  The bug was present in code compiled with
+          <option>-mno-accumulate-outgoing-args</option>.  This option
+          is implicitly enabled by <option>-Os</option> and some
+          <option>-march</option> and <option>-mtune</option> options.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 3f949af6-50bb-49e9-abfd-36da0a413a30 -->
+      <!-- TARGET: * -->
+      <formalpara hosts="windows">
+        <title>GCC stack size limit increased</title>
+        <para>
+          On Windows hosts, the maximum stack size for the GCC
+          executable has been increased.  This means that more complex
+          programs can be compiled.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 22e4496c-d084-40ca-8c63-ecc4353496dc -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>Disabling diagnostics for use of system header and
+        library directories</title>
+        <para>
+          The warnings for use of options such as
+          <option>-I/usr/include</option> when cross compiling can be
+          disabled with a new option
+          <option>-Wno-poison-system-directories</option>.  This
+          option is intended for use in chroot environments when such
+          directories contain the correct headers and libraries for
+          the target system rather than the host.
+        </para>
+      </formalpara>
+
+      <!-- UUID: 7b7d9b5b-37ff-47ff-96f9-5edd030bdef4 -->
+      <!-- TARGET: i686-mingw32 -->
+      <formalpara>
+        <title>C++ conversions between strings and <type>long
+          double</type></title>
+        <para>
+          Bugs in the C++ runtime library causing incorrect
+          conversions between strings and <type>long double</type>
+          have been fixed.
+        </para>
+      </formalpara>
+
+      <!-- UUID: b8dba600-a527-46dc-af73-fba488f8415c -->
+      <!-- TARGET: * -->
+      <formalpara hosts="windows">
+        <title>UNC pathname bug fix</title>
+        <para>
+          A bug has been fixed that caused linker errors on Windows
+          hosts when running a &csl_sgxx; toolchain installed in a UNC
+          path
+          (<filename>\\<replaceable>host</replaceable>\<replaceable>directory</replaceable></filename>).
+        </para>
+      </formalpara>
+
+      <!-- UUID: ae7a895d-2803-4316-9e53-8409f02ca4f2 -->
+      <!-- TARGET: * -->
+      <formalpara>
+        <title>GCC version 4.3.2</title>
+        <para>
+          &csl_prod; for &csl_target_name; is now based on GCC version 4.3.2.
+          For more information about changes from GCC version 4.2 that was
+          included in previous releases, see
+          <uri>http://gcc.gnu.org/gcc-4.3/changes.html</uri>.
+        </para>
+      </formalpara>
+
+<!-- Release notes end here.  -->

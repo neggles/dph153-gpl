@@ -1,0 +1,17 @@
+# Overrides for timesys
+
+# We want to build six multilibs:
+# .		(default, -mcpu=740)
+# 4xx		(-mcpu=405)
+# 44x		(-mcpu=440)
+# 8xx		(-mcpu=801)
+# 85xx		(-te500v1)
+# 74xx		(-te600)
+
+MULTILIB_OPTIONS = mcpu=405/mcpu=440/mcpu=801/te500v1/te600
+
+MULTILIB_DIRNAMES = 4xx 44x 8xx 85xx 74xx
+
+MULTILIB_MATCHES = 
+
+MULTILIB_EXCEPTIONS = 

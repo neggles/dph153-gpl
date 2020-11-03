@@ -1,0 +1,5435 @@
+2008-11-17  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_emit_epilogue): Adjust
+	computation of restore_lr.  Duplicate restoration of LR and
+	execute the appropriate one depending on whether GPRs are being
+	restored inline.
+
+2008-11-17  Catherine Moore  <clm@codesourcery.com>
+
+	* config/mt-sde: Revert last patch.
+
+2008-11-17  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/t-symbian (MULTILIB_EXCEPTIONS, MULTILIB_MATCHES,
+	MULTILIB_ALIASES): Define.
+
+2008-11-17  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_savres_routine_sym): Fix
+	computation for cache selector.  Mark the generated symbol as a
+	function.
+	(rs6000_emit_prologue): Correct condition.
+	* config/rs6000/rs6000.md (*save_gpregs_<mode>): Use explicit
+	match for register 11.
+	(*save_fpregs_<mode>): Likewise.
+	(*restore_gpregs_<mode>): Likewise.
+	(*return_and_restore_gpregs_<mode>): Likewise.
+	(*return_and_restore_fpregs_<mode>): Likewise.
+	* config/rs6000/spe.md (*save_gpregs_spe): Use explicit match for
+	register 11.
+	(*restore_gpregs_spe): Likewise.
+	(*return_and_restore_gpregs_spe): Likewise.
+
+2008-11-14  Catherine Moore  <clm@codesourcery.com>
+
+	* config/mt-sde (CFLAGS_FOR_TARGET): Add -mexplicit-relocs.
+	(CXXFLAGS_FOR_TARGET): Likewise.
+
+2008-11-14  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    Andrew Stubbs  <ams@codesourcery.com>
+	    Gunnar Von Boehn  <gunnar@genesi-usa.com>
+
+	Issue #3284
+
+	gcc/
+	PR target/36134
+	* config/m68k/m68k.md (addsi3_5200): Add a new alternative preferring
+	the shorter LEA insn over ADD.L where possible.
+
+	gcc/testsuite/
+	PR target/36134
+	* gcc.target/m68k/pr36134.c: New test.
+
+2008-11-13  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/sicortex.h, config/mips/t-sicortex: New.
+	* config.gcc (mips64el-sicortex-linux-gnu): Use these config
+	files.
+
+2008-11-13  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config.gcc (powerpc*-elf*): Configure for e500mc.
+	* config/rs6000/t-ppc-e500mc: New.
+	* config/rs6000/e500mc.h: New.
+
+2008-11-12  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Issue 4221/1
+	* release-notes-csl.xml: Document removal of default -mfix-ice9a.
+
+2008-11-11  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* function.c (alignment_for_aligned_arrays): Use floor_log2
+	instead of CLZ_HWI.
+
+2008-11-10  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Issue #4082
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_legitimize_address): Check for
+	non-word-aligned REG+CONST addressing.
+
+	gcc/testsuite/
+	* gcc.target/powerpc/20081104-1.c: New test.
+
+2008-11-07  Julian Brown  <julian@codesourcery.com>
+
+	Issue #4085
+
+	gcc/
+	* combine.c (find_split_point): Disable patch from PR27971.
+
+2008-11-06  Kazu Hirata  <kazu@codesourcery.com>
+
+	Issue 4029
+	gcc/
+	Backport:
+	2008-11-06  Kazu Hirata  <kazu@codesourcery.com>
+	PR target/35574
+	* config/sparc/predicates.md (const_double_or_vector_operand):
+	New.
+	* config/sparc/sparc.c (sparc_extra_constraint_check): Handle the
+	'D' constraint.
+	* config/sparc/sparc.h: Document the 'D' constraint.
+	* config/sparc/sparc.md (*movdf_insn_sp32_v9, *movdf_insn_sp64):
+	Use the 'D' constraint in addition to 'F' in some alternatives.
+	(DF splitter): Generalize for V64mode.
+	* doc/md.texi (SPARC): Document the 'D' constraint.
+
+	* release-notes-csl.xml: Add a release note for the fix above.
+
+2008-11-06  Andrew Stubbs  <ams@codesourcery.com>
+
+	Issue #3120
+
+	gcc/
+	* release-notes-csl.xml: -pg support for ARM EABI.
+
+2008-10-29  Andrew Stubbs  <ams@codesourcery.com>
+
+	Issue 3120
+
+	gcc/
+	* config/arm/linux-eabi.h (ARM_FUNCTION_PROFILER): Delete.
+	(SUBTARGET_FRAME_POINTER_REQUIRED): Delete.
+	* config/arm/bpabi.h (PROFILE_HOOK): New undef.
+
+	Back-port from mainline:
+	2008-10-08  Paul Brook  <paul@codesourcery.com>
+	gcc/
+	* config/arm/bpabi.h (ARM_FUNCTION_PROFILER): Define new EABI
+	compatible profiler (__gnu_mcount_nc).
+	(SUBTARGET_FRAME_POINTER_REQUIRED): Define.
+
+2008-10-27  Catherine Moore  <clm@codesourcery.com>
+
+	Issue #4105
+
+	Backport:
+	gcc/
+
+	2008-10-22  Chao-ying Fu  <fu@mips.com>
+
+	* config/mips/mips.opt (msmartmips): Accept -mno-smartmips.
+
+2008-10-24  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (no_global_regs_above): Fix precedence
+	problem.
+
+2008-10-23  Kazu Hirata  <kazu@codesourcery.com>
+
+	Issue 3852
+	gcc/
+	* config/arm/t-asa (MULTILIB_EXTRA_OPTS): New.
+
+2008-10-22  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/t-uclinux-eabi (MULTILIB_EXCEPTIONS): Exclude bogus ARM
+	multilib.
+
+2008-10-21  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* doc/invoke.texi: Document -mfix-cortex-m3-ldrd.
+	* config/arm/arm.c (arm_override_options): Set fix_cm3_ldrd
+	if Cortex-M3 cpu is selected.
+	(output_move_double): Avoid overlapping base register and first
+	destination register when fix_cm3_ldrd.
+	* config/arm/arm.opt: Add -mfix-cortex-m3-ldrd.
+	* config/arm/t-cs-eabi: Add -mfix-cortex-m3-ldrd to Thumb-2 multilib.
+	* config/arm/t-arm-elf: Ditto.
+	* config/arm/t-uclinux-eabi: Ditto.
+
+2008-10-21  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.md (consttable_4): Handle (high ...).
+
+2008-10-16  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config.gcc (powerpc-*-eabi*): Add rs6000/t-cs-eabi when
+	--enable-extra-sgxx-multilibs is passed to configure.
+	* config/rs6000/t-ppcgas (MULTILIB_OPTIONS): Remove te500mc.
+	(MULTILIB_DIRNAMES): Likewise.
+	(MULTILIB_EXCEPTIONS): Likewise.
+	* config/rs6000/t-cs-eabi: New file.
+
+2008-10-16  Julian Brown  <julian@codesourcery.com>
+
+	Issue #4039
+
+	gcc/
+	* config/arm/neon.md (movmisalign<mode>): Use expander/unnamed insn
+	for both D & Q variants. Don't permit both operands to be mems.
+	* release-notes-csl.xml (Misaligned NEON memory accesses): Add note.
+
+2008-10-15  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc-target/mips/octeon-1.c (dg-mips-options): Use -mno-abicalls.
+	* gcc-target/mips/octeon-5.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-6.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-18.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-19.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-23.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-28.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-34.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-37.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-43.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-44.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-49.c (dg-mips-options): Likewise.
+	* gcc-target/mips/octeon-54.c (dg-mips-options): Likewise.
+
+2008-10-14  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #4017
+
+	* release-notes-csl.xml (Linker script option syntax): New note.
+
+	gcc/
+	* config.gcc (powerpc-*): Make t-ppcgas imply usegas.h.
+	* config/svr4.h (SVR4_ASM_SPEC): New.
+	(ASM_SPEC): Inherit from SVR4_ASM_SPEC.
+	* config/rs6000/sysv4.h (ASM_SPEC): Inherit from SVR4_ASM_SPEC.
+	
+	gcc/doc/
+	* invoke.texi (Option Summary): Add -T to linker options.
+	(Link Options): Document -T.
+	
+2008-10-13  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_file_start): Output gnu
+	attribute for struct return convention.
+
+2008-10-13  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (fputype): Remove stray comma.
+
+2008-10-13  Andrew Stubbs  <ams@codesourcery.com>
+
+	Issue #3884
+
+	gcc/
+	* doc/invoke.texi (PowerPC Options): -meabi option no longer places
+	__eabi function in main.
+
+2008-10-12  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #3224
+	* release-notes-csl.xml: Mention OpenMP add-on.
+
+2008-10-12  Catherine Moore  <clm@codesourcery.com>
+
+	Issue # 3903
+
+	Backport:
+
+	2008-07-28  Ilie Garbacea  <ilie@mips.com>
+	            Chao-ying Fu  <fu@mips.com>
+
+	* configure.tgt: Enable futex for MIPS.
+	* config/linux/mips/futex.h: New file.
+
+2008-10-12  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.opt (muclibc): New option entry.
+	* config/mips/mips.c (mips_override_options): Disable
+	__thread support when the -muclibc option is used.
+
+2008-10-11  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	gcc/
+	* config/m68k/lb1sf68.asm (PICCALL, PICJUMP): Use GOT instead of
+	PC-relative addressing when compiling for uclinux PIC.
+
+2008-10-09  Catherine Moore  <clm@codesourcery.com>
+
+	Issue #3312
+
+	gcc/
+	* config/mips/mips.h ( DSP_CTRL_REG_FIRST): Define.
+	(DSP_CTRL_REG_LAST): Define.
+	* config/mips/mips.c (mips_conditional_register_usage): Handle
+	DSP registers.
+
+2008-10-08  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* release-notes-csl.xml: Fix typo.
+
+2008-10-08  Nathan Sidwell  <nathan@codesourcery.com>
+	    Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* release-notes-csl.xml (Shared Libraries bug fix): New.
+
+	gcc/
+	* config/m68k/lb1sf68.asm (__cmpdf_internal, __cmpsf_internal): Hide.
+	(__cmpdf, __cmpsf): Use PIC call sequence.
+
+2008-10-07  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Issue #3988
+
+	* release-notes-csl.xml (Dynamic libraries and -Os bug fix): New.
+
+	gcc/
+	* config/rs6000/ppc-asm.h (HIDDEN_FUNC): New macro.
+	* config/rs6000/crtresfpr.asm, config/rs6000/crtresgpr.asm,
+	config/rs6000/crtresxfpr.asm, config/rs6000/crtresxgpr.asm,
+	config/rs6000/crtsavfpr.asm, config/rs6000/crtsavgpr.asm,
+	config/rs6000/e500crtres32gpr.asm,
+	config/rs6000/e500crtres64gpr.asm,
+	config/rs6000/e500crtres64gprctr.asm,
+	config/rs6000/e500crtrest32gpr.asm,
+	config/rs6000/e500crtrest64gpr.asm,
+	config/rs6000/e500crtresx32gpr.asm,
+	config/rs6000/e500crtresx64gpr.asm,
+	config/rs6000/e500crtsav32gpr.asm,
+	config/rs6000/e500crtsav64gpr.asm,
+	config/rs6000/e500crtsav64gprctr.asm,
+	config/rs6000/e500crtsavg32gpr.asm,
+	config/rs6000/e500crtsavg64gpr.asm,
+	config/rs6000/e500crtsavg64gprctr.asm: Use it.
+
+2008-10-07  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* release-notes-csl.xml: Document it.
+
+	gcc/
+	* doc/invoke.texi (MIPS Options): Add ice9 arch.
+	* config/mips/mips.c (mips_cpu_info_table): Add ice9 arch.
+
+2008-10-03  Catherine Moore  <clm@codesourcery.com>
+
+        gcc/testsuite/
+	* gcc.target/mips/fix-ice9a-1.c: Disable for soft-float
+	multilibs.
+	* gcc.target/mips/fix-ice9a-1.c: Likewise.
+
+2008-10-03  Kazu Hirata  <kazu@codesourcery.com>
+
+	Backport:
+	gcc/testsuite/
+	2008-09-23  Eric Botcazou  <ebotcazou@adacore.com>
+
+	* gcc.dg/pragma-init-fini.c: Use dg-warning in lieu of dg-error.
+	* gcc.dg/pragma-align-2.c: Likewise.
+	* gcc.dg/format/cmn-err-1.c: Likewise.
+
+2008-10-02  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/mips/lazy-binding-1.c: Compile with -fpic.
+
+2008-10-02  Maciej W. Rozycki  <macro@codesourcery.com>
+
+	Issue #3673
+	gcc/testsuite/
+	* lib/target-supports.exp
+	(check_effective_target_arm_iwmmxt_ok): New procedure.
+	* gcc.dg/arm-mmx-1.c: Only run if arm_iwmmxt_ok.
+
+2008-09-29  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-09-29  Joseph Myers  <joseph@codesourcery.com>
+	* ifcvt.c (noce_emit_store_flag): If using condition from original
+	jump, reverse it if if_info->cond was reversed.
+
+2008-09-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Issue #3922
+	* release-notes-csl.xml (Code generation bug fix): New.
+	gcc/
+	* config/m68k/m68k.md (extendsidi2): Rename to extendsidi2_m68k,
+	don't use it for ColdFire.  Add (define_expand "extendsidi2").
+	(extendsidi2_cf): New, almost identical copy of extendsidi2_m68k.
+	gcc/testsuite/
+	* gcc.c-torture/compile/20080929-1.c: New.
+
+2008-09-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* release-notes-csl.xml (ColdFire M54455 support): Fix target.
+
+2008-09-25  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3208
+
+	* release-notes-csl.xml (Half-precision floating point): New note.
+
+2008-09-25  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/fp16.c (__gnu_f2h_ieee, __gnu_h2f_ieee): Enable on
+	ARMv6-M.
+	* config/arm/t-bpabi (LIB2FUNCS_EXTRA): Remove fp16.c.
+	(LIB2FUNCS_STATIC_EXTRA): Add fp16.c.
+	* config/arm/t-symbian (LIB2FUNCS_EXTRA): Rename...
+	(LIB2FUNCS_STATIC_EXTRA): ... to this.
+	* config/arm/t-arm-softfp: Remove HFmode conversions.
+	* config/soft-fp/extendhfsf2.c: Revert HFmode suport.
+	* config/soft-fp/truncsfhf2.c: Ditto.
+	* config/soft-fp/README: Ditto.
+	* config/soft-fp/half.h: Ditto.
+
+2008-09-25  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/torture/arm-fp16-ops.h: Fix bogus tests.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops.h: Ditto.
+
+2008-09-25  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_hard_regno_mode_ok): Allow 4-word quantities
+	in core registers. Update comment.
+
+2008-09-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* release-notes-csl.xml: Document ice9a option.
+
+2008-09-25  Julian Brown  <julian@codesourcery.com>
+
+	Issue #3800
+
+	gcc/testsuite/
+	* gcc.target/arm/eabi1.c (__eabi_uread4, __eabi_uwrite4)
+	(__eabi_uread8, __eabi_uwrite8): Change spellings of declarations
+	to...
+	(__aeabi_uread4, __aeabi_uwrite4, __aeabi_uread8, __aeabi_uwrite8):
+	These.
+
+2008-09-24  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/t-arm-softfp (softfp_extensions): Add hfsf.
+	(softfp_truncations): Add sfhf.
+	* config/arm/sfp-machine.h (_FP_NANFRAC_H, _FP_NANSIGN_H): Define.
+	* config/arm/fp16.c: New file.
+	* config/arm/t-bpabi (LIB2FUNCS_EXTRA): Add fp16.c.
+	* config/arm/t-symbian (LIB2FUNCS_EXTRA):  Add fp16.c.
+	* config/soft-fp/extendhfsf2.c: New file.
+	* config/soft-fp/truncsfhf2.c: New file.
+	* config/soft-fp/half.h: New file.
+	* config/soft-fp/README: HFmode routines do not come from gcc.
+
+2008-09-22  Daniel Gutson  <daniel@codesourcery.com>
+            Nathan Sidwell  <nathan@codesourcery.com>
+            Maciej W. Rozycki  <macro@codesourcery.com>
+
+	Issue #3634
+	gcc/
+	* config.gcc (all_defaults): Add fix-ice9a.
+	* config/mips/mips.c (mips_conditional_register_usage): Add $f30
+	and $f31 as appropriate as fixed registers.
+	* config/mips/mips.h (OPTION_DEFAULT_SPECS): Add -mfix-ice9a
+	handling.
+	(ASM_SPEC): Likewise.
+	* config/mips/mips.md (ice9a_stallnops): New mode attribute.
+	(ice9a_round): Likewise.
+	(ice9a_length_stall): Likewise.
+	(ice9a_length_round): Likewise.
+	(ice9a_length_both): Likewise.
+	(*mul<mode>3): Change condition.
+	(*mul<mode>3_fix_ice9a): New.
+	(*madd<mode>): Change condition.
+	(*madd<mode>_ice9a): New.
+	(*msub<mode>): Change condition.
+	(*msub<mode>_ice9a): New.
+	(*nmadd<mode>): Change condition.
+	(*nmadd<mode>_fastmath): Likewise.
+	(*nmadd<mode>_ice9a): New.
+	(*nmadd<mode>_fastmath_ice9a): New.
+	(*nmsub<mode>): Change condition.
+	(*nmsub<mode>_fastmath): Likewise.
+	(*nmsub<mode>_ice9a): New.
+	(*nmsub<mode>_fastmath_ice9a): Likewise.
+	(*recip<mode>3): Change condition and definition.  Move the SB1
+	fix to...
+	(*recip<mode>3_fix_sb1): ... this new pattern.
+	(*recip<mode>3_fix_ice9a): New.
+	(sqrt<mode>2): Change from define_insn to define_expand.  Move
+	the SB1 fix to...
+	(*sqrt<mode>2): New.
+	(*sqrt<mode>2_fix_sb1): ... this new pattern.
+	(*sqrt<mode>2_fix_ice9a): New.
+	(*rsqrt<mode>a): Change condition and definition.  Move the SB1
+	fix to...
+	(*rsqrt<mode>a_fix_sb1): ... this new pattern.
+	(*rsqrt<mode>a_fix_ice9a): New.
+	(*rsqrt<mode>b): Likewise *rsqrt<mode>a.
+	(*rsqrt<mode>b_fix_sb1): Likewise *rsqrt<mode>a_fix_sb1.
+	(*rsqrt<mode>b_fix_ice9a): New.
+	* config/mips/mips.opt (mfix-ice9a): New option.
+	* doc/invoke.texi (-mno-fix-ice9a): New option.
+	(-mfix-ice9a): Likewise.
+
+	gcc/testsuite/
+	* gcc.target/mips/fix-ice9a.h: New file.
+	* gcc.target/mips/fix-ice9a-1.c: Likewise.
+	* gcc.target/mips/fix-ice9a-2.c: Likewise.
+
+2008-09-23  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3208
+
+	gcc/
+	* config/arm/arm.c (arm_init_libfuncs): Add NULL entries for
+	HFmode arithmetic functions.
+	(arm_override_options): Call sorry for fp16 and no ldrh.
+	(arm_legitimate_index_p): Treat HFmode like HImode.
+	(coproc_secondary_reload_class): Special-case HFmode.
+	* config/arm/arm.md (floatsihf2): Use emit_move_insn.
+	(floatdihf2): Likewise.
+	(truncdfhf2): Likewise.
+	(*thumb1_movhf): Fix backwards operands to strh.
+
+2008-09-23  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3208
+
+	gcc/testsuite/
+	* gcc.target/arm/fp16-compile-alt-10.c: Add -std=gnu99 to options.
+	* gcc.target/arm/fp16-compile-alt-11.c: Likewise.
+	* gcc.target/arm/fp16-compile-ieee-10.c: Likewise.
+	* gcc.target/arm/fp16-compile-ieee-11.c: Likewise.
+	* gcc.target/arm/fp16-compile-exprtype.c: New.
+	* gcc.target/arm/fp16-builtins-1.c: New.
+	* gcc.target/arm/fp16-unprototyped-1.c: New.
+	* gcc.target/arm/fp16-unprototyped-2.c: New.
+	* gcc.target/arm/fp16-variadic-1.c: New.
+	* gcc.target/arm/fp16-rounding-alt-1.c: New.
+	* gcc.target/arm/fp16-rounding-ieee-1.c: New.
+	* gcc.dg/torture/arm-fp16-int-convert-alt.c: New.
+	* gcc.dg/torture/arm-fp16-int-convert-ieee.c: New.
+	* gcc.dg/torture/arm-fp16-ops.h: New.
+	* gcc.dg/torture/arm-fp16-ops-1.c: New.
+	* gcc.dg/torture/arm-fp16-ops-2.c: New.
+	* gcc.dg/torture/arm-fp16-ops-3.c: New.
+	* gcc.dg/torture/arm-fp16-ops-4.c: New.
+	* gcc.dg/torture/arm-fp16-ops-5.c: New.
+	* gcc.dg/torture/arm-fp16-ops-6.c: New.
+	* gcc.dg/torture/arm-fp16-ops-7.c: New.
+	* gcc.dg/torture/arm-fp16-ops-8.c: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops.h: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-1.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-2.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-3.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-4.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-5.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-6.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-7.C: New.
+	* g++.dg/ext/arm-fp16/arm-fp16-ops-8.C: New.
+
+2008-09-23  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* optabs.c (prepare_float_lib_cmp):  Test that the comparison,
+	swapped, and reversed optabs exist before trying to use them.
+
+2008-09-23  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_override_options): Override alignments if
+	tuning for Cortex-A8.
+	(create_fix_barrier, arm_reorg): If aligning to jumps or loops,
+	make labels have a size.
+	* config/arm/arm.md (VUNSPEC_ALIGN16, VUNSPEC_ALIGN32): New constants.
+	(align_16, align_32): New patterns.
+
+2008-09-23  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/vfp.md (*arm_movsi_vfp, *thumb2_movsi_vfp)
+	(*arm_movdi_vfp, *thumb2_movdi_vfp, *movsf_vfp, *thumb2_movsf_vfp)
+	(*movdf_vfp, *thumb2_movdf_vfp, *movsfcc_vfp, *thumb2_movsfcc_vfp)
+	(*movdfcc_vfp, *thumb2_movdfcc_vfp): Add neon_type.
+	* config/arm/arm.md (neon_type): Update comment.
+
+2008-09-23  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.md (movsi): Don't split symbol refs here.
+	(define_split): New.
+
+2008-09-22  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/m68k/lb1sf68.asm: Add GNU-stack annotation to avoid
+	executable stack.
+
+2008-09-18  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-09-17  Joseph Myers  <joseph@codesourcery.com>
+	* expr.c (emit_group_store): Do not shift before moving via a
+	stack slot.
+
+	2008-08-13  H.J. Lu  <hongjiu.lu@intel.com>
+	PR middle-end/36701
+	* expr.c (emit_group_store): Allocate stack temp with the
+	largest alignment when copying from register to stack.
+
+	2008-09-02  H.J. Lu  <hongjiu.lu@intel.com>
+	* expr.c (emit_group_store): Don't assert stack temp mode size.
+
+2008-09-15  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips-octeon-elf.h (TARGET_OS_CPP_BUILTINS): Remove.
+
+2008-09-11  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #3606
+	* release-notes-csl.xml: Document dllexport fix.
+	
+	gcc/
+	* tree.c (handle_dll_attribute): Mark dllexport'd inlines as
+	non-external.
+	gcc/cp
+	* decl2.c (decl_needed_p): Consider dllexport'd functions needed.
+	* semantics.c (expand_or_defer_fn): Similarly.
+	gcc/testsuite/
+	* gcc.dg/dll-6.c: New test.
+	* gcc.dg/dll-6a.c: Likewise.
+	* gcc.dg/dll-7.c: Likewise.
+	* gcc.dg/dll-7a.c: Likewise.
+	* g++.dg/ext/dllexport2.C: Likewise.
+	* g++.dg/ext/dllexport2a.cc: Likewise.
+
+2008-09-12  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/testsuite/
+	2008-08-25  Janis Johnson  <janis187@us.ibm.com>
+	* gcc.dg/Wstrict-aliasing-bogus-ref-all-2.c: Ignore a warning.
+
+2008-09-11  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-09-11  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.dg/builtins-8.c: Condition cbrt test on HAVE_C99_RUNTIME.
+
+	2008-09-11  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.target/i386/sse5-haddX.c, gcc.target/i386/sse5-hsubX.c:
+	Avoid intN_t types.
+
+	2008-09-11  Joseph Myers  <joseph@codesourcery.com>
+	* lib/compat.exp, gcc.dg/compat/struct-layout-1.exp,
+	g++.dg/compat/struct-layout-1.exp: Use .exe extension for compat
+	test executables.
+	* gcc.dg/compat/struct-layout-1_generate.c,
+	g++.dg/compat/struct-layout-1_generate.c: Convert backslash to
+	slash in srcdir for dg-options string.
+
+2008-09-11  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config.gcc (mips*-sde-elf*): Always apply sdemtk parts.  Apply
+	t-sdelib only when not building newlib.
+	* config/mips/t-sdemtk: Move sdelib specific pieces to ...
+	* config/mips/t-sdelib: ... here.  New file.
+
+2008-09-10  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Issue #3406
+	* release-notes-csl.xml: Document -fpie fix.
+
+	gcc/
+	* config/mips/linux.h (SUBTARGET_ASM_SPEC): Add -fpie and -fPIE.
+	* config/mips/linux64.h (SUBTARGET_ASM_SPEC): Likewise.
+
+2008-09-09  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3208
+
+	gcc/testsuite/
+	* gcc.target/arm/fp16-compile-alt-1.c: New.
+	* gcc.target/arm/fp16-compile-alt-2.c: New.
+	* gcc.target/arm/fp16-compile-alt-3.c: New.
+	* gcc.target/arm/fp16-compile-alt-4.c: New.
+	* gcc.target/arm/fp16-compile-alt-5.c: New.
+	* gcc.target/arm/fp16-compile-alt-6.c: New.
+	* gcc.target/arm/fp16-compile-alt-7.c: New.
+	* gcc.target/arm/fp16-compile-alt-8.c: New.
+	* gcc.target/arm/fp16-compile-alt-9.c: New.
+	* gcc.target/arm/fp16-compile-alt-10.c: New.
+	* gcc.target/arm/fp16-compile-alt-11.c: New.
+	* gcc.target/arm/fp16-compile-ieee-1.c: New.
+	* gcc.target/arm/fp16-compile-ieee-2.c: New.
+	* gcc.target/arm/fp16-compile-ieee-3.c: New.
+	* gcc.target/arm/fp16-compile-ieee-4.c: New.
+	* gcc.target/arm/fp16-compile-ieee-5.c: New.
+	* gcc.target/arm/fp16-compile-ieee-6.c: New.
+	* gcc.target/arm/fp16-compile-ieee-7.c: New.
+	* gcc.target/arm/fp16-compile-ieee-8.c: New.
+	* gcc.target/arm/fp16-compile-ieee-9.c: New.
+	* gcc.target/arm/fp16-compile-ieee-10.c: New.
+	* gcc.target/arm/fp16-compile-ieee-11.c: New.
+	* gcc.target/arm/fp16-compile-none-1.c: New.
+	* gcc.target/arm/fp16-param-1.c: New.
+	* gcc.target/arm/fp16-return-1.c: New.
+	* gcc.target/arm/fp16-compile-vcvt.c: New.
+	* gcc.dg/torture/arm-fp16-compile-assign.c: New.
+	* gcc.dg/torture/arm-fp16-compile-convert.c: New.
+	* g++.dg/ext/arm-fp16/fp16-overload-1.C: New.
+	* g++.dg/ext/arm-fp16/fp16-return-1.C: New.
+	* g++.dg/ext/arm-fp16/fp16-param-1.C: New.
+	* g++.dg/ext/arm-fp16/fp16-mangle-1.C: New.
+
+2008-09-09  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3208
+
+	gcc/
+	* doc/tm.texi (Misc): Document TARGET_INVALID_PARAMETER_TYPE,
+	TARGET_INVALID_RETURN_TYPE, TARGET_PROMOTED_TYPE, and
+	TARGET_CONVERT_TO_TYPE.
+	* doc/invoke.texi (Option Summary): List -mfp16-format.
+	(ARM Options): List neon-fp16 as -mfpu value.  Document -mfp16-format.
+	* hooks.c (hook_tree_const_tree_null): Define.
+	* hooks.h (hook_tree_const_tree_null): Declare.
+	* target.h (struct gcc_target):  Add invalid_parameter_type,
+	invalid_return_type, promoted_type, and convert_to_type fields.
+	* target-def.h: (TARGET_INVALID_PARAMETER_TYPE): Define.
+	(TARGET_INVALID_RETURN_TYPE): Define.
+	(TARGET_PROMOTED_TYPE): Define.
+	(TARGET_CONVERT_TO_TYPE): Define.
+	(TARGET_INITIALIZER): Update for new fields.
+	* fold-const.c (fold_convert_const_real_from_real): Check for
+	overflow.
+	* real.c (encode_ieee_half): Define.
+	(decode_ieee_half): Define.
+	(ieee_half_format): Define.
+	(arm_half_format): Define.
+	* real.h (ieee_half_format): Declare.
+	(arm_half_format): Declare.
+	* c-decl.c (grokdeclarator): Check targetm.invalid_return_type.
+	(grokparms): Check targetm.invalid_parameter_type.
+	* c-typeck.c (default_conversion): Check targetm.promoted_type.
+	* c-convert.c (convert): Check targetm.convert_to_type.
+	* cp/typeck.c (default_conversion): Check targetm.promoted_type.
+	* cp/decl.c (grokdeclarator): Check targetm.invalid_return_type.
+	(grokparms): Check targetm.invalid_parameter_type.
+	* cp/cvt.c (ocp_convert): Check targetm.convert_to_type.
+	(build_expr_type_conversion): Check targetm.promoted_type.
+	* config/arm/arm.c: Include intl.h.
+	(TARGET_INVALID_PARAMETER_TYPE): Redefine.
+	(TARGET_INVALID_RETURN_TYPE): Redefine.
+	(TARGET_PROMOTED_TYPE): Redefine.
+	(TARGET_CONVERT_TO_TYPE): Redefine.
+	(arm_fp16_format): Define.
+	(all_fpus): Add entry for neon-fp16.
+	(fp_model_for_fpu): Likewise.
+	(struct fp16_format): Declare.
+	(all_fp16_formats): Define.
+	(arm_init_libfuncs): Add entries for HFmode conversions.
+	(arm_override_options): Set arm_fp16_format.
+	(thumb1_legitimate_address_p): Make it recognize HFmode constants.
+	(arm_print_operand): Add 'z' specifier for vld1.16/vst1.16.
+	(arm_hard_regno_mode_ok): Allow HFmode values in VFP registers.
+	(arm_init_fp16_builtins): New.
+	(arm_init_builtins): Call it.
+	(arm_invalid_parameter_type): New.
+	(arm_invalid_return_type): New.
+	(arm_promoted_type): New.
+	(arm_convert_to_type).
+	(arm_file_start): Deal with neon-fp16 as fpu_name.  Emit tag for fp16
+	format.
+	(arm_mangle_type): Mangle __fp16 as "Dh".
+	* config/arm/arm.h (TARGET_VFPD32): Make it know about
+	FPUTYPE_NEON_FP16.
+	(TARGET_NEON_FP16): New.
+	(TARGET_NEON): Make it know about FPUTYPE_NEON_FP16.
+	(enum fputype): Add FPUTYPE_NEON_FP16.
+	(enum arm_fp16_format_type): Declare.
+	(arm_fp16_format): Declare.
+	(LARGEST_EXPONENT_IS_NORMAL): Define.
+	* config/arm/arm-modes.def (HFmode): Define.
+	* config/arm/vfp.md: (*movhf_vfp): New.
+	(extendhfsf2): New.
+	(truncsfhf2): New.
+	* config/arm/arm.opt (mfp16-format=): New.
+	* config/arm/arm.md: (fpu): Add neon_fp16.
+	(floatsihf2, floatdihf2): New.
+	(fix_trunchfsi2, fix_trunchfdi2): New.
+	(truncdfhf2): New.
+	(extendhfdf2): New.
+	(movhf): New.
+	(*arm32_movhf): New.
+	(*thumb1_movhf): New.
+	(consttable_2): Handle HFmode constants.
+
+	libiberty/
+	* cp-demangle.c (cplus_demangle_builtin_Dh_type): Declare.
+	(cplus_demangle_type): Make it handle "Dh".
+
+2008-09-09  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Issue #3732
+
+	gcc/
+	* doc/invoke.texi (ARM Options): Correct errors in discussion 
+	of -mfloat-abi, -mhard-float, and -msoft-float.
+
+2008-09-09  Kazu Hirata  <kazu@codesourcery.com>
+
+	gcc/
+	* config.gcc (mips-sgi-irix[56]*, mips*-*-netbsd*,
+	mips*-*-openbsd*, mips*-sde-elf*, mips64octeon*-wrs-elf*,
+	mipsisa64-*-elf*, mipsisa64el-*-elf*, mipsisa64sr71k-*-elf*,
+	mipsisa64sb1-*-elf*, mipsisa64sb1el-*-elf*, mips-*-elf*,
+	mipsel-*-elf*, mips64-*-elf*, mips64el-*-elf*, mips64vr-*-elf*,
+	mips64vrel-*-elf*, mips64orion-*-elf*, mips64orionel-*-elf*,
+	mips*-*-rtems*, mips-wrs-vxworks, mips-wrs-windiss,
+	mipstx39-*-elf*, mipstx39el-*-elf*): Don't add t-crtfm to
+	tmake_file.
+
+	libgcc/
+	* config.host (mips-sgi-irix[56]*, mips*-*-netbsd*,
+	mips*-*-openbsd*, mipsisa32-*-elf*, mipsisa32el-*-elf*,
+	mipsisa32r2-*-elf*, mipsisa32r2el-*-elf*, mipsisa64-*-elf*,
+	mipsisa64el-*-elf*, mipsisa64sr71k-*-elf*, mipsisa64sb1-*-elf*,
+	mipsisa64sb1el-*-elf*, mips-*-elf*, mipsel-*-elf*, mips64-*-elf*,
+	mips64el-*-elf*, mips64vr-*-elf*, mips64vrel-*-elf*,
+	mips64orion-*-elf*, mips64orionel-*-elf*, mips64octeon-wrs-elf*,
+	mips64octeonel-wrs-elf*, mips*-*-rtems*, mips-wrs-vxworks,
+	mips-wrs-windiss, mipstx39-*-elf*, mipstx39el-*-elf*): Remove
+	extra_parts and tmake_file.
+
+2008-09-08  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	* release-notes-csl.xml: Document exception handler fix.
+
+	gcc/
+	* config/arm/unwind-arm.c (__gnu_unwind_pr_common): Correct test
+	for barrier handlers.
+
+2008-09-08  Daniel Jacobowitz  <dan@codesourcery.com>
+	    Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* g++.dg/compat/eh/filter2_x.C: Declare abort.
+	* g++.dg/compat/eh/new1_x.C, g++.dg/compat/eh/new1_y.C: Include
+	cstddef and use std::size_t.
+
+	* gcc.dg/compat/compat-common.h: Define SKIP_COMPLEX_INT if
+	SKIP_COMPLEX.  Honor SKIP_COMPLEX.
+	* gcc.dg/compat/scalar-by-value-3_x.c,
+	gcc.dg/compat/scalar-by-value-3_y.c,
+	gcc.dg/compat/scalar-by-value-4_x.c,
+	gcc.dg/compat/scalar-by-value-4_y.c,
+	gcc.dg/compat/scalar-by-value-5.c,
+	gcc.dg/compat/scalar-by-value-5_main.c,
+	gcc.dg/compat/scalar-by-value-6.c,
+	gcc.dg/compat/scalar-by-value-6_main.c,
+	gcc.dg/compat/scalar-by-value-6_x.c,
+	gcc.dg/compat/scalar-by-value-6_y.c,
+	gcc.dg/compat/struct-by-value-16_x.c,
+	gcc.dg/compat/struct-by-value-16_y.c,
+	gcc.dg/compat/struct-by-value-17_x.c,
+	gcc.dg/compat/struct-by-value-17_y.c,
+	gcc.dg/compat/struct-by-value-18_x.c,
+	gcc.dg/compat/struct-by-value-18_y.c,
+	gcc.dg/compat/struct-layout-1.h,
+	gcc.dg/compat/scalar-return-3_x.c,
+	gcc.dg/compat/scalar-return-3_y.c,
+	gcc.dg/compat/scalar-return-4_x.c,
+	gcc.dg/compat/scalar-return-4_y.c: Honor SKIP_COMPLEX.
+
+	* gcc.dg/compat/scalar-by-value-y.h: Use stdarg.h for non-GCC
+	compilers.
+
+	* gcc.dg/compat/struct-by-value-22_y.c,
+	gcc.dg/compat/struct-by-value-22_main.c,
+	gcc.dg/compat/struct-by-value-22_x.c: Honor SKIP_VLA_IN_STRUCT.
+
+	* lib/c-compat.exp (compat_setup_dfp): Check the compiler under test
+	first.
+	* lib/compat.exp: Document COMPLEX and VLA_IN_STRUCT skips.
+
+2008-09-08  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.md (arm_addsi3): Add r/r/k alternative.
+
+2008-09-08  Kazu Hirata  <kazu@codesourcery.com>
+
+	gcc/
+	* config.gcc (mips-sgi-irix[56]*, mips*-*-netbsd*, mips*-*-linux*,
+	mips*-sde-elf*, mips64octeon*-wrs-elf*, mipsisa32r2*,
+	mipsisa64sr71k-*-elf*, mipsisa64sb1*, mips64vr*, mips64orion*,
+	mips*-*-rtems*, mips-wrs-vxworks, mips-wrs-windiss, mipstx39): Add
+	mips/t-crtfm to tmake_file.
+
+	libgcc/
+	* config.host (mips*): Add mips/t-crtfm to tmake_file. Add
+	crtfastmath.o to extra_parts.
+	* config/mips/t-crtfm: New.
+
+2008-09-07  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.gd/struct/wo_prof_global_var.c: Use uninitialized integer
+	values instead of uninitialized FP values to avoid NaNs.
+	* gcc.dg/struct/wo_prof_local_var.c: Same.
+
+2008-09-07  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	gcc/
+	* config/m68k/m68k.c (sched_attr_op_type): Handle all CONSTs.
+	
+	gcc/testsuite/
+	* gcc.target/m68k/xgot-1.c (dg-options): Add -O2.
+
+2008-09-06  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* combine.c (simplify_set): Avoid calling LOAD_EXTEND_OP on
+	non-integer modes.
+
+2008-09-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-09-05  Joseph Myers  <joseph@codesourcery.com>
+	* config/mips/mips.h (enum reg_class): Add FRAME_REGS.
+	(REG_CLASS_NAMES): Update.
+	(REG_CLASS_CONTENTS): Update.
+	* config/mips/mips.c (mips_regno_to_class): Use FRAME_REGS instead
+	of ALL_REGS for regs 77 and 78.
+	* function.c (instantiate_virtual_regs_in_insn): Assert that
+	return value of simplify_gen_subreg is not NULL.
+
+	gcc/testsuite/
+	2008-09-05  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.c-torture/compile/20080903-1.c: New test.
+
+2008-09-04  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Issue 3304
+	gcc/
+	* config/arm/arm.c (arm_print_operand): Deal with HIGH.
+	* config/arm/constraints.md (j): New constraint for movw operands.
+	(N): Remove thumb2 meaning.
+	* config/arm/arm.md (*arm_movw): Delete.
+	(*arm_movsi_insn): Use j constraint for movw instead of N constraint.
+	* config/arm/vfp.md (*arm_movsi_vfp, *thumb2_movsi_vfp): Likewise.
+	* config/arm/thumb2.md (*thumb2_movsi_insn): Likewise.
+
+2008-09-04  Julian Brown  <julian@codesourcery.com>
+ 
+ 	gcc/
+ 	* Makefile.in (CSL_LICENSELIB): Remove space after -L to appease
+ 	Darwin ld.
+ 
+2008-09-04  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config/arm/bpabi.h (LINK_SPEC): Add --fix-janus-2cc if needed.
+
+	* release-notes-csl.xml: Adjust janus-2cc note.
+
+2008-09-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	libgomp/
+	* libgomp.texi (Library Index): Renamed from "Index" to prevent
+	conflict with index.html on case-insensitive file systems.
+
+2008-09-03  Julian Brown  <julian@codesourcery.com>
+
+	* release-notes-csl.xml (NEON improvements): Add release note.
+
+2008-09-02  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* g++.dg/abi/arm_va_list.C: Correct order of dg-do and
+	dg-require-effective-target directives.
+
+2008-09-02  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/arm/long-calls-1.c: Tolerate the lack of sibling
+	calls and/or PLT markers.
+	* gcc.target/arm/long-calls-2.c: Tolerate the lack of sibling
+	calls and/or PLT markers.
+	* gcc.target/arm/long-calls-3.c: Tolerate the lack of sibling
+	calls and/or PLT markers.
+	* gcc.target/arm/long-calls-4.c: Tolerate the lack of sibling
+	calls and/or PLT markers.
+
+2008-09-01  Mark Mitchell  <mark@codesourcery.com>
+
+	Backport:
+	2008-09-01  Mark Mitchell  <mark@codesourcery.com>
+	* include/std/type_traits (__make_unsigned_selector<>): Consider
+	enums of size smaller than short.
+	(__make_signed_selector<>): Likewise.
+	* testsuite/20_util/make_signed/requirements/typedefs_neg.cc:
+	Adjust line numbers.
+	* testsuite/20_util/make_usigned/requirements/typedefs_neg.cc:
+	Adjust line numbers.
+	* testsuite/20_util/make_signed/requirements/typedefs-2.cc:
+	Ensure test_enum is the same size as short.
+	* testsuite/20_util/make_unsigned/requirements/typedefs-2.cc:
+	Ensure test_enum is the same size as short.
+
+2008-09-01  Joseph Myers  <joseph@codesourcery.com>
+
+	* release-notes-csl.xml: Avoid line containing only whitespace.
+
+2008-08-27  Daniel Gutson  <daniel@codesourcery.com>
+
+	Janus 2CC ARM shift fix:
+	gcc/
+	* config/arm/arm.md (*addsi3_carryin_shift): Added "length" clause
+	to handle the extra NOP.
+	(andsi_not_shiftsi_si): Likewise.
+	(*thumb1_ashlsi3): Likewise.
+	(*thumb1_ashrsi3): Likewise.
+	(*thumb1_lshrsi3): Likewise.
+	(*thumb1_rotrsi3): Likewise.
+	(*arm_shiftsi3): Likewise.
+	(*shiftsi3_compare0): Likewise.
+	(*shiftsi3_compare0_scratch): Likewise.
+	(*arm_notsi_shiftsi): Likewise.
+	(*arm_notsi_shiftsi_compare0): Likewise.
+	(*arm_not_shiftsi_compare0_scratch): Likewise.
+	(*arm_cmpsi_shiftsi): Likewise.
+	(*arm_cmpsi_shiftsi_swp): Likewise.
+	(*arm_cmpsi_negshiftsi_si): Likewise.
+	(*arith_shiftsi): Likewise.
+	(*arith_shiftsi_compare0): Likewise.
+	(*arith_shiftsi_compare0_scratch): Likewise.
+	(*sub_shiftsi): Likewise.
+	(*sub_shiftsi_compare0): Likewise.
+	(*sub_shiftsi_compare0_scratch): Likewise.
+	(*if_shift_move): Likewise.
+	(*if_move_shift): Likewise.
+	(*if_shift_shift): Likewise.
+	(*thumb1_ashlsi3_janus2): New. Duplicated pattern to handle the
+	extra NOP.
+	(*thumb1_ashrsi3_janus2): Likewise.
+	(*thumb1_lshrsi3_janus2): Likewise.
+	(*thumb1_rotrsi3_janus2): Likewise.
+	* config/arm/arm.c (arm_print_operand): Added the nop after the %S
+	pattern.
+	(arm_override_options): Added handling of the -mfix-janus-2cc flag.
+	* config/arm/arm.h (janus2_code): Declare.
+	* config/arm/arm.opt (-mfix-janus-2cc): New.
+
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_arm_no_thumb):
+	New function.
+	* gcc.target/arm/janus-2cc-shift-1.c: New.
+	* gcc.target/arm/janus-2cc-shift-2.c: New.
+
+	* release-notes-csl.xml: Document.
+
+2008-08-31  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/
+	* gcc.target/arm/va_list.c: Return zero on success.
+
+	* release-notes-csl.xml: Update note for va_list change.
+
+2008-08-30  Mark Mitchell  <mark@codesourcery.com>
+
+	libstdc++-v3/
+	* testsuite/25_algorithms/nth_element/2.cc: Constrain iterations
+	when testing on a simultor.
+
+2008-08-29  Mark Mitchell  <mark@codesourcery.com>
+
+	* release-notes-csl.xml: Update note for NEON mangling.
+
+	Issue #3579
+	gcc/
+	* config/arm/arm.c (arm_build_builtin_va_list): New function.
+	(arm_extract_valist_ptr): Likewise.
+	(arm_expand_builtin_va_start): Likewise.
+	(arm_gimplify_va_arg_expr): Likewise.
+	(TARGET_BUILD_BUILTIN_VA_LIST): Define.
+	(TARGET_EXPAND_BUILTIN_VA_START): Likewise.
+	(TARGET_GIMPLIFY_VA_VARG_EXPR): Likewise.
+	(arm_mangle_type): Handle __va_list specially.
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_arm_eabi): New
+	function.
+	* gcc.target/arm/va_list.c: New test.
+	* g++.dg/abi/arm_va_list.C: Likewise.
+
+2008-08-29  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/cp/
+	* mangle.c (write_type): Add target-specific manglings for
+	non-fundamental types to the substitution table.
+	gcc/testsuite/
+	* g++.dg/abi/mangle-neon.C: Add substitution test.
+
+	* release-notes-csl.xml: Document change.
+
+2008-08-29  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-04-09  Andy Hutchinson  <hutchinsonandy@aim.com>
+	PR testsuite/34894
+	PR testsuite/33782
+	* lib/target-supports.dg: Add check_effective_target_trampolines.
+	Disable profiling for avr-*-*.
+	* gcc.c-torture/compile/pr27889.c: dg-requires trampolines.
+	* gcc.c-torture/compile/nested-1.c: Ditto.
+	* gcc.c-torture/compile/20050122-2.c: Ditto.
+	* gcc.c-torture/compile/20010226-1.c: Ditto.
+	* gcc.c-torture/compile/20010327-1.c:  Skip for avr-*-*.
+	* gcc.c-torture/compile/980506-1.c: Ditto.
+	* gcc.c-torture/compile/20020604-1.c: Ditto.
+	* gcc.c-torture/compile/limits-stringlit.c: Ditto
+	* gcc.c-torture/compile/20001226-1.c: Ditto
+
+	2008-05-12  Andy Hutchinson  <hutchinsonandy@aim.com>
+	* gcc.dg/pr34457-1.c: Skip for target without trampolines.
+	* gcc.dg/20050607-1.c: Ditto.
+	* gcc.dg/trampoline-1.c: Ditto.
+	* gcc.dg/debug/debug-3.c: Ditto.
+	* gcc.dg/debug/debug-5.c: Ditto.
+
+2008-08-29  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/vect/vect-105.c: Prevent compiler from hoisting abort out
+	of loop.
+
+2008-08-28  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/struct/wo_prof_single_str_global.c: Mask return value.
+	* gcc.dg/struct/wo_prof_single_str_local.c: Mask return value.
+	* gcc.dg/struct/wo_prof_single_str_pointer.c: Mask return value.
+
+	Backport:
+
+	gcc/testsuite/
+	2008-04-22  Steve Ellcey  <sje@cup.hp.com>
+	* gcc.dg/struct/wo_prof_global_var.c: Initialize array.
+	* gcc.dg/struct/wo_prof_malloc_size_var.c: Ditto.
+	* gcc.dg/struct/w_prof_local_var.c: Ditto.
+	* gcc.dg/struct/w_prof_global_var.c: Ditto.
+	* gcc.dg/struct/wo_prof_local_var.c: Ditto.
+
+2008-08-28  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/cp
+	* decl.c (maybe_deduce_size_from_array_init): Use relayout_decl.
+	gcc/testsuite/
+	* g++.dg/cpp/_Pragma1.C: Skip on arm*-*-eabi*.
+	* g++.dg/ext/visibility/arm1.C: Require DLL targets.
+	* g++.dg/init/ref15.C: Require unwrapped targets.
+
+2008-08-28  Paul Brook  <paul@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+	gcc/
+	* config/arm/neon.md (neon_type): Move to arm.md.
+	(neon_mov<VSTRUCT>): Add neon_type attribute.
+	(movmisalign<mode>): Ditto.
+	* config/arm/arm.md (neon_type): Move to here.
+	(conds): Add "unconditioal" and use as default for NEON insns.
+
+	gcc/testsuite/
+	* gcc.target/arm/neon-cond-1.c: New test.
+
+2008-08-27  Nathan Froyd  <froydnj@codesourcery.com>
+
+	libgomp/
+	* Makefile.am: Use install-data-local for install-html and
+	install-pdf.
+	* Makefile.in: Regenerate.
+
+2008-08-26  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Port not-reviewed patch from gcc-patches@.
+	
+	gcc/
+	200x-xx-xx  Roman Zippel <zippel@linux-m68k.org>
+	PR middle-end/29474
+	* gcc/recog.c (validate_replace_rtx_1): Prevent swap of 
+	commutative operands during reload
+
+
+2008-08-26  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	gcc/
+	* config/m68k/m68k.md (cmpdi): Use (scratch) instead of pseudo.
+
+2008-08-25  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Issue #3604
+
+	* release-notes-csl.xml (-msim build fix): New.
+
+	gcc/
+	* config/rs6000/sysv4.h (LIB_SIM_SPEC): Use LIB_DEFAULT_SPEC.
+	(STARTFILE_SIM_SPEC): Remove sim-crt0.o%s.
+	(ENDFILE_SIM_SPEC): Add -Tsim-hosted.ld.
+	(LINK_OS_SIM_SPEC): Define to empty.
+
+2008-08-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* release-notes-csl.xml (OpenMP support): New.
+
+2008-08-21  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config/m68k/m68k-devices.def (52274, 52277): New devices.
+
+	* release-notes-csl.xml: Document addition of DragonFire0.
+
+2008-08-21  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-08-21  Joseph Myers  <joseph@codesourcery.com>
+	* g++.dg/opt/anchor1.C (foo): Return the return value of
+	ycf->ascent.
+
+2008-08-21  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	libgomp/
+	2008-08-21  Nathan Froyd  <froydnj@codesourcery.com>
+	* testsuite/libgomp.exp (libgomp_init): Only set things that
+	depend on blddir if blddir exists.
+	(libgomp_target_compile): Likewise.
+	* testsuite/libgomp.c++/c++.exp: Likewise.
+	* testsuite/libgomp.fortran/fortran.exp: Likewise.
+
+2008-08-20  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-08-20  Joseph Myers  <joseph@codesourcery.com>
+	PR target/31070
+	* config/sparc/sparc.c (function_arg_slotno): Handle structure
+	with MODE_VECTOR_INT mode.
+
+2008-08-19  Joseph Myers  <joseph@codesourcery.com>
+
+	* release-notes-csl.xml (Target architecture defaults to i686):
+	Add new release note.
+
+2008-08-19  Joseph Myers  <joseph@codesourcery.com>
+
+	* release-notes-csl.xml: Update release note for upgrade to refer
+	to version 4.3.2.
+
+2008-08-19  Kazu Hirata  <kazu@codesourcery.com>
+
+	Issue 3422
+	gcc/
+	* config.gcc (mips64*-*-linux*, mips-*-elf*, mipsel-*-elf*,
+	mips64-*-elf*, mips64el-*-elf*): Add mips/t-crtfm.
+	* config/mips/crtfastmath.c: New.
+	* config/mips/linux.h (ENDFILE_SPEC): New.
+	* config/mips/linux64.h (ENDFILE_SPEC): New.
+	* config/mips/t-crtfm: New.
+
+	* release-notes-csl.xml: Add a release note for the new FPU
+	defaults on mips64el-sicortex-linux-gnu
+
+2008-08-18  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/testuite/
+	* gcc.dg/pr34856.c: Fix thinko
+
+2008-08-18  Nathan Froyd  <froydnj@codesourcery.com>
+
+	libgomp/
+	* Makefile.am (datarootdir, docdir, htmldir, pdfdir): Define.
+	(HTMLS_INSTALL, HTMLS_BUILD): Define.
+	($(HTMLS_BUILD)): New rule.
+	(html__strip_dir): Define.
+	(install-data-am): Add install-html and install-pdf prerequsites.
+	(install-html): Add actions.
+	(TEXI2HTML): Define.
+	* Makefile.in: Regenerate.
+	* configure.ac (datarootdir, docdir, htmldir, pdfdir): Add
+	appropriate --with options and AC_SUBSTs.
+	* configure: Regenerate.
+
+2008-08-18  Nathan Froyd  <froydnj@codesourcery.com>
+
+	libgomp/
+	* Makefile.am (LTLDFLAGS): Define.
+	(LINK): Define.
+	* Makefile.in: Regenerate.
+
+2008-08-18  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/testuite/
+	* gcc.dg/pr34856.c: Add powerpc*-eabi* exception.
+
+2008-08-15  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-06-28  Andrew Jenner  <andrew@codesourcery.com>
+	* regrename.c (build_def_use): Don't copy RTX.
+
+2008-08-13  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-08-13  Joseph Myers  <joseph@codesourcery.com>
+	* config/sparc/sparc.c (emit_soft_tfmode_cvt): Explicitly sign or
+	zero extend SImode values being converted to TFmode before passing
+	to libcalls.
+
+2008-08-12  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-08-12  Nathan Froyd  <froydnj@codesourcery.com>
+
+	PR libgomp/26165
+	* gcc.c (include_spec_function): Tweak call to find_a_file.
+
+2008-08-10  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-28  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	gcc/
+	* Makefile.in (stmp-int-hdrs): Don't depend on
+	fixinc_list. Only
+	process fixincludes if fixinc_list is
+	present.
+	(install-mkheaders): Likewise.
+
+	2008-02-11  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2004-06-29  Nigel Stephens  <nigel@mips.com>
+
+	* Makefile.in (libgcc.mk): Make this depend on
+	$(tmake_file), in
+	case new multilib options have been defined.
+	(s-mlib): Similarly.
+
+2008-08-07  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	* config/arm/neon.md neon_vget_lane<mode>): Adjust element indices
+	for big-endian.
+
+2008-08-07  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-08-07  Joseph Myers  <joseph@codesourcery.com>
+	* config/arm/iwmmxt.md (movv8qi_internal, movv4hi_internal,
+	movv2si_internal): Combine into mov<mode>_internal.
+	(movv2si_internal_2): Remove.
+
+2008-08-06  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.h (MIPS_ARCH_DSP_SPEC): Add missing *.
+
+	* release-notes-csl.xml: Fix target.
+
+2008-08-06  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-08-06  Joseph Myers  <joseph@codesourcery.com>
+	* jump.c (rtx_renumbered_equal_p): Do not call subreg_regno_offset
+	for unrepresentable subregs or treat them as equal to other regs
+	or subregs with the same register number.
+
+2008-08-05  Catherine Moore  <clm@codesourcery.com>
+
+	Issue #3088
+	gcc/
+	* config/mips/sde.h (SUBTARGET_SELF_SPECS): Add
+	MIPS_ARCH_DSP_SPEC.
+	* config/mips/mips.h (MIPS_ARCH_DSP_SPEC): New.
+
+	* release-notes-csl.xml: Document.
+
+2008-08-04  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/mips/mips-nonpic/nonpic-9.c (main): Call exit.
+
+2008-07-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Issue #2576
+
+	Backport:
+
+	gcc/
+	2008-07-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* config/arm/arm.c (arm_expand_prologue): Use 0-length rtvec
+	instead of NULL_RTVEC.
+
+2008-07-28  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #466
+	gcc/
+	* config/arm/thumb2.md: Add 16-bit multiply instructions.
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_arm_thumb2_ok):
+	New function.
+	* gcc.target/arm/thumb2-mul-space.c: New file.
+	* gcc.target/arm/thumb2-mul-space-2.c: New file.
+	* gcc.target/arm/thumb2-mul-space-3.c: New file.
+	* gcc.target/arm/thumb2-mul-speed.c: New file.
+
+	* release-notes-csl.xml: Document.
+
+2008-07-29  Catherine Moore  <clm@codesourcery.com>
+	    Daniel Jacobowitz <dan@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.h (ISA_HAS_BBIT):  Enable for TARGET_OCTEON.
+	* config/mips/mips.md (branch_with_likely): New attribute.
+	(branch_without_likely): New attribute.
+	(define_delay): Check for new branch_likely attributes.
+	(branch_bit<mode>): Set branch_without_likely to "yes".
+	(branch_bit_truncdi<mode>): Likewise.
+	(branch_bit<mode>_inverted): Likewise.
+	(branch_bit_truncdi<mode>_inverted): Likewise.
+
+2008-07-25  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #3433
+	gcc/
+	* gcc.c (SWITCHES_NEED_SPACES): Define to "o".
+
+	* release-notes-csl.xml: Document.
+
+2008-07-25  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/iwmmxt.md (movv8qi_internal, movv4hi_internal,
+	movv2si_internal): Use "*" for pool_range and neg_pool_range for
+	mem = reg alternative.
+
+2008-07-25  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-06-03  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	* release-notes-csl.xml: Add note.
+	gcc/
+	* config/mips/mips.c (mips_expand_prologue): Fix thinko.
+
+	2008-05-27  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	-mwarn-framesize=<size> option for MIPS.
+	* release-notes-csl.xml: Add note.
+	gcc/
+	* doc/invoke.texi (mwarn-framesize): Document option.
+	* config/mips/mips.opt (mwarn-framesize): Add option.
+	* config/mips/mips.c (mips_warn_framesize): New static variable.
+	(mips_handle_option): Handle mwarn-framesize.
+	(mips_expand_prologue): Emit warning if frame size exceeds specified
+	value.
+
+2008-07-24  Joseph Myers  <joseph@codesourcery.com>
+
+	* config.sub: Allow mips64octeon* targets.
+
+	NOT ASSIGNED TO FSF
+	COPYRIGHT CAVIUM
+	gcc/
+	* config/mips/octeon-elf-unwind.h, config/mips/octeon-elf.h,
+	config/mips/octeon.h, config/mips/t-octeon-elf: New.
+	* config.gcc: Handle mips64octeon*-wrs-elf*.
+	(mips-wrs-linux-gnu): Use mips/octeon.h.
+	* config/mips/mips-protos.h (octeon_output_shared_variable): New.
+	* config/mips/mips.c (octeon_handle_cvmx_shared_attribute,
+	octeon_select_section, octeon_unique_section,
+	octeon_output_shared_variable): New.
+	(mips_attribute_table): Add cvmx_shared.
+	(mips_in_small_data_p): Check for cvmx_shared attribute.
+	* config/mips/mips.opt (mocteon-useun): Use Mask.
+
+	libgcc/
+	* config.host: Handle mips64octeon*-wrs-elf*.
+
+2008-07-24  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.c (mips_expand_ins_as_unaligned_store): Restore
+	Octeon unaligned store support.
+
+2008-07-21  Mark Mitchell  <mark@codesourcery.com>
+
+	Issue #3245
+
+	Backport:
+
+	libstdc++-v3/
+	2008-07-21  Mark Mitchell  <mark@codesourcery.com>
+	* config/os/gnu-linux/arm-eabi-extra.ver: New file.
+	* configure.host: Use it for arm*-*-linux-*eabi.
+
+	* release-notes-csl.xml: Document.
+
+2008-07-21  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.md (extzv): Avoid using dext instructions for
+	certain DImode subreg extractions.  From Cavium toolchain.
+
+2008-07-21  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* tree-ssa-remove-local-statics.c
+	(find_static_nonvolatile_declarations): Don't check for potential
+	definitions if we're looking at a statement with a CALL_EXPR.
+	(compute_definedness_for_block): Reorganize logic.
+
+	gcc/testsuite/
+	* gcc.dg/remove-local-statics-13.c: New test.
+	* gcc.dg/remove-local-statics-14.c: New test.
+
+2008-07-18  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-07-18  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.dg/fshort-wchar.c: Use -Wl,--no-wchar-size-warning on
+	arm*-*-*eabi.
+
+2008-07-17  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/
+	* config/mips/sde.h (TARET_MIPS_SDE): Define to 1.
+	(SUBTARGET_SELF_SPECS): Undefine before defining.
+
+2008-07-10  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-07-10  Joseph Myers  <joseph@codesourcery.com>
+	PR middle-end/29056
+	* gcc.target/powerpc/ppc-negeq0-1.c: Use long instead of int.
+	Adjust shift and scan-assembler-not pattern to allow for 64-bit
+	case.
+
+2008-07-10  Joseph Myers  <joseph@codesourcery.com>
+
+	config/
+	* mh-mingw (LDFLAGS): Append to rather than replacing previous
+	value.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/linux64.h (SUBTARGET_ASM_SPEC): Update for non-PIC.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/wrs-linux.h (SUBTARGET_SELF_SPECS): Add missing
+	comma.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	libstdc++-v3/
+	2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+	* libsupc++/unwind-cxx.h (__is_gxx_forced_unwind_class,
+	__GXX_INIT_FORCED_UNWIND_CLASS): Define for ARM EABI unwinder.
+	* libsupc++/eh_personality.cc (PERSONALITY_FUNCTION): Call
+	__GXX_INIT_FORCED_UNWIND_CLASS for forced unwind with ARM EABI
+	unwinder.
+	* libsupc++/eh_arm.cc (__cxa_type_match): Use
+	__is_gxx_forced_unwind_class to check for forced unwind.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/wrs-linux.h (SUBTARGET_SELF_SPECS): Add
+	NO_SHARED_SPECS.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	libstdc++-v3/
+	2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+	* testsuite/20_util/make_signed/requirements/typedefs-2.cc,
+	testsuite/20_util/make_unsigned/requirements/typedefs-2.cc: Use
+	-Wl,--no-enum-size-warning for arm*-*-linux*eabi.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.h (ISA_HAS_BBIT): Temporarily disable.
+
+2008-07-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/linux64.h (SUBTARGET_SELF_SPECS): Undefine before
+	redefining.
+
+2008-07-08  Catherine Moore  <clm@codesourcery.com>
+
+	gcc/config/mips
+	xlr.md (ir_xlr_alu): Add logical, signext attributes.
+
+2008-07-08  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* passes.c (init_optimization_passes): Move pass_remove_local_statics
+	later in the pass order.
+	* tree-ssa-remove-local-statics.c (rls_done): Conditionally free the
+	bitmaps and NULL out bb->aux.
+	(unstaticize_variable): Deal with GIMPLE_MODIFY_STMTs instead of
+	MODIFY_EXPRs.
+	(compute_definedness_for_block): Check for defines only if we haven't
+	found a CALL_EXPR.
+
+2008-07-07  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-07-07  Joseph Myers  <joseph@codesourcery.com>
+	* config/arm/aout.h (DOLLARS_IN_IDENTIFIERS): Remove.
+
+2008-07-07  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* gcc.c (print_sysroot): New.
+	(option_map, display_help, process_command): Handle the
+	-print-sysroot option.
+	(main): Print the sysroot if requested.
+
+	gcc/doc/
+	* invoke.texi (Debugging Options): Document -print-sysroot.
+
+2008-07-03  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_init_neon_builtins): Register built-in
+	types immediately after creating them.
+
+2008-07-03  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (add_minipool_backward_ref): Check for
+	8-byte-aligned entries in second case of forcing insertion after a
+	particular entry.  Change third case to avoid inserting
+	non-8-byte-aligned entries before 8-byte-aligned ones.
+
+2008-07-03  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/iwmmxt.md (movv8qi_internal, movv4hi_internal,
+	movv2si_internal): Add mem = reg alternative.
+
+2008-07-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-07-02  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/t-ppcgas (MULTILIB_OPTIONS): Add te500mc.
+	(MULTILIB_DIRNAMES): Likewise.
+	(MULTILIB_EXCEPTIONS): Add exception for te500mc.
+	* config/rs6000/eabi.h (NAME__MAIN, INVOKE__main): Remove.
+	(CC1_EXTRA_SPEC): Add te500mc clause.
+	(ASM_DEFAULT_SPEC): Likewise.
+	* config/rs6000/t-ppccomm (LIB2FUNS_STATIC_EXTRA): Remove eabi.S.
+	(eabi.S): Remove rule.
+
+2008-07-03  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config/m68k/t-uclinux (M68K_MLIB_CPU): Check for FL_UCLINUX.
+	* config/m68k/m68k-devices.def: Add FL_UCLINUX to 68020 and 54455
+	multilibs.
+	* config/m68k/m68k.h (FL_UCLINUX): Define.
+
+	* release-notes-csl.xml: Document.
+
+2008-07-02  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* c-incpath.c: Include toplev.h.
+	(merge_include_chains): Use warning instead of cpp_error for
+	system directory poisoning diagnostic.
+	* Makefile.in (c-incpath.o): Depend on toplev.h.
+	* gcc.c (LINK_COMMAND_SPEC): Pass
+	--error-poison-system-directories if
+	-Werror=poison-system-directories.
+
+2008-07-02  Julian Brown  <julian@codesourcery.com>
+
+	Backport from mainline:
+
+	2008-06-27  Mark Mitchell  <mark@codesourcery.com>
+
+	libstdc++-v3/
+	* libsupc++/vec.cc (__aeabi_vec_dtor_cookie): Handle NULL array
+	address.
+	(__aeabi_vec_delete): Likewise.
+	(__aeabi_vec_delete3): Likewise.
+	(__aeabi_vec_delete3_nodtor): Likewise.
+
+	gcc/testsuite/
+	* g++.dg/abi/arm_cxa_vec2.C: New test.
+
+2008-07-01  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_arm_neon): New.
+	(check_effective_target_vect_cmdline_needed): Use it.
+
+2008-07-01  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/neon.md (neon_vget_lane<mode>_sext_internal,
+	neon_vget_lane<mode>_zext_internal): Adjust element indices for
+	big-endian.
+
+2008-07-01  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config/mips/linux.h (SUBTARGET_SELF_SPECS): Override this,
+	rather than ...
+	(DRIVER_SELF_SPECS): ... this.
+	* config/mips/mips.md (extzv, extzv<mode>, insv, insv<mode>,
+	*insv<mode>di): Use mips_use_ins_ext_p rather than mips_use_ext_p
+	and mips_use_ins_p.
+	* config/mips/mips-protos.h (mips_lower_sign_bit_p,
+	mips_use_ext_p): Delete.
+	(mips_expand_vector_init): Declare.
+	* config/mips/mips.c (mips_gnu_local_gp): Declare.
+	(mips_got_base): Use can_create_pseudo_p.
+	(mips16_build_function_stub): Remove unused variable.
+	(mips_lower_sign_bit_p, mips_use_ins_p, mips_use_ext_p): Delete.
+
+	gcc/
+	* config/mips/mips.md (type): Correct typo for accext.
+
+2008-06-30  Joseph Myers  <joseph@codesourcery.com>
+
+	config/
+	* mh-mingw (BOOT_CFLAGS): Do not use -D__USE_MINGW_ACCESS.
+
+2008-06-28  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Backport 2 patches from mainline:
+
+	2008-06-28  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* doc/extend.texi (Variable Attributes): Use @ref instead of @xref.
+	(Type Attributes): Fix nesting of @table and @subsection.  Adjust
+	punctuation.  Use @ref instead of @xref.
+	(Function Names): Remove stray @display/@end display.
+	(C++ Attributes): Use @ref instead of @xref.
+	(Deprecated Features): Fix punctuation around @xref.
+	(Backwards Compatibility): Likewise.
+	* doc/rtl.texi (Incdec): Remove stray @table/@end table.
+
+	2008-06-15  Ralf Wildenhues  <Ralf.Wildenhues@gmx.de>
+
+	gcc/
+	* doc/sourcebuild.texi (Config Fragments): Remove obsolete
+	FIXME note about gcc/config.guess.
+	* doc/options.texi (Option file format): Remove non-ASCII bytes.
+	* doc/cpp.texi: Expand TABs, drop indentation outside examples.
+	* doc/cppopts.texi: Likewise.
+	* doc/extend.texi: Likewise.
+	* doc/gcc.texi: Likewise.
+	* doc/gccint.texi: Likewise.
+	* doc/gcov.texi: Likewise.
+	* doc/gty.texi: Likewise.
+	* doc/hostconfig.texi: Likewise.
+	* doc/install.texi: Likewise.
+	* doc/invoke.texi: Likewise.
+	* doc/loop.texi: Likewise.
+	* doc/makefile.texi: Likewise.
+	* doc/md.texi: Likewise.
+	* doc/passes.texi: Likewise.
+	* doc/tm.texi: Likewise.
+	* doc/tree-ssa.texi: Likewise.
+	* doc/trouble.texi: Likewise.
+
+2008-06-27  Julian Brown  <julian@codesourcery.com>
+
+	gcc/cp/
+	* decl2.c (determine_visibility): Allow target to override
+	visibility of class data.
+
+	gcc/
+	* config/arm/arm.c (arm_cxx_determine_class_data_visibility): Make
+	no-op for targets which don't use DLLs.
+
+	gcc/testsuite/
+	* g++.dg/ext/visibility/arm3.C: Add explanatory text. Skip on
+	non-DLL targets.
+
+2008-06-26  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-13  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* optabs.c (expand_binop): Force operands to registers before
+	generating libcalls.
+
+2008-06-26  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.c (mips_call_tls_get_addr)
+	(mips_emit_loadgp): Correct merge.
+
+2008-06-26  Joseph Myers  <joseph@codesourcery.com>
+
+	* release-notes-csl.xml: Resync release note text with Sourcery
+	G++ 4.2.
+
+2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-04-01  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.h (TARGET_CPU_CPP_BUILTINS): Define
+	__mips_isa_rev=2 for Octeon.
+
+2008-06-25  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config.gcc (arm*-*-uclinux*): Remove duplicate uclinux-elf.h.
+
+2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-02-15  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2007-11-06  David Ung  <davidu@mips.com>
+
+	gcc/
+	* config/mips/mips.h (AC1HI_REGNUM, AC1LO_REGNUM, AC2HI_REGNUM)
+	(AC2LO_REGNUM, AC3HI_REGNUM, AC3LO_REGNUM): Define constants.
+
+2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-07-02  Richard Sandiford  <richard@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.h (MIPS_ISA_LEVEL_SPEC): Handle -march=octeon.
+
+2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Revert:
+
+	2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-10-18  Joseph Myers  <joseph@codesourcery.com>
+
+	NOT ASSIGNED TO FSF
+	COPYRIGHT RAZA
+	* config.sub (mipsisa64xlr, ipsisa64xlrel): Add new machine names.
+
+	gcc/
+	* config.gcc (mipsisa64xlr-*-elf*, mipsisa64xlrel-*-elf*): New
+	targets.
+
+2008-06-25  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-10-18  Joseph Myers  <joseph@codesourcery.com>
+
+	NOT ASSIGNED TO FSF
+	COPYRIGHT RAZA
+	* config.sub (mipsisa64xlr, ipsisa64xlrel): Add new machine names.
+
+	gcc/
+	* config.gcc (mipsisa64xlr-*-elf*, mipsisa64xlrel-*-elf*): New
+	targets.
+	* config/mips/mips.h (PROCESSOR_XLR, TARGET_XLR): Define.
+	(MIPS_ISA_LEVEL_SPEC): Handle -march=xlr.
+
+2008-06-24  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-02-12  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2008-01-16  David Ung  <davidu@mips.com>
+
+	* config/mips/sdemtk.h: Define macro TARGET_MIPS_SDEMTK.
+	* config/mips/mips.c (mips_file_start): Check against
+	TARGET_MIPS_SDEMTK which supports the TARGET_NO_FLOAT option.
+
+	2007-11-02  Thiemo Seufer  <ths@mips.com>
+
+	* config/mips/mips.c (mips_file_start): Add support for flagging
+	32-bit code with -mfp64 floating point.
+
+2008-06-24  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-03-12  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2007-11-29  Thiemo Seufer  <ths@mips.com>
+
+	gcc/
+	* config/mips/mips.c (override_options): Let -fpic imply
+	-mabicalls, forward port from SDE6.
+
+2008-06-23  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (ASM_OUTPUT_REG_PUSH): Handle STATIC_CHAIN_REGNUM
+	specially for Thumb-1.
+	(ASM_OUTPUT_REG_POP): Likewise.
+
+2008-06-23  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md (*thumb2_negscc): Remove bad negated-GT
+	code sequence.
+
+2008-06-20  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-10-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.c (mips_cpu_info_table): Fix damaged merge
+	of XLR entry from r185319.
+	(mips_rtx_cost_data): Likewise.
+	(mips_sched_reorder): Add ATTRIBUTE_UNUSED to cycle parameter.
+
+2008-06-18  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-09-06  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.opt (mips16e): Add as deprecated alias
+	for -mips16.
+	* doc/invoke.texi (Option Summary, MIPS Options): Document it.
+
+2008-06-18  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-02-12  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2007-12-21  David Ung  <davidu@mips.com>
+
+	gcc/
+	* config/mips/mips.h (TARGET_MIPS_SDE): Define macro as 0.
+	* config/mips/sde.h (TARGET_MIPS_SDE): Override macro definition to 1.
+	* config/mips/mips.md (abs<mode>2): Enable abs.[sd] patterns if
+	TARGET_MIPS_SDE && TARGET_HARD_FLOAT.
+
+2008-06-18  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-10-14  Sandra Loosemore  <sandra@codesourcery.com>
+
+	* config/mt-sde: Update to make it agree with the mainline
+	version committed with the below patch.
+
+	Backport from mainline:
+	gcc/
+
+	2007-08-17  Richard Sandiford  <richard@codesourcery.com>
+	    Nigel Stephens  <nigel@mips.com>
+
+	* config/mips/sde.h (DRIVER_SELF_SPECS): Add commas.
+	Treat -mno-data-in-code and -mcode-xonly as aliases for
+	-mcode-readable=no and -mcode-readable=pcrel respectively.
+	* config/mips/t-sde (TARGET_LIBGCC2_CFLAGS): Add -mcode-xonly.
+	(MULTILIB_OPTIONS): Add -mcode-readable=no multilibs.
+	(MULTILIB_DIRNAMES): Update accordingly.
+
+2008-06-18  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2007-09-08  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/mips/t-sde (MULTILIB_MATCHES):  Add mips16e as alias
+	for mips16.
+
+2008-06-18  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_assemble_integer): Do not handle
+	big-endian NEON vectors specially.
+	* config/arm/neon.md (vec_set<mode>_internal, vec_extract<mode>):
+	Adjust element indices for big-endian.
+
+2008-06-18  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-02-11  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	gcc/
+	* config/mips/t-sde (MULTILIB_OPTIONS): Substitute mno-data-in-code for
+	mcode-readable=no option.
+
+2008-06-17  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from SourceryG++ 4.2:
+
+	2008-03-28  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* config/mips/t-sdemtk (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
+	MULTILIB_EXCLUSIONS): Likewise.
+
+2008-06-17  Catherine Moore  <clm@codesourcery.com>
+
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-17  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config.gcc (mips*-sde-elf*): Add SourceryG++ multilib support.
+	* config/mips/t-sgxx-sde: New.
+	* config/mips/sdemtk.h (MIPS_ARCH_FLOAT_SPEC): Override, adding
+	-mno-float option.
+
+2008-06-17  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-03-09  Ira Rosen  <irar@il.ibm.com>
+	* config/rs6000/rs6000.c (builtin_description): Rename vector
+	left shift operations.
+	* config/rs6000/altivec.md (UNSPEC_VSL): Remove.
+	(altivec_vsl<VI_char>): Rename to ...
+	(ashl<mode>3): ... new name.
+	(mulv4sf3, mulv4si3, negv4sf2): Replace gen_altivec_vslw with
+	gen_ashlv4si3.
+	(absv4sf2): Convert to use ashift:V4SI instead of UNSPEC_VSL.
+
+2008-06-16  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-30  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/sibcall-3.c: XFAIL for Thumb.
+	* gcc.dg/sibcall-4.c: Likewise.
+
+2008-06-16  Paul Brook  <paul@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2
+	2007-03-30  Paul Brook  <paul@codesourcery.com>
+	gcc/
+	* calls.c (store_one_arg): Check alignment of mode used for save.
+
+2008-06-13  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config.gcc (powerpc-*-linux*): Add rs6000/e500.h to tm_file
+	and rs6000/t-linux to tmake_file.
+
+2008-06-13  Paul Brook  <paul@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2
+	Issue #1510
+	2007-04-27  Paul Brook  <paul@codesourcery.com>
+	gcc/
+	* cse.c (cse_process_notes): Make sure PLUS are canonical.
+
+2008-06-13  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	libgcc/
+	* config.host (arm*-*-linux*, arm*-*-uclinux*, arm*-*-eabi*)
+	(arm*-*-symbianelf): Add arm/t-divmod-ef to tmake_file.
+	* Makefile.in (LIB2_DIVMOD_EXCEPTION_FLAGS): Set to previous
+	default if not set by a target-specific Makefile fragment.
+	(lib2-divmod-o, lib2-divmod-s-o): Use above.
+	* config/arm/t-divmod-ef: New.
+
+2008-06-13  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	libgcc/
+	* shared-object.mk (c_flags-$(base)$(objext)): New.
+	($(base)$(objext)): Use above.
+	($(base)_s$(objext)): Likewise.
+	* static-object.mk (c_flags-$(base)$(objext)): New.
+	($(base)$(objext)): Use above.
+
+2008-06-13  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_vect_int)
+	(check_effective_target_vect_shift)
+	(check_effective_target_vect_long)
+	(check_effective_target_vect_float)
+	(check_effective_target_vect_int_mult): Check for ARM.
+
+2008-06-12  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config/mips/linux64.h: USE_SUBTARGET_SELF_SPECS.
+	* config/mips/sde.h: Likewise.
+	* config/mips/iris6.h: Likewise.
+
+2008-06-12  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-15  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/mips/t-sgxx-linux: New target fragment.
+	* config/mips/t-sgxxlite-linux: New target fragment.
+	* config/mips/cs-sgxx-linux.h: New header file.
+	* config/mips/cs-sgxxlite-linux.h: New header file.
+	* config/mips/t-none-linux: Remove.
+	* config/mips/cs-linux.h: Remove.
+	* config.gcc (mips*-*-linux*): Handle --enable-extra-sgxx-multilibs
+	and --enable-extra-sgxxlite-multilibs configure options. Use
+	sgxx-specific header files and target fragments. Remove use of
+	t-none-linux and cs-linux.h.
+
+2008-06-12  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-25  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    Julian Brown  <julian@codesourcery.com>
+
+	* 74k.md: (r74k_dsp_alu, r74k_dsp_alu_sat, r74k_dsp_mac, r74k_dsp_mac_sat)
+	(r74k_dsp_acc_ext, r74k_dsp_acc_mod): New insn reservations.
+	(r74k_dsp_mac, r74k_dsp_mac_sat, r74k_int_mult, r74k_int_mul3)
+	(r74k_dsp_mac, r74k_dsp_mac_sat): New bypasses.
+
+
+2008-06-12  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-25  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	gcc/
+	* config/mips/mips-protos.h (dspalu_bypass_p): Add prototype.
+	* config/mips/mips.c (dspalu_bypass_table): New.
+	(dspalu_bypass_p): New.
+	* 24k.md (r24k_dsp_alu, r24k_dsp_mac, r24k_dsp_mac_sat)
+	(r24k_dsp_acc_ext, r24k_dsp_acc_mod): New insn reservations.
+	(r24k_int_mult, r24k_int_mthilo, r24k_dsp_mac, r24k_dsp_mac_sat)
+	(r24k_dsp_acc_ext, r24k_dsp_acc_mod, r24k_dsp_alu): New bypasses.
+	* config/mips/mips.md (dspmac, dspmacsat, accext, accmod, dspalu)
+	(dspalusat): Add insn types.
+	* config/mips/mips-dsp.md (add<DSPV:mode>3)
+	(mips_add<DSP:dspfmt1>_s_<DSP:dspfmt2>)
+	(sub<DSPV:mode>3, mips_sub<DSP:dspfmt1>_s_<DSP:dspfmt2>, mips_addsc)
+	(mips_addwc, mips_modsub, mips_raddu_w_qb, mips_absq_s_<DSPQ:dspfmt2>)
+	(mips_precrq_qb_ph, mips_precrq_ph_w, mips_precrq_rs_ph_w)
+	(mips_precrqu_s_qb_ph, mips_preceq_w_phl, mips_preceq_w_phr)
+	(mips_precequ_ph_qbl, mips_precequ_ph_qbr, mips_precequ_ph_qbla)
+	(mips_precequ_ph_qbra, mips_preceu_ph_qbl, mips_preceu_ph_qbr)
+	(mips_preceu_ph_qbla, mips_preceu_ph_qbra, mips_shll_<DSPV:dspfmt2>)
+	(mips_shll_s_<DSPQ:dspfmt2>, mips_shll_s_<DSPQ:dspfmt2>, mips_shrl_qb)
+	(mips_shra_ph, mips_shra_r_<DSPQ:dspfmt2>, mips_bitrev, mips_insv)
+	(mips_repl_qb, mips_repl_ph, mips_cmp<DSPV:dspfmt1_1>_eq_<DSPV:dspfmt2>)
+	(mips_cmp<DSPV:dspfmt1_1>_lt_<DSPV:dspfmt2>)
+	(mips_cmp<DSPV:dspfmt1_1>_le_<DSPV:dspfmt2>, mips_cmpgu_eq_qb)
+	(mips_cmpgu_lt_qb, mips_cmpgu_le_qb, mips_pick_<DSPV:dspfmt2>)
+	(mips_packrl_ph, mips_wrdsp, mips_rddsp): Change type to dspalu.
+	(mips_dpau_h_qbl, mips_dpau_h_qbr, mips_dpsu_h_qbl, mips_dpsu_h_qbr)
+	(mips_dpaq_s_w_ph, mips_dpsq_s_w_ph, mips_mulsaq_s_w_ph)
+	(mips_maq_s_w_phl, mips_maq_s_w_phr, mips_maq_sa_w_phr: Set type to
+	dspmac.
+	(mips_dpaq_sa_l_w, mips_dpsq_sa_l_w, mips_maq_sa_w_phl): Set type to
+	dspmacsat.
+	(mips_extr_w, mips_extr_r_w, mips_extr_rs_w, mips_extp, mips_extpdp):
+	Set type to accext.
+	(mips_shilo, mips_mthlip): Set type to accmod.
+	* config/mips/mips-dspr2.md (mips_absq_s_qb, mips_addu_s_ph)
+	(mips_adduh_r_qb): Set type to dspalusat.
+	(mips_addu_ph, mips_adduh_qb, mips_append, mips_balign)
+	(mips_cmpgdu_eq_qb, mips_cmpgdu_lt_qb, mips_cmpgdu_le_qb)
+	(mips_precr_qb_ph, mips_precr_sra_ph_w, mips_precr_sra_r_ph_w)
+	(mips_prepend, mips_shra_qb, mips_shra_r_qb, mips_shrl_ph)
+	(mips_subu_ph, mips_subuh_qb, mips_subuh_r_qb, mips_addqh_ph)
+	(mips_addqh_r_ph, mips_addqh_w, mips_addqh_r_w, mips_subqh_ph)
+	(mips_subqh_r_ph, mips_subqh_w, mips_subqh_r_w): Set type to dspalu.
+	(mips_dpa_w_ph, mips_dps_w_ph, mips_mulsa_w_ph, mips_dpax_w_ph)
+	(mips_dpsx_w_ph, mips_dpaqx_s_w_ph, mips_dpsqx_s_w_ph): Set type to
+	dspmac.
+	(mips_subu_s_ph): Set type to dspalusat.
+	(mips_dpaqx_sa_w_ph, mips_dpsqx_sa_w_ph): Set type to dspmacsat.
+
+2008-06-12  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* lib/target-supports.exp
+	(check_effective_target_powerpc_hard_double): New.
+	* gcc.dg/tree-ssa/loop-19.c: Use powerpc_hard_double instead of
+	powerpc*-*-*.
+
+2008-06-12  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/dfp/convert-bfp-6.c, gcc.dg/dfp/convert-bfp-9.c: XFAIL
+	for lax_strtofp.
+
+2008-06-12  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-05-21  Janis Johnson  <janis187@us.ibm.com>
+	* doc/sourcebuild.texi (Test Directives): Add dg-xfail-run-if.
+
+	gcc/testsuite/
+	2008-05-21  Janis Johnson  <janis187@us.ibm.com>
+	* lib/target-supports-dg.exp (dg-xfail-run-if): New.
+
+2008-06-12  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-25  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	    Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	gcc/
+	* config/mips/mips.c (mips_mult_madd_chain_bypass_p): New.
+	* config/mips/mips-protos.h (mips_mult_madd_chain_bypass_p): Add
+	prototype.
+	* config/mips/74k.md: Add bypasses for r74k_int_mult, r74_int_madd,
+	r74k_int_mul3.
+
+
+2008-06-11  Catherine Moore  <clm@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-06-06  Sandip Matte  <sandip@rmicorp.com>
+
+	* doc/invoke.texi: Document -march=xlr.
+	* config/mips/xlr.md: New file.
+	* config/mips/mips.md: Include it.
+	(cpu): Add "xlr".
+	* config/mips/mips.h (PROCESSOR_XLR): New processor_type.
+	* config/mips/mips.c (mips_cpu_info_table): Add an XLR entry.
+	(mips_rtx_cost_data): Likewise.
+
+2008-06-10  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+
+	2008-03-27  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* config/mips/mips.md (loadgp_nonpic): New pattern.
+	(builtin_longjmp): Use for all TARGET_ABICALLS.
+	(exception_receiver): Revert local changes.
+	* config/mips/mips.c (mips_gnu_local_gp, mips_got_base): New functions.
+	(struct machine_function): Update the comment for
+	mips16_gp_pseudo_rtx.
+	(mips_call_tls_get_addr, mips_legitimize_tls_address): Use
+	mips_got_base.
+	(mips_restore_gp): Revert local changes.  Assert PIC.
+	(mips_load_call_address, mips_expand_call): Revert local changes.
+	(mips_conditional_register_usage): Make $gp ordinary for
+	non-PIC.
+	(mips_tls_got_ref_1, mips_tls_got_ref_p): Delete.
+	(mips_function_has_gp_insn, mips_global_pointer): Revert local changes.
+	(mips_save_reg_p): Check for fixed $gp.
+	(mips_gnu_local_gp_rtx): Renamed from mips_gnu_local_gp.
+	(mips_emit_loadgp): Use mips_gnu_local_gp.
+	(mips_dangerous_for_la25_p): Revert local change.
+	(mips16_gp_pseudo_reg): Use gen_loadgp_nonpic.
+	(mips_extra_live_on_entry): Revert local change.
+	* config/mips/mips.h (TARGET_USE_GOT): Require flag_pic.
+	(TARGET_CALL_CLOBBERED_GP): Likewise.
+	(TARGET_NONPIC_ABICALLS): Define.
+	2008-03-19  Mark Shinwell  <shinwell@codesourcery.com>
+		    Catherine Moore  <clm@codesourcery.com>
+		    Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* configure.ac: Add --enable-mips-nonpic.
+	* configure: Regenerated.
+	* config.gcc: Set TARGET_ABICALLS_DEFAULT instead of MASK_ABICALLS
+	for MIPS targets.  Handle --enable-mips-nonpic.
+	* config/mips/linux.h (TARGET_DEFAULT): Delete.
+	(SUBTARGET_ASM_SPEC): Use -mnon-pic-abicalls.
+	* config/mips/elfoabi.h, config/mips/linux64.h,
+	config/mips/sde.h, config/mips/iris6.h, config/mips/wrs-linux.h,
+	config/mips/vr.h: Use SUBTARGET_SELF_SPECS.
+	* config/mips/mips.md (exception_receiver): Disable for
+	non-PIC.
+	* config/mips/mips.c (mips_classify_symbol): Do not use the GOT
+	for non-PIC.
+	(mips_tls_symbol_ref_1, mips_cannot_force_const_mem): Correct comments.
+	(mips_restore_gp): Skip for non-PIC.
+	(mips_load_call_address): Skip lazy binding for non-PIC.
+	(mips_expand_call): Skip GP usage for non-PIC.
+	(override_options): Remove flag_pic override.  Use sorry for
+	other ABIs.
+	(mips_file_start): Emit pic0 for non-PIC.
+	(mips_tls_got_ref_1, mips_tls_got_ref_p): New.
+	(mips_function_has_gp_insn): Use mips_tls_got_ref_p.  Skip jump
+	tables.
+	(mips_global_pointer, mips_current_loadgp_style): Adjust for non-PIC.
+	(mips_expand_prologue): Do not cprestore for non-PIC.
+	(mips_function_rodata_section): Skip for non-PIC.
+	(mips_dangerous_for_la25_p): Likewise.
+	(mips_extra_live_on_entry): Skip for non-PIC.
+	* config/mips/mips.h (TARGET_GPWORD): Require flag_pic.
+	(ABICALLS_SPEC, ABICALLS_SELF_SPECS, SUBTARGET_SELF_SPECS)
+	(DRIVER_SELF_SPECS): New.
+	(MIPS_CALL): Correct for non-PIC.
+
+2008-06-09  Kazu Hirata  <kazu@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-05-28  Kazu Hirata  <kazu@codesourcery.com>
+
+	Issue 2895
+	gcc/
+	* config.gcc (arm*-*-linux*): Handle enable_extra_asa_multilibs.
+	enable_extra_asa_multilibs.
+	* config/arm/t-asa: New.
+
+	2008-05-28  Kazu Hirata  <kazu@codesourcery.com>
+
+	* config/arm/t-asa (MULTILIB_EXCEPTIONS): Remove
+	march=armv4t/mfpu=neon* and march=armv4t/*mfloat-abi=softfp.  Add
+	*march=armv4t*/*mfpu=neon* and *march=armv4t*/*mfloat-abi=softfp*.
+	(MULTILIB_ALIASES): Remove march?armv4t=mthumb/march?armv4t* and
+	march?armv6=mthumb/march?armv6*. Add
+	march?armv4t=mthumb/march?armv4t, march?armv6=mthumb/march?armv6,
+	and
+	march?armv6/mfloat-abi?softfp=mthumb/march?armv6/mfloat-abi?softfp.
+
+2008-06-09  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/powerpc/20030218-1.c: Separate dg-message and
+	dg-error for two diagnostics on the same line.
+
+2008-06-09  Catherine Moore  <clm@codesourcery.com>
+
+	From 4.2 branch:
+
+	gcc/testsuite/
+	* gcc.target/mips/branch-1.c: Support OCTEON.
+
+2008-06-09  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-05-20  Janis Johnson  <janis187@us.ibm.com>
+	* g++.dg/ext/vector14.C: Ignore a possible warning.
+
+2008-06-09  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-06-09  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.dg/pr34856.c: Condition use of -maltivec on
+	powerpc_altivec_ok.  Use -w on other powerpc*-*-linux*.
+
+2008-06-09  Catherine Moore  <clm@codesourcery.com>
+
+	From 4.2 branch:
+
+	gcc/testsuite/
+	* gcc.target/mips/mips-nonpic: New testsuite.
+
+2008-06-09  Catherine Moore  <clm@codesourery.com>
+
+	gcc/testsuite/
+	* gcc.target/mips/mips32-dsp-run.c (mipsisa32-sde-elf): Add as
+	target.
+	* gcc.target/mips/mips32-dsp.c: Likewise.
+
+2008-06-07  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-04-04  Janis Johnson  <janis187@us.ibm.com>
+	* g++.dg/other/anon5.C: Don't depend on line number for error message.
+	* gcc.dg/torture/builtin-modf-1.c: Use special options for
+	powerpc*-*-linux*.
+	* gcc.dg/var-expand3.c: Skip for powerpc-linux if not on AltiVec HW.
+	* gcc.dg/pr34856.c: Use -maltivec on powerpc linux.
+
+2008-06-07  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/powerpc/altivec-24.c, gcc.target/powerpc/pr35907.c:
+	Correct target selector syntax.
+
+2008-06-06  Sandra Loosemore  <sandra@codesourcery.com>
+
+	From 4.2 branch:
+
+	* release-notes-csl.xml (GCC stack size limit increased):
+	Conditionalize release note for host.
+	(UNC pathname bug fix): Likewise.
+
+2008-06-06  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/wrs-linux.h (SUBTARGET_EXTRA_LINK_SPEC): Don't pass
+	--be8 for -r links.
+
+2008-06-06  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	libstdc++-v3/
+	2008-06-06  Joseph Myers  <joseph@codesourcery.com>
+	* configure.ac: Do not check for gconv.h.
+	* crossconfig.m4 (GLIBCXX_CROSSCONFIG): Do not test for gconv.h or
+	gconf.h.  For glibc and uClibc systems, define
+	_GLIBCXX_USE_RANDOM_TR1 and HAVE_MMAP and use AC_LC_MESSAGES and
+	AM_ICONV.
+	* configure, config.h.in: Regenerate.
+
+2008-06-06  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	libstdc++-v3/
+	2008-06-06  Joseph Myers  <joseph@codesourcery.com>
+	* testsuite/17_intro/headers/all.cc,
+	testsuite/17_intro/headers/all_c++200x_compatibility.cc,
+	testsuite/17_intro/headers/all_pedantic_errors.cc,
+	testsuite/ext/headers.cc: Only include
+	<ext/codecvt_specializations.h> and <ext/enc_filebuf.h> if
+	_GLIBCXX_HAVE_ICONV.
+
+2008-06-05  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-12-15  Richard Sandiford  <richard@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/mips/mips.exp (setup_mips_tests): Record whether
+	endianness is forced.  Trest -mabicalls and -mno-abicalls as
+	ABI options.
+	(is_gp32_flag): Treat -mabi=32 as a 32-bit option.
+	(is_gp64_flag): New function.
+	(dg-mips-options): Generalize -mgp64 handling to is_gp64_flag.
+	Do not set the ABI if the arguments already specify one.
+	Skip tests if the arguments specify an incompatible ABI.
+	Use -mno-abicalls for -mabi=eabi.
+	* gcc.target/mips/octeon-1.c, gcc.target/mips/octeon-2.c: New tests.
+	* gcc.target/mips/octeon-3.c, gcc.target/mips/octeon-4.c: Likewise
+	* gcc.target/mips/octeon-5.c, gcc.target/mips/octeon-6.c: Likewise
+	* gcc.target/mips/octeon-7.c, gcc.target/mips/octeon-8.c: Likewise
+	* gcc.target/mips/octeon-9.c, gcc.target/mips/octeon-10.c: Likewise
+	* gcc.target/mips/octeon-11.c, gcc.target/mips/octeon-12.c: Likewise
+	* gcc.target/mips/octeon-13.c, gcc.target/mips/octeon-14.c: Likewise
+	* gcc.target/mips/octeon-15.c, gcc.target/mips/octeon-16.c: Likewise
+	* gcc.target/mips/octeon-17.c, gcc.target/mips/octeon-18.c: Likewise
+	* gcc.target/mips/octeon-19.c, gcc.target/mips/octeon-20.c: Likewise
+	* gcc.target/mips/octeon-21.c, gcc.target/mips/octeon-22.c: Likewise
+	* gcc.target/mips/octeon-23.c, gcc.target/mips/octeon-24.c: Likewise
+	* gcc.target/mips/octeon-25.c, gcc.target/mips/octeon-26.c: Likewise
+	* gcc.target/mips/octeon-27.c, gcc.target/mips/octeon-28.c: Likewise
+	* gcc.target/mips/octeon-29.c, gcc.target/mips/octeon-30.c: Likewise
+	* gcc.target/mips/octeon-31.c, gcc.target/mips/octeon-32.c: Likewise
+	* gcc.target/mips/octeon-33.c, gcc.target/mips/octeon-34.c: Likewise
+	* gcc.target/mips/octeon-35.c, gcc.target/mips/octeon-36.c: Likewise
+	* gcc.target/mips/octeon-37.c, gcc.target/mips/octeon-38.c: Likewise
+	* gcc.target/mips/octeon-39.c, gcc.target/mips/octeon-40.c: Likewise
+	* gcc.target/mips/octeon-41.c, gcc.target/mips/octeon-42.c: Likewise
+	* gcc.target/mips/octeon-43.c, gcc.target/mips/octeon-44.c: Likewise
+	* gcc.target/mips/octeon-45.c, gcc.target/mips/octeon-46.c: Likewise
+	* gcc.target/mips/octeon-47.c, gcc.target/mips/octeon-48.c: Likewise
+	* gcc.target/mips/octeon-49.c, gcc.target/mips/octeon-50.c: Likewise
+	* gcc.target/mips/octeon-51.c, gcc.target/mips/octeon-52.c: Likewise
+	* gcc.target/mips/octeon-53.c, gcc.target/mips/octeon-54.c: Likewise
+	* gcc.target/mips/octeon-55.c, gcc.target/mips/octeon-56.c: Likewise
+	* gcc.target/mips/scc-1.c, gcc.target/mips/scc-2.c: Likewise.
+	* gcc.target/mips/branch-1.c: Likewise.
+2008-06-05  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-12-15  Richard Sandiford  <richard@codesourcery.com>
+
+	Adapted from a patch by Cavium Networks.
+
+	gcc/
+	* config/mips/mips.opt (mocteon-useun): New option.
+	* config/mips/mips-protos.h (mask_low_and_shift_len): Declare.
+	(mips_lower_sign_bit_p, mips_use_ins_p, mips_use_ext_p): Declare.
+	(mips_adjust_register_ext_operands): Likewise.
+	* config/mips/mips.h (PROCESSOR_OCTEON): New processor_type.
+	(TARGET_OCTEON): New macro.
+	(ISA_HAS_DCLZ_DCLO): Delete.
+	(ISA_HAS_POPCOUNT): New macro.
+	(ISA_HAS_ROTR_SI, ISA_HAS_ROTR_DI): Include TARGET_OCTEON.
+	(ISA_HAS_SEB_SEH, ISA_HAS_INS_EXT): Likewise.
+	(ISA_HAS_EXTS, ISA_HAS_BBIT, ISA_HAS_SEQ_SNE, ISA_HAS_BADDU)
+	(ISA_HAS_UL_US, ISA_HAS_CINS): New macros.
+	(ASM_SPEC): Pass down -mocteon-useun and -mno-octeon-useun.
+	* config/mips/mips.c (mips_cpu_info_table): Add an octeon entry.
+	(mips_rtx_cost_data): Likewise.
+	(mask_low_and_shift_len, mips_get_seq_sne_operand): New functions.
+	(mips_emit_scc): Use mips_get_seq_sne_operand to choose between
+	seq/sne and xor/addu.
+	(mips_expand_unaligned_load): Use mov_ulw and mov_uld if
+	ISA_HAS_UL_US.
+	(mips_expand_unaligned_store): Likewise mov_usw and mov_usd.
+	(mips_lower_sign_bit_p, mips_use_ins_p, mips_use_ext_p): New functions.
+	(mips_adjust_register_ext_operands): Likewise.
+	(print_operand): Add %E, %G and %H formats.
+	(mips_issue_rate): Return 2 when scheduling for PROCESSOR_OCTEON.
+	(mips_multipass_dfa_lookahead): Likewise.
+	* config/mips/octeon.md: New file.
+	* config/mips/mips.md: Include it.
+	(UNSPEC_UNALIGNED_LOAD, UNSPEC_UNALIGNED_STORE): New constants.
+	(type): Add pop.
+	(cpu): Add octeon.
+	(SUBDI): New mode macro.
+	(topbit): New mode attribute.
+	(any_extract, any_shiftrt, equailty_op): New code macros.
+	(*baddu_si, *baddu_disi, *baddu_didi, *baddu_didi2, popcount<mode>2)
+	(*<code>_trunc_exts<mode>, *trunc_zero_ext_<SHORT:mode><GPR:mode>):
+	New patterns.
+	(zero_extendsidi2): Turn into a define_expand.  Rename old
+	define_insn_and_split to...
+	(*zero_extendsidi2): ...this and require !ISA_HAS_EXT_INS.
+	(*clear_upper32): Require !ISA_HAS_EXT_INS.
+	(*zero_extendsidi2_dext, *clear_upper32_dext): New patterns.
+	(extv): Change operand 1 from a QImode memory_operand to any
+	nonimmediate_operand.  Try using extvsi and extvdi for register
+	extractions if ISA_HAS_EXTS.
+	(extv<mode>, *extv_truncdi<mode>): New patterns.
+	(extzv): Use mips_use_ext_p instead of mips_use_ins_ext_p.
+	Call mips_adjust_register_ext_operands.
+	(extzv<mode>): Use mips_use_ext_p instead of mips_use_ins_ext_p.
+	(*extzv_truncdi<mode>, *extz_truncdi<mode>_exts): New patterns.
+	(insv):  Use mips_use_ins_p instead of mips_use_ins_ext_p.
+	Fix formatting.
+	(insv<mode>): Use mips_use_ins_p instead of mips_use_ins_ext_p.
+	(*insv<mode>di, *insv_<code>_<mode>di, *insvdi_clear_upper32)
+	(*cins): New patterns.
+	(mov_<load>l, mov_<load>r, mov_<store>l, mov_<store>r): Require
+	ISA_HAS_UL_US.
+	(mov_u<load>, mov_u<store>): New patterns.
+	(*truncsi_storeqi, *truncsi_storehi): Likewise.
+	(*branch_bit<mode>, *branch_bit<mode>_testdi): New patterns.
+	(*branch_bit<mode>_inverted): New pattern.
+	(*branch_bit_truncdi<mode>_inverted): Likewise.
+	(*seq_<mode>, *seq_<mode>_mips16, *sne_<mode>): Require
+	!ISA_HAS_SEQ_SNE.
+	(*seq_si_to_di, *seq_si_to_di_mips16, *sne_si_to_di): New patterns.
+	(*s<code>_<mode>_s<code>, *s<code>_si_to_di_s<code>): Likewise.
+	* config/mips/predicates.md (mask_low_and_shift_operator): New
+	predicate.
+
+2008-06-05  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config.gcc (powerpc-*-linux*spe*): Use t-dfprules.
+	* config/rs6000/dfp.md (negdd2, absdd2, negtd2, abstd2): Do not
+	enable for TARGET_E500_DOUBLE.
+	(*movdd_softfloat32): Also enable for !TARGET_FPRS.
+	* config/rs6000/rs6000.c (invalid_e500_subreg): Treat decimal
+	floating-point modes like integer modes for E500 double.
+	(rs6000_legitimate_offset_address_p): Likewise.
+	(rs6000_legitimize_address): Likewise.  Do not allow REG+REG
+	addressing for DDmode for E500 double.
+	(rs6000_hard_regno_nregs): Do not treat decimal floating-point
+	modes as using 64-bits of registers for E500 double.
+	(spe_build_register_parallel): Do not handle DDmode or TDmode.
+	(rs6000_spe_function_arg): Do not handle DDmode or TDmode
+	specially for E500 double.
+	(function_arg): Do not call rs6000_spe_function_arg for DDmode or
+	TDmode for E500 double.
+	(rs6000_gimplify_va_arg): Only handle SDmode in registers
+	specially if TARGET_HARD_FLOAT && TARGET_FPRS.
+	(rs6000_split_multireg_move): Do not handle TDmode specially for
+	E500 double.
+	(spe_func_has_64bit_regs_p): Do not treat DDmode or TDmode as
+	using 64-bit registers for E500 double.
+	(emit_frame_save): Do not handle DDmode specially for E500 double.
+	(gen_frame_mem_offset): Likewise.
+	(rs6000_function_value): Do not call spe_build_register_parallel
+	for DDmode or TDmode.
+	(rs6000_libcall_value): Likewise.
+	* config/rs6000/rs6000.h (LOCAL_ALIGNMENT, MEMBER_TYPE_FORCES_BLK,
+	DATA_ALIGNMENT, CLASS_MAX_NREGS): Do not handle DDmode specially
+	for E500 double.
+
+2008-06-05  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* dfp.c (WORDS_BIGENDIAN): Define to 0 if not defined.
+	(encode_decimal64, decode_decimal64, encode_decimal128,
+	decode_decimal128): Reverse order of 32-bit parts of value if host
+	and target endianness differ.
+
+	libdecnumber/
+	* dconfig.h: New.
+	* decContext.c, decExcept.c, decExcept.h, decLibrary.c,
+	decNumber.c, decNumberLocal.h, decRound.c, dpd/decimal128.c,
+	dpd/decimal32.c, dpd/decimal64.c: Include dconfig.h not config.h.
+	* dpd/decimal128Local.h (decimal128SetSign, decimal128ClearSign,
+	decimal128FlipSign): Use WORDS_BIGENDIAN not
+	FLOAT_WORDS_BIG_ENDIAN.
+	* bid/host-ieee128.c: Include dconfig.h.
+	(__host_to_ieee_128, __ieee_to_host_128): Swap 64-bit halves of
+	value if WORDS_BIGENDIAN.
+
+	libgcc/
+	* Makefile.in (DECNUMINC): Remove
+	-I$(MULTIBUILDTOP)../../libdecnumber.
+	* gstdint.h: New.
+
+2008-06-05  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_init_neon_builtins): Move initialization
+	with function calls after declarations.  Lay out
+	neon_float_type_node before further use.
+
+2008-06-04  Catherine Moore  <clm@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-27  Robin Randhawa <robin@mips.com>
+
+	* libstdc++-v3/config/cpu/mips/atomicity.h : Added memory barriers
+	to enforce strict ordering on weakly ordered systems.
+
+2008-06-04  Paul Brook  <paul@codesourcery.com>
+
+	Fix Issue #2917
+	gcc/
+	* config/arm/arm.c (neon_vector_mem_operand): Handle element/structure
+	loads.  Allow PRE_DEC.
+	(output_move_neon): Handle PRE_DEC.
+	(arm_print_operand): Add 'A' for neon structure loads.
+	* config/arm/arm-protos.h (neon_vector_mem_operand): Update prototype.
+	* config/arm/neon.md (movmisalign): Use Um constraint and %A.
+	* config/arm/constraints.md (Un, Us): Update neon_vector_mem_operand
+	calls.
+	(Um): New constraint.
+
+2008-06-04  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/testsuite/
+	2008-06-04  Joseph Myers  <joseph@codesourcery.com>
+	* lib/target-supports.exp (check_effective_target_powerpc_spu):
+	Call check_effective_target_powerpc_altivec_ok.
+	* gcc.target/powerpc/dfp-dd.c, gcc.target/powerpc/dfp-td.c,
+	gcc.target/powerpc/ppc32-abi-dfp-1.c,
+	gcc.target/powerpc/ppu-intrinsics.c: Require powerpc_fprs.
+
+2008-06-04  Kazu Hirata  <kazu@codesourcery.com>
+
+	Issue 1073
+	gcc/
+	* config/m68k/m68k.c (m68k_tune_flags): New.
+	(override_options): Compute m68k_tune_flags.
+	(MULL_COST, MULW_COST): Update for various variants of CFV2.
+	* config/m68k/m68k.h (TUNE_MAC, TUNE_EMAC): New.
+
+2008-06-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-06-02  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/t-linux (MULTILIB_OPTIONS): Add te500mc.
+	(MULTILIB_DIRNAMES): Likewise.
+	(MULTILIB_EXCEPTIONS): Handle te500mc.
+	* config/rs6000/linux.h (CC1_EXTRA_SPEC): Handle te500mc.
+	(ASM_DEFAULT_SPEC): Likewise.
+	* config/rs6000/rs6000.h (OPTION_DEFAULT_SPECS): Handle te500mc.
+
+2008-06-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-06-02  Nathan Froyd  <froydnj@codesourcery.com>
+
+	NOT ASSIGNED TO FSF
+	COPYRIGHT FREESCALE
+
+	gcc/doc:
+	* invoke.texi: Mention e500mc as a legitimate Power cpu.
+
+	gcc/
+	* config.gcc: Mention e500mc as a legitimate --with-cpu option.
+	* config/rs6000/rs6000.c (ppce500mc_cost): New.
+	(rs6000_override_options): Add e500mc to processor_target_table.
+	Enable isel for e500mc.  Disable string instructions for e500mc.
+	Set rs6000_cost for e500mc.
+	(rs6000_issue_rate): Handle CPU_PPCE500MC.
+	* config/rs6000/rs6000.h (ASM_CPU_SPEC): Handle mcpu=e500mc.
+	(enum processor_type): Add PROCESSOR_PPCE500MC.
+	(TARGET_ISEL): Use rs6000_isel.
+	* config/rs6000/e500mc.md: New file.
+	* config/rs6000/rs6000.md: Include it.
+	(define_attr "cpu"): Add e500mc.
+	(define_attr "type"): Add insert_dword.
+	* config/rs6000/e500.h (TARGET_ISEL): Remove.
+	(CHECK_E500_OPTIONS): Remove TARGET_ISEL condition.
+
+	2008-06-02  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* release-notes-csl.xml (E500mc support): New.
+
+	gcc/
+	* config/rs6000/e500mc.md: Eliminate duplication.
+
+2008-06-03  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-02-22  Nathan Froyd  <froydnj@codesourcery.com>
+	* config/rs6000/rs6000.c (rs6000_legitimize_address): Check to
+	ensure that we can address an entire entity > 8 bytes.  Don't
+	generate reg+reg addressing for such data.
+
+	2008-03-07  Peter Bergner  <bergner@vnet.ibm.com>
+	PR target/35373
+	* config/rs6000/rs6000.c (rs6000_legitimize_address): Don't generate
+	reg+const addressing for Altivec modes.  Don't generate reg+reg
+	addressing for TFmode or TDmode quantities.
+
+2008-06-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-28  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/testsuite/
+	* lib/target-supports.exp (check_effective_target_powerpc_spe_ok): New.
+
+2008-06-03  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/predicates.md (save_world_operation): Adjust checks.
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-05-22  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Issue #3062
+
+	* release-notes-csl.xml (E500 size optimization compiler crash): New.
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_emit_prologue): Mark the
+	adjustment to r11 as frame related when generating out-of-line
+	prologues.
+
+	2008-03-07  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_savres_strategy): Be slightly
+	smarter about restoring with an out-of-line function.
+	(rs6000_emit_prologue): Make sure we only set r11 once.  Be
+	smarter about restoring LR.
+
+	2008-02-29  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (emit_allocate_stack): Add copy_r11
+	parameter.  Copy stack_reg to r11 where appropriate.
+	(rs6000_stack_info): Only add padding for SPE save area if we
+	are saving SPE GPRs and CR.
+	(saveres_routine_syms): New variable.
+	(FIRST_SAVRES_REGISTER, LAST_SAVRES_REGISTER, N_SAVRES_REGISTERS):
+	Define.
+	(rs6000_savres_routine_sym): New function.
+	(rs6000_emit_stack_reset, rs6000_restore_saved_cr): New functions,
+	split out of...
+	(rs6000_emit_epilogue): ...here.  Use rs6000_use_multiple_p and
+	rs6000_savres_strategy.  Restore GPRs out-of-line if appropriate.
+	Tweak FPR out-of-line saving.
+	(rs6000_make_savres_rtx): New function.
+	(rs6000_use_multiple_p): New function.
+	(rs6000_savres_strategy): New function.
+	(rs6000_emit_prologue): Use rs6000_savres_strategy.  Save GPRs
+	out-of-line if appropriate.
+	* config/rs6000/sysv4.h (FP_SAVE_INLINE): Save FPRs out-of-line
+	if we are optimizing for size.
+	(GP_SAVE_INLINE): Define.
+	(SAVE_FP_SUFFIX, RESTORE_FP_SUFFIX): Only use _l on 64-bit targets.
+	* config/rs6000/darwin.h (GP_SAVE_INLINE): Define.
+	* config/rs6000/aix.h (GP_SAVE_INLINE): Define.
+	* config/rs6000/rs6000.md (*save_gpregs_<mode>): New insn.
+	(*save_fpregs_<mode>): Add use of r11.
+	(*restore_gpregs_<mode>): New insn.
+	(*return_and_restore_gpregs_<mode>): New insn.
+	(*return_and_restore_fpregs_<mode>): Adjust to clobber LR and
+	use r11.
+	* config/rs6000/spe.md (*save_gpregs_spe): New insn.
+	(*restore_gpregs_spe): New insn.
+	(*return_and_restore_gpregs_spe): New insn.
+
+2008-06-02  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.md (absv2sf2, negv2sf2, addv2sf3, subv2sf3,
+	mulv2sf3, divv2sf3): New expanders.
+	* config/rs6000/spe.md (spe_evabs, spe_evand, spe_evaddw,
+	spe_evdivws): Rename to use standard GCC names.
+	* config/rs6000/paired.md (negv2sf, absv2sf2, addv2sf3, subv2sf3,
+	mulv2sf3, divv2sf3): Rename to avoid conflict with the new expanders.
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-19  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (bdesc_2arg, bdesc_1arg): Use new CODE_FOR_
+	names for renamed patterns.
+
+2008-05-30  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/wrs-linux.h (CC1_SPEC): Allow -tcortex-a8-be8
+	-mfloat-abi=softfp.
+	(SUBTARGET_EXTRA_ASM_SPEC): Use -meabi=5.
+	* config/arm/t-wrs-linux (MULTILIB_EXCEPTIONS): Remove
+	*cortex-a8-be8*/*mfloat-abi=softfp*.
+	(MULTILIB_ALIASES): Add
+	tcortex-a8-be8=tcortex-a8-be8/mfloat-abi?softfp.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-12-12  Richard Sandiford  <richard@codesourcery.com>
+	gcc/testsuite/
+	* gcc.dg/torture/m68k-interrupt-1.c: New file.
+	2006-06-23  Richard Sandiford  <richard@codesourcery.com>
+	gcc/testsuite/
+	* gcc.dg/tree-ssa/20040204-1.c: Don't XFAIL for m68k*-*-*.
+
+2008-05-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/rs6000.c (ppc8540_cost): Fix typo.
+	(spe_synthesize_frame_save): Remove declaration.
+
+2008-05-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* tree-ssa-remove-local-statics.c
+	(find_static_nonvolatile_declarations): Use SSA_OP_VDEF.
+	(unstaticize_variable): Likewise.
+	(dump_final_bitmaps): Remove.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Tree->const_tree fix.
+
+	gcc/
+	* config/m68k/m68k.c (m68k_return_in_memory): Fix arguments types.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-16  Richard Sandiford  <richard@codesourcery.com>
+ 	gcc/
+	* config/m68k/m68k.h (INDEX_REG_CLASS): Delete in favor of...
+	(MODE_INDEX_REG_CLASS): ...this new macro.  Return NO_REGS unless
+	MODE_OK_FOR_INDEX_P.
+	(MODE_OK_FOR_INDEX_P): New macro.
+	(REGNO_OK_FOR_INDEX_P): Delete in favor of...
+	(REGNO_MODE_OK_FOR_INDEX_P): ...this new macro.  Return false
+	unless MODE_OK_FOR_INDEX_P.
+	(REG_OK_FOR_INDEX_P): Delete in favor of...
+	(REG_MODE_OK_FOR_INDEX_P): ...this new macro.  Return false
+	unless MODE_OK_FOR_INDEX_P.
+	* m68k-protos.h (m68k_legitimate_index_reg_p): Add mode argument.
+	* m68k.c (m68k_legitimate_index_reg_p, m68k_decompose_index):
+	Add mode argument.  Use it.
+	* config/m68k/m68k.md (tst<mode>_cf, cmp<mode>_cf, movsf_cf_hard)
+	(movdf_cf_hard, extendsfdf2_cf, truncdfsf2_cf, ftrunc<mode>2_cf)
+	(add<mode>3_cf, sub<mode>3_cf, fmul<mode>3_cf, div<mode>3_cf)
+	(neg<mode>2_cf, sqrt<mode>2_cf, abs<mode>2_cf): Replace "Q<U>"
+	constraints for FP addresses with "m" constraints.
+	2007-02-16  Nathan Sidwell  <nathan@codesourcery.com>
+	gcc/testsuite/
+	* gcc.dg/m68k-fp-1.c: New.
+
+2008-05-30  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/cortex-r4.md: Update GPLv3 notice.
+	* hwdiv.md: Likewise.
+	* marvell-f-vfp.md: Likewise.
+	* marvell-f.md: Likewise.
+	* nocrt0.h: Likewise.
+	* vfp11.md: Likewise.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2 (Add missing testcase from
+	earlier merge):
+
+	2008-02-01  Joseph Myers  <joseph@codesourcery.com>
+	gcc/testsuite/
+	* gcc.target/m68k/xgot-1.c: New test.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-11  Kazu Hirata  <kazu@codesourcery.com>
+	Issue 2396
+	gcc/
+	* configure.ac: Teach that fido supports .debug_line.
+	* configure: Regenerate.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2 (config.gcc part was merged earlier):
+
+	2007-03-26  Nathan Sidwell  <nathan@codesourcery.com>
+	gcc/
+	* config.gcc (m68k-*-linux*): Add sysroot-suffix.h to tm_file. Add
+	m68k/t-floatlib, m68k/t-linux & m68k/t-mlibs to tmake_file.
+	* config/m68k/t-linux: New.
+	* doc/install.texi: Document m68k-*-linux is now multilibbed by
+	default.
+
+2008-05-30  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Revert:
+
+	2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	Merge from Sourcery G++ 4.2:
+	2007-02-16  Paul Brook  <paul@codesourcery.com>
+	    Richard Sandiford  <richard@codesourcery.com>
+	gcc/
+	* config/m68k/m68k.md (UNSPEC_MOVEQ_MEM): New constant.
+	(*movsi_smallconst): New pattern.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* config/m68k/m68k.md: Fix previous commit.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-16  Richard Sandiford  <richard@codesourcery.com>
+ 	gcc/
+	* config/m68k/m68k.md (tst<mode>_cf, cmp<mode>_cf, movsf_cf_hard)
+	(movdf_cf_hard, extendsfdf2_cf, truncdfsf2_cf, floatsi<mode>2_cf)
+	(floathi<mode>2_cf, floatqi<mode>2_cf, ftrunc<mode>2_cf)
+	(fix<mode>qi2_cf, fix<mode>hi2_cf, fix<mode>si2_cf)
+	(add<mode>3_cf, sub<mode>3_cf, fmul<mode>3_cf, div<mode>3_cf)
+	(divmodsi4_cf, udivmodsi4_cf)
+	(neg<mode>2_cf, sqrt<mode>2_cf, abs<mode>2_cf): Replace "Q<U>"
+	constraints for FP addresses with "m" constraints.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-16  Paul Brook  <paul@codesourcery.com>
+	    Richard Sandiford  <richard@codesourcery.com>
+	gcc/
+	* config/m68k/m68k.md (UNSPEC_MOVEQ_MEM): New constant.
+	(*movsi_smallconst): New pattern.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-05-19  Kazu Hirata  <kazu@codesourcery.com>
+
+	gcc/
+	* config.gcc (arm-timesys-linux-gnueabi): Add ./sysroot-suffix.h
+	./sysroot-suffix.h to tm_file while removing arm/timesys-linux.h
+	from tm_file.  Add tmake_file.
+	* config/arm/t-timesys (MULTILIB_OSDIRNAMES): Populate.
+	* config/arm/timesys-liunx.h: Remove.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-05-07  Paul Brook  <paul@codesourcery.com>
+
+	* config/arm/arm.c (arm_no_early_mul_dep): Correct the logic to
+	look into a MAC instruction.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-04-04  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/linux-eabi.h (ARM_FUNCTION_PROFILER): Define.
+	(SUBTARGET_FRAME_POINTER_REQUIRED): Define.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-08  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/t-linux-eabi (MULTILIB_OSDIRNAMES): Override old value.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-29  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/lib1funcs.asm (THUMB_LDIV0): Fix bogus ARCH_7 ifdefs.
+	Use cbz.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-25  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* testsuite/gcc.dg/arm-mmx-1.c: Skip if conflicting -mcpu or -mabi
+	argument specified.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-18  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/bpabi.S (test_div_by_zero): New macro.
+	(aeabi_ldivmod): Use above macro to tailcall long long div-by-zero
+	handler.
+	(aeabi_uldivmod): Likewise.
+	* config/arm/bpabi-v6m.S (test_div_by_zero): New macro.
+	(aeabi_ldivmod, aeabi_uldivmod): Use above macro.
+	* config/arm/lib1funcs.asm (ARM_LDIV0): Tailcall int div-by-zero
+	handler. Add signed/unsigned argument, pass correct value to that
+	handler.
+	(THUMB_LDIV0): Same, for Thumb.
+	(DIV_FUNC_END): Add signed argument.
+	(WEAK): New macro.
+	(__udivsi3, __umodsi3): Add unsigned argument to DIV_FUNC_END.
+	(__divsi3, modsi3): Add signed argument to DIV_FUNC_END.
+	(__aeabi_uidivmod, __aeabi_idivmod): Check division by zero.
+	(__div0): Rename to __aeabi_idiv0, __aeabi_ldiv0 for EABI, and declare
+	those names weak.
+	* config/arm/t-bpabi (LIB1ASMFUNCS): Add _aeabi_idiv0, _aeabi_ldiv0.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-17  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* doc/invoke.texi: Document -mword-relocations.
+	* config/arm/uclinux-elf.h: Define TARGET_DEFAULT_WORD_RELOCATIONS.
+	* config/arm/symbian.h: Define TARGET_DEFAULT_WORD_RELOCATIONS.
+	* config/arm/vxworks.h: Define TARGET_DEFAULT_WORD_RELOCATIONS.
+	* config/arm/arm.h: Define TARGET_DEFAULT_WORD_RELOCATIONS.
+	* config/arm/arm.md (movsi): Don't use movt if only word relocations
+	are permitted.
+	* config/arm/arm.opt: Add -mword-relocations.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-16  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config.gcc (arm*): Handle --enable-extra-sgxx-multilibs.
+	Use arm/t-sysroot-suffix and ./sysroot-suffix.h.
+	* config/arm/uclinux-eabi.h (SYSROOT_SUFFIX_SPEC): Remove.
+	* config/arm/linux-eabi.h (SYSROOT_SUFFIX_SPEC): Remove.
+	* config/arm/t-linux-eabi: Remove marvell-f multilib.
+	Match Cortex-A9 and Cortex-R4F.
+	* config/arm/t-arm-elf: Remove marvell-f multilib.
+	Match Cortex-A9 and Cortex-R4F.
+	* config/arm/t-uclinux-eabi: Match Cortex-A9 and Cortex-R4F.
+	* config/arm/print-sysroot-suffix.sh: New file.
+	* config/arm/t-sysroot-suffix: New file.
+	* config/arm/t-cs-eabi: New file.
+	* config/arm/t-cs-linux: New file.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-05  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* genmultilib: Fix sed patterns.
+	Verify that aliases are valid.
+	* config/arm/t-timesys (MULTILIB_ALIASES): Set.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-05  Paul Brook  <paul@codesourcery.com>
+
+	gcc/doc/
+	* fragments.texi: Document MULTILIB_ALIASES.
+
+	gcc/
+	* genmultilib: Add aliases.
+	* Makefile.in (s-mlib): Pass MULTILIB_ALIASES.
+	* config/arm/t-linux-eabi: Use MULTILIB_ALIASES.
+	* config/arm/t-arm-elf: Ditto.
+	* config/arm/t-uclinux-eabi: Ditto.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-28  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_override_options): Set arm_abi earlier.
+	Allow Interworking on ARMv4 EABI based targets.
+	* config/arm/bpabi.h (TARGET_FIX_V4BX_SPEC): Define.
+	(SUBTARGET_EXTRA_ASM_SPEC, LINK_SPEC): Add TARGET_FIX_V4BX_SPEC.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-25  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/ieee754-df.S (muldf3): Use RET macros.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-23  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_tune_cortex_a9): New variable.
+	(arm_override_options): Set arm_tune_cortex_a9.
+	(arm_split_constant): Use arm_emit_movpair.
+	(arm_rtx_costs_1): Increase cost of register shifts on cortex-A9.
+	Add costs for HIGH and LO_SUM.
+	(arm_size_rtx_costs): Add costs for HIGH and LO_SUM.
+	(arm_emit_movpair): New function.
+	(arm_print_operand): Handle symbols with %c.
+	(arm_final_prescan_insn): Use TARGET_NO_SINGLE_COND_EXEC.
+	(arm_issue_rate): Add cortexa9.
+	* config/arm/arm.h (TARGET_NO_SINGLE_COND_EXEC): Define.
+	(TARGET_USE_MOVT): Define.
+	(arm_tune_cortex_a9): Add prototype.
+	* config/arm/arm-cores.def: Add cortex-a9.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/arm-protos.h (arm_emit_movpair): Add prototype.
+	* config/arm/arm.md: Include cortex-a9.md.
+	Add TARGET_NO_SINGLE_COND_EXEC conditions.
+	(generic_sched, generic_vfp): Add cortex-a9.
+	(movsi): Use arm_emit_movpair.
+	(arm_movt, arm_movw): New patterns.
+	* config/arm/cortex-a9.md: New file.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-09  Julian Brown  <julian@codesourcery.com>
+
+	gcc/
+	* config/arm/neon.md (UNSPEC_MISALIGNED_ACCESS): New constant.
+	(movmisalign<mode>): Define for D and Q width registers.
+
+	gcc/testsuite/
+	* lib/target-supports.exp
+	(check_effective_target_arm_vect_no_misalign): New function.
+	(check_effective_target_vect_no_align): Use above to determine
+	whether misaligned accesses are expected for ARM.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-04  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_output_epilogue): Avoid clobbering tail call
+	arguments.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-01-03  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_rtx_costs_1): Add costs for ARMv6 value
+	extension instructions.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-12-20  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/cortex-r4f.md: New file.
+	* config/arm/arm.c (arm_no_early_mul_dep): Also match
+	multiply-subtract.
+	(arm_issue_rate): Return 2 for cortex-a8 and cortex-r4.
+	* config/arm/cortex-r4.md: Replace (eq_attr "tune" "cortexr4")
+	with (eq_attr "tune_cortexr4" "yes").
+	* config/arm/vfp.md: Split ffarith and ffarith into fcpys, ffariths,
+	ffarithd, fadds, faddd, fconsts, fconstd, fcmps and fcmpd.
+	* config/arm/arm.md: Inlcude cortex-r4f.md.
+	(define_attr fpu): Add new VFP variants.
+	(define_attr type): Add new types.
+	(tune_cortexr4): New attr.
+	(generic_sched, generic_vfp): Use tune_cortexr4 and new FPU types.
+	* config/arm/cortex-a8-neon.md: Split farith and ffarith insn types.
+	* config/arm/marvell-f-vfp.md: Ditto.
+	* config/arm/arm1020e.md: Ditto.
+	* config/arm/vfp11.md: Ditto.
+	* config/arm/arm-tune.md: Regenerate.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-12-14  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* doc/invoke.texi: Document new ARM -mfpu= and -mcpu= options.
+	* config/arm/arm.c (all_fpus): Add vfpv3 and vfpv3-d16.
+	(fp_model_for_fpu): Add entry for FPUTYPE_VFP3D16.
+	(arm_file_start): Add FPUTYPE_VFP3D16.  Rename vfp3 to vfpv3.
+	* config/arm/arm.h (TARGET_VFPD32): Define.
+	(TARGET_VFP3): Use TARGET_VFPD32.
+	(fputype): Add FPUTYPE_VFP3D16.
+	(LAST_VFP_REGNUM): Use TARGET_VFPD32.
+	* config/arm/constraints.md ("w"): Use TARGET_VFPD32.
+	* config/arm/arm-cores.def: Add cortex-r4f.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-12-11  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md: Extend peephole to cover 3-arg subs.
+	(thumb2_alusi3_short): Exclude MINUS.
+	(thumb2_subsi_short): New pattern.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-27  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_optimization_options): Revert flag_see
+	change.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-19  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (FL_COMPAT): Define.
+	(arm_override_options): Mask out FL_COMPAT when checking cpu vs. arch.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-19  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_optimization_options):
+	Enable -fsee and disable -fmove-loop-invariants.
+	Use very restrictive inlining heuristics.
+
+	gcc/testsuite/
+	* gcc.c-torture/execute/bcp-1.x: New.  Don't
+	run bcp-1.c test on arm, with -Os.
+	* gcc.c-torture/execute/990208-1.x: New.  Likewise.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-20  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.md (insv): Use gen_insv_t2 and gen_insv_zero.
+	(extzv): Use gen_extzv_t2.
+	(insv_t2, insv_zero, extv, extzv_t2): New patterns.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-20  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md (thumb2_one_cmplsi2_short,
+	thumb2_negsi2_short): New patterns and peepholes.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-20  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_size_rtx_costs): Use ARM costs for Thumb-2.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-13  Paul Brook  <paul@codesourcery.com>
+
+	* config/arm/arm.c (arm_output_epilogue): Adjust stack pointer by
+	popping call-clobbered registers.
+	(arm_expand_prologue): Adjust stack pointer by pushing extra
+	registers.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-12  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (TARGET_ADJUST_REG_ALLOC_ORDER): Define.
+	(thumb_core_reg_alloc_order): New.
+	(arm_adjust_reg_alloc_order): New.
+	* config/arm/arm.h (REG_ALLOC_ORDER): Adjust comment.
+	* config/arm/arm-protos.h (arm_adjust_reg_alloc_order): New
+	prototype.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-12  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (CLASS_LIKELY_SPILLED_P): Update comment.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-12  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (CLASS_LIKELY_SPILLED_P): Check against
+	LO_REGS only for Thumb-1.
+	(MODE_BASE_REG_CLASS): Restrict base registers to low
+	registers for Thumb-2.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-10  Paul Brook  <paul@codesourcery.com>
+
+	* config/arm/arm.md (arm_addsi3): Add r/k/n alternative.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-07  Kazu Hirata  <kazu@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.dg/arm-g2.c, gcc.dg/arm-mmx-1.c, gcc.dg/arm-scd42-2.c:
+	Skip if the multilib testing specifies -march that does not
+	agree with the one specified in the testcase.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-25  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/
+	* config.gcc (arm*-*-linux*): Add timesys specific files.
+	* config/arm/timesys-linux.h: New.
+	* config/arm/t-timesys: New.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-16  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (use_return_insn): Use offsets->saved_regs_mask
+	instead of {arm,thumb}_compute_save_reg_mask.
+	(output_return_instruction): Ditto.
+	(arm_output_epilogue): Ditto.
+	(arm_expand_prologue): Ditto.
+	(thumb_unexpanded_epilogue): Ditto.
+	(thumb1_expand_prologue): Ditto.
+	(thumb1_output_function_prologue): Ditto.
+	(arm_set_return_address): Ditto.
+	(thumb_set_return_address): Ditto.
+	(arm_get_frame_offsets): Set offsets->saved_regs_mask.  Push extra
+	regs to achieve stack alignment.
+	(thumb1_compute_save_reg_mask): Fix compiler warning.
+	* gcc/config/arm.h (arm_stack_offsets): Add saved_regs_mask.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-05  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (BRANCH_COST): Set to 1 when optimizing
+	for size on Thumb-2.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-05  Richard Sandiford  <richard@codesourcery.com>
+
+	gcc/
+	* config/arm/neon-gen.ml: Include vxWorks.h rather than stdint.h
+	for VxWorks kernels.
+	* config/arm/arm_neon.h: Regenerate.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-05  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md (thumb2_movsi_insn): Split ldr and
+	str alternatives according to use of high and low regs.
+	* config/arm/vfp.md (thumb2_movsi_vfp): Likewise.
+	* config/arm/arm.h (CONDITIONAL_REGISTER_USAGE): Use high
+	regs when optimizing for size on Thumb-2.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-07-02  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md (thumb2_alusi3_short): Exclude PLUS.
+	(thumb2_addsi_shortim): Rename ...
+	(thumb2_addsi_short): ... to this.  Allow register operands.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Backport from mainline:
+
+	2008-02-26  Paul Brook  <paul@codesourcery.com>
+
+	* config/arm/arm.c (thumb_set_frame_pointer): Ensure SP is first
+	operand for Thumb-2.
+	* config/arm/arm.h (reg_class): Add CORE_REGS.
+	(REG_CLASS_NAMES, REG_CLASS_CONTENTS): Ditto.
+	(BASE_REG_CLASS): Use CORE_REGS.
+	(PREFERRED_RELOAD_CLASS): Add STACK_REG.
+	(REGNO_MODE_OK_FOR_REG_BASE_P): Use REGNO_MODE_OK_FOR_BASE_P.
+	(REGNO_OK_FOR_INDEX_P): Exclude SP.
+	(ARM_REG_OK_FOR_INDEX_P): Always define.  Use
+	ARM_REGNO_OK_FOR_INDEX_P.
+	(ARM_PRINT_OPERAND_ADDRESS): Swap operands for [reg, sp].
+	* config/arm/arm.md (arm_addsi3, thumb1_addsi3, arm_subsi3_insn,
+	arm_movsi_insn, thumb1_movsi_insni, stack_tie): Add "k" alternatives.
+	(ldm/stm peepholes): Ditto.
+	* config/arm/thumb2.md (thumb2_movdi): Add "k" alternatives.
+	* config/arm/vfp.md (arm_movsi_vfp, thumb2_movsi_vfp): Ditto.
+	* config/arm/iwmmxt.md (iwmmxt_movsi_insn): Ditto.
+	* config/arm/constraints.md: Enable "k" constraint on ARM.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-01  Joseph Myers  <joseph@codesourcery.com>
+	* release-notes-csl.xml: Add -mxgot release note.
+	gcc/
+	* config/m68k/m68k.opt (mxgot): New option.
+	* config/m68k/m68k.c (legitimize_pic_address): Handle -mxgot.
+	(m68k_output_addr_const_extra): New.
+	* config/m68k/m68k.h (OUTPUT_ADDR_CONST_EXTRA): New.
+	* config/m68k/m68k-protos.h (m68k_output_addr_const_extra): Declare.
+	* config/m68k/m68k.md (UNSPEC_GOTOFF): Define.
+	* doc/invoke.texi (M680x0 Options): Document -mxgot.
+	gcc/testsuite/
+	* gcc.target/m68k/xgot-1.c: New test.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-12  Nathan Sidwell  <nathan@codesourcery.com>
+	gcc/
+	* config/m68k/t-cf (MULTILIB_EXTRA_OPTS): Add no-mac.
+	* config/m68k/m68k-devices.def: Remove multilibs that only differ
+	by MAC/EMAC.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-06-13  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/crti.asm, config/arm/crtn.asm: Remove .file
+	directives.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-06-06  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (VALID_IWMMXT_REG_MODE): Allow SImode.
+	(ARM_LEGITIMIZE_RELOAD_ADDRESS): Reduce range allowed for SImode
+	offsets with iWMMXt.
+	* config/arm/arm.c (arm_hard_regno_mode_ok): Update for change to
+	VALID_IWMMXT_REG_MODE.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-05-17  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (output_move_double): Prefer LDRD to LDM.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-05-15  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/nocrt0.h (LIB_SPEC): Remove default -T.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-05-04  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/bpabi.h (SUBTARGET_EXTRA_ASM_SPEC): Bump EABI
+	version number to five.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-05-02  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_unwind_emit): Suppress unused unwinding
+	annotations.
+	(arm_output_fn_unwind): Mark functions that can not be unwound.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-26  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (vfp_output_fldmd): When low_irq_latency
+	is non zero, pop each register separately.
+	(vfp_emit_fstmd): When low_irq_latency is non zero,
+	save each register separately.
+	(arm_get_vfp_saved_size): Adjust saved register
+	size calculation for the above changes.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-25  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/bpabi-v6m.S (aeabi_lcmp): Use unsigned comparison for
+	low word.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-22  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/lib1funcs.asm (div0): Use correct punctuation.
+	* config/arm/ieee754-sf.S (mulsf3): Likewise.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-18  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.h (TARGET_CPU_CPP_BUILTINS): Set
+	__low_irq_latency__.
+	* config/arm/lib1funcs.asm: Define do_pop and
+	do_push as variadic macros. When __low_irq_latency__
+	is defined, push and pop registers individually.
+	* config/arm/ieee754-df.S: Adjust syntax of using
+	do_push.
+	* config/arm/ieee754-sf.S: Likewise.
+	* config/arm/bpapi.S: Likewise.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-17  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (TARGET_DWARF_REGISTER_SPAN): Define.
+	(arm_dwarf_register_span): New function.
+	(arm_dbx_register_number): Add VFPv3 dwarf numbering.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-16  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (print_pop_reg_by_ldr): Fix warning about ambiguous
+	else.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Backport from mainline:
+
+	2008-05-06  Mark Shinwell  <shinwell@codesourcery.com>
+		    Daniel Jacobowitz  <dan@codesourcery.com>
+		    Andrew Jenner  <andrew@codesourcery.com>
+
+	* g++.old-deja/g++.jason/enum6.C, g++.old-deja/g++.law/enum9.C,
+	g++.old-deja/g++.other/enum4.C, gfortran/enum_9.f90,
+	gfortran.dg/enum_10.f90: Broaden dg-options pattern.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-01  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/uclinux-eabi.h (SUBTARGET_EXTRA_LINK_SPEC): Add
+	--target2=abs.
+	* config/arm/unwind-arm.h (_Unwind_decode_target2): Handle uClinux.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-31  Paul Brook  <paul@codesourcery.com>
+
+	* config/arm/arm.c (output_move_double): Only apply limited range
+	check in ARM mode.
+
+2008-05-29  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-30  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (use_return_insn): Test for TARGET_APCS_FRAME
+	if we need to adjust the stack.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-07  Mark Shinwell  <shinwell@codesourcery.com>
+	gcc/
+	* config/m68k/lb1sf68.asm: Add PIC macros for Linux targets.
+
+2008-05-29  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config.gcc (m68k-*-linux*): Add with_arch, adjust tm_file,
+	add tmake_file.
+
+2008-05-28  Paul Brook  <paul@codesourcery.com>
+
+	Avoid Issue #2945
+	gcc/
+	* config/arm/arm.md (abssi2): Add TARGET_NO_SINGLE_COND_EXEC expander.
+	(arm_abssi2, arm_neg_abssi2): Enable for Thumb-2. Always split.
+	(arm_nocond_abssi2, arm_nocond_neg_abssi2): New patterns.
+	Add splitters for abssi patterns.
+	* config/arm/thumb2.md (thumb2_abssi2, thumb2_neg_abssi2): Remove.
+
+2008-05-26  Carlos O'Donell  <carlos@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-05-23  Paul Brook  <paul@codesourcery.com>
+		    Carlos O'Donell  <carlos@codesourcery.com>
+
+ 	* doc/extend.texi: Clarify use of __attribute__((naked)).
+ 	* doc/tm.texi: Document TARGET_ALLOCATE_STACK_SLOTS_FOR_ARGS.
+ 	* target.h (gcc_target): Add allocate_stack_slots_for_args.
+ 	* function.c (use_register_for_decl): Use
+ 	targetm.calls.allocate_stack_slots_for_args.
+ 	* target-def.h (TARGET_CALLS): Add
+ 	TARGET_ALLOCATE_STACK_SLOTS_FOR_ARGS.
+ 	* config/arm/arm.c (arm_allocate_stack_slots_for_args):
+ 	New function.
+ 	(TARGET_ALLOCATE_STACK_SLOTS_FOR_ARGS): Define.
+
+	gcc/testsuite/
+	2008-05-23  Paul Brook  <paul@codesourcery.com>
+		    Carlos O'Donell  <carlos@codesourcery.com>
+
+ 	* gcc.target/arm/naked-1.c: New test.
+ 	* gcc.target/arm/naked-2.c: New test.
+
+2008-05-26  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-04-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* config/rs6000/crtresgpr.asm, config/rs6000/crtresxgpr.asm,
+	config/rs6000/crtsavgpr.asm, config/rs6000/crtresfpr.asm,
+	config/rs6000/crtresxfpr.asm, config/rs6000/crtsavfpr.asm: Break out
+	from...
+	* config/rs6000/crtsavres.asm: ...here.  Remove unneeded file.
+	* config/rs6000/e500crtres32gpr.asm, config/rs6000/e500crtres64gpr.asm,
+	config/rs6000/e500crtres64gprctr.asm,
+	config/rs6000/e500crtrest32gpr.asm, config/rs6000/e500crtrest64gpr.asm,
+	config/rs6000/e500crtresx32gpr.asm, config/rs6000/e500crtresx64gpr.asm,
+	config/rs6000/e500crtsav32gpr.asm, config/rs6000/e500crtsav64gpr.asm,
+	config/rs6000/e500crtsav64gprctr.asm,
+	config/rs6000/e500crtsavg32gpr.asm, config/rs6000/e500crtsavg64gpr.asm,
+	config/rs6000/e500crtsavg64gprctr.asm: New files.
+	* config/rs6000/t-ppccomm: Add build rules for new files.
+	(LIB2FUNCS_STATIC_EXTRA): Add new files.
+	* config/rs6000/t-netbsd: Add build rules for new files.
+	(LIB2FUNCS_STATIC_EXTRA): New variable.
+	* config/rs6000/sysv4.h (ENDFILE_SPEC): Don't include crtsavres.o
+	(CRTSAVRES_DEFAULT_SPEC): Likewise.
+	* config/rs6000/netbsd.h (ENDFILE_SPEC): Likewise.
+
+	libgcc/
+	2008-04-30  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* config/rs6000/t-ppccomm: Add build rules for new files.
+	(LIB2ADD_ST): New variable.
+
+2008-05-26  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-25  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* tree-ssa-remove-local-statics. (initialize_statement_dataflow):
+	Continue hash table traversal.
+	(compute_definedness_for_block): Delete useless return statement.
+	Adjust comment accordingly.
+
+	2007-03-05  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* tree-pass.h (pass_remove_local_statics): Declare.
+	* passes.c (init_optimization_passes): Add
+	pass_remove_local_statics to the optimization passes.
+	* Makefile.in (OBJS-common): Add tree-ssa-remove-local-statics.c.
+	(tree-ssa-remove-local-statics.o): New rule.
+	* tree-ssa-remove-local-statics.c: New file.
+	* c.opt (fremove-local-statics): New option.
+	* timevar.def (TV_RLS): New timevar.
+	* toplev.h (flag_remove_local_statics): Declare.
+	* cgraph.h (struct cgraph_node): Add 'ever_was_nested'.
+	* cgraph.c (cgraph_node): Set ever_was_nested in the node and
+	its parent when creating a new node.
+	gcc/doc/
+	* invoke.texi: Document -fremove-local-statics.
+	gcc/testsuite/
+	* gcc.dg/remove-local-statics-1.c: New file.
+	* gcc.dg/remove-local-statics-2.c: New file.
+	* gcc.dg/remove-local-statics-3.c: New file.
+	* gcc.dg/remove-local-statics-4.c: New file.
+	* gcc.dg/remove-local-statics-5.c: New file.
+	* gcc.dg/remove-local-statics-6.c: New file.
+	* gcc.dg/remove-local-statics-7.c: New file.
+	* gcc.dg/remove-local-statics-8.c: New file.
+	* gcc.dg/remove-local-statics-9.c: New file.
+	* gcc.dg/remove-local-statics-10.c: New file.
+	* gcc.dg/remove-local-statics-11.c: New file.
+	* gcc.dg/remove-local-statics-12.c: New file.
+
+
+2008-05-26  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	2008-04-24  Nathan Froyd  <froydnj@codesourcery.com>
+		    Nathan Sidwell  <nathan@codesourcery.com>
+
+	* config/rs6000/rs6000.opt (mspe): Remove Var property.
+	(misel): Likewise.
+	* config/rs6000/rs6000.h (rs6000_spe): Declare.
+	(rs6000_isel): Likewise.
+	* config/rs6000/rs6000.c (rs6000_spe): New variable.
+	(rs6000_isel): New variable.
+	(rs6000_handle_option): Handle OPT_mspe and OPT_misel.
+
+2008-05-26  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/powerpc/altivec-24.c, gcc.target/powerpc/pr35907.c:
+	Run if vmx_hw, compile otherwise.  Do not check for AltiVec at
+	runtime.
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/testsuite/
+	* gcc.target/powerpc/altivec-vec-merge.c,
+	gcc.target/powerpc/altivec-10.c, gcc.target/powerpc/altivec-12.c,
+	gcc.target/powerpc/altivec-1.c, gcc.target/powerpc/altivec-3.c,
+	g++.dg/ext/altivec-2.C, g++.dg/ext/altivec-3.C: Run if vmx_hw, compile
+	otherwise.  Do not check for AltiVec at runtime.
+	* gcc.target/powerpc/altivec_check.h: Delete.
+	* g++.dg/eh/simd-2.C: Only use -maltivec if vmx_hw.
+	* g++.dg/ext/altivec_check.h: Delete.
+	* g++.dg/eh/check-vect.h (sig_ill_handler): Remove AltiVec runtime
+	check.
+
+	* gcc.target/powerpc/20030505.c: Compile for all EABI targets.
+	Explicitly enable SPE.
+	* gcc.target/powerpc/ppc-spe.c: Likewise.
+
+	* gcc.target/powerpc/darwin-longlong.c: Explicitly require 64-bit
+	instruction support.  Do not check for it at runtime.
+
+	* gcc.target/powerpc/20030218-1.c: Pass -mfloat-gprs=single.  Expect
+	-flax-vector-conversions message.
+	* gcc.target/powerpc/spe1.c: Pass -mfloat-gprs=single.  Make Foo
+	extern.
+	* g++.dg/other/opaque-2.C: Pass -mfloat-gprs=single.
+	* g++.dg/other/opaque-3.C, g++.dg/ext/spe1.C: Likewise.
+
+	* gcc.dg/cpp/assert4.c: Recognize __PPC__.
+
+	* g++.dg/other/opaque-1.C: Run on targets with SPE.
+	* g++.dg/other/profile1.C: Use dg-require-profiling.
+
+	* g++.dg/conversion/simd1.C: Expect warning on all PowerPC
+	non-AltiVec targets.
+	* g++.dg/ext/attribute-test-1.C, g++.dg/ext/attribute-test-2.C,
+	g++.dg/ext/attribute-test-3.C, g++.dg/ext/attribute-test-4.C: Likewise.
+
+	* lib/target-supports.exp (check_effective_target_ppc64): New.
+
+2008-05-26  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* release-notes-csl.xml: Add missing release note.
+
+2008-05-23  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/arm/t-wrs-linux (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
+	MULTILIB_EXCEPTIONS): Add -tcortex-a8-be8 multilib.
+	* config/arm/wrs-linux.h (CC1_SPEC, SUBTARGET_EXTRA_ASM_SPEC,
+	SUBTARGET_EXTRA_LINK_SPEC, SYSROOT_SUFFIX_SPEC): Update for new
+	multilib.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-02-23  David Edelsohn  <edelsohn@gnu.org>
+
+	* config/rs6000/rs6000.h (CONSTANT_ALIGNMENT): Use STRICT_ALIGNMENT
+	instead of TARGET_STRICT_ALIGN.
+
+	gcc/
+	2008-02-22  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* config/rs6000/rs6000.h (CONSTANT_ALIGNMENT): Don't overalign
+	strings when optimizing for size, unless the target cares about
+	alignment.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-28  Paul Brook  <paul@codesourcery.com>
+
+	Merge ARMv6-M support.
+	gcc/
+	* config/arm/t-linux-eabi: Remove explicit marm (default) multilib.
+	Add entries for all multilibs to MULTILIB_OSDIRNAMES.
+	* config/arm/t-arm-elf: Ditto. Add armv6-m multilib.
+	(LIB1ASMFUNCS): Prefix sf/df routines with arm_.
+	* config/arm/t-uclinux-eabi: New file.
+	* config/arm/t-linux-eabi: Add Thumb-2 multilib.
+	* config/arm/uclinux-eabi.h (SYSROOT_SUFFIX_SPEC): Define.
+	* config/arm/linux-eabi.h (SYSROOT_SUFFIX_SPEC): Add thumb-2 sysroot.
+	* config.gcc: Add t-softfp and t-arm-softfp to ARM ELF based targets.
+	Add armv6-m.
+	* config/arm/t-arm-softfp: New file.
+	* config/arm/elf.h: Prevent libgcc float conversion routines being
+	built when we have assembly implementations.
+	* config/arm/ieee754-sf.S: Rename L_* L_arm_*
+	* config/arm/ieee754-df.S: Ditto.
+	* config/arm/arm.c (FL_FOR_ARCH6M): Define.
+	(all_architectures): Add armv6-m.
+	(arm_output_mi_thunk): Add TARGET_THUNMB1_ONLY code.
+	* config/arm/arm.h (TARGET_THUMB1_ONLY): Define.
+	(ARM_DECLARE_FUNCTION_NAME): Handle v6m thunks.
+	* config/arm/lib1funcs.asm: Add __ARM_ARCH_6M__. Omit ARM mode
+	code and macros when it is defined.  Include bpabi-v6m.S.
+	(gnu_Unwind_Restore_VFP_D, gnu_Unwind_Save_VFP_D,
+	gnu_Unwind_Restore_VFP_D_16_to_31, gnu_Unwind_Save_VFP_D_16_to_31,
+	gnu_Unwind_Restore_WMMXD, gnu_Unwind_Save_WMMXD,
+	gnu_Unwind_Restore_WMMXC, gnu_Unwind_Save_WMMXC): Stubs for ARMv6-M.
+	* config/arm/sfp-machine.h: New file.
+	* config/arm/arm-cores.def: Add cortex-m1.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/libunwind.S: Add ARMv6-M implementation.
+	* config/arm/bpabi.h: Add renames for unsigned conversion routines.
+	* config/arm/bpabi-v6m.S: New file.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-26  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.1 branch:
+
+	2006-03-01  Paul Brook  <paul@codesourcery.com>
+	gcc/testsuite/
+	* g++.dg/other/armv7m-1.C: New test.
+
+	2006-10-27  Joseph Myers  <joseph@codesourcery.com>
+		    Richard Sandiford  <richard@codesourcery.com>
+	gcc/testsuite/
+	* gcc.dg/arm-vfp1.c, gcc.target/arm/vfp-ldmdbd.c,
+	gcc.target/arm/vfp-ldmdbs.c, gcc.target/arm/vfp-ldmiad.c,
+	gcc.target/arm/vfp-ldmias.c, gcc.target/arm/vfp-stmdbd.c,
+	gcc.target/arm/vfp-stmdbs.c, gcc.target/arm/vfp-stmiad.c,
+	gcc.target/arm/vfp-stmias.c: Use arm_vfp_ok.
+
+	2006-08-19  Joseph Myers  <joseph@codesourcery.com>
+	gcc/testsuite/
+	* gcc.target/arm/vfp-ldmdbd.c, gcc.target/arm/vfp-ldmdbs.c,
+	gcc.target/arm/vfp-ldmiad.c, gcc.target/arm/vfp-ldmias.c,
+	gcc.target/arm/vfp-stmdbd.c, gcc.target/arm/vfp-stmdbs.c,
+	gcc.target/arm/vfp-stmiad.c, gcc.target/arm/vfp-stmias.c: Skip for
+	iWMMXt.
+
+	2006-04-21  Kazu Hirata  <kazu@codesourcery.com>
+	gcc/testsuite/
+	* gcc.target/arm/vfp-ldmdbd.c, gcc.target/arm/vfp-ldmdbs.c,
+	gcc.target/arm/vfp-ldmiad.c, gcc.target/arm/vfp-ldmias.c,
+	gcc.target/arm/vfp-stmdbd.c, gcc.target/arm/vfp-stmdbs.c,
+	gcc.target/arm/vfp-stmiad.c, gcc.target/arm/vfp-stmias.c: New.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-25  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (load_multiple_sequence): Return
+	0 if low irq latency is requested.
+	(store_multiple_sequence): Likewise.
+	(arm_gen_load_multiple): Load registers one-by-one
+	if low irq latency is requested.
+	(arm_gen_store_multiple): Likewise.
+	* config/arm/predicates.md (load_multiple_operation):
+	Return false is low irq latency is requested.
+	(store_multiple_operation): Likewise.
+	* config/arm/arm.h (low_irq_latency): Define.
+	* config/arm/arm.md (movmemqi): Don't use
+	it if low irq latency is requsted.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-24  Vladimir Prus  <vladimir@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_override_options): Warn if
+	mlow-irq-latency is specified in thumb mode.
+	(print_pop_reg_by_ldr): New.
+	(arm_output_epilogue): Use print_pop_reg_by_ldr
+	when low irq latency is requested.
+	(emit_multi_reg_push): Push registers separately
+	if low irq latency is requested.
+	* config/arm/arm.opt (mlow-irq-latency): New option.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-23  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config/arm/uclinux-eabi.h (SUBTARGET_EXTRA_LINK_SPEC): Add -elf2flt
+	and --pic-veneer.
+	* config/arm/bpabi.h (SUBTARGET_EXTRA_LINK_SPEC): Provide empty
+	default definition.
+	(LINK_SPEC): Include SUBTARGET_EXTRA_LINK_SPEC.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config.gcc: Loosen checks for arm uclinux eabi targets.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/arm/lib1funcs.asm (ARM_DIV_BODY):  Conditionalize for
+	__ARM_TUNE_MARVELL_F__.
+	* config/arm/arm.h (TARGET_CPU_CPP_BUILTINS): Add code to define
+	__ARM_TUNE_MARVELL_F__.
+	* config/arm/linux-eabi.h (SYSROOT_SUFFIX_SPEC): Add support for
+	marvell-f multilibs.
+	* config/arm/t-linux-eabi (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
+	MULTILIB_EXCEPTIONS, MULTILIB_MATCHES): Likewise.
+	* config/arm/t-arm-elf (MULTILIB_OPTIONS, MULTILIB_DIRNAMES,
+	MULTILIB_EXCEPTIONS, MULTILIB_MATCHES): Likewise.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/cortex-r4.md: New.
+	* config/arm/hwdiv.md (divsi3, udivsi3): Annotate with
+	insn attributes.
+	* config/arm/arm.md: Include cortex-r4.md.
+	(insn): Add sdiv and udiv values.
+	(generic_sched): Don't use generic scheduling for Cortex-R4.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Vladimir Prus  <vladimir@codesourcery>
+
+	* config/arm/arm.c
+	(arm_compute_save_reg0_reg12_mask): Always
+	check if register 11 must be saved.  Additionally
+	force save of it if frame_pointer_needeed.
+	(arm_compute_save_reg_mask): Save IP and PC
+	only with apcs frames.
+	(arm_output_epilogue): Adjust Thumb2 codepath to
+	be also invoked and work for ARM non-apcs frames.
+	(arm_expand_prologue): Don't bother saving IP
+	for non-apcs frame, since it's not clobbered by
+	prologue code.  Implement non-apcs frame
+	layout.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-20  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_arch_marvell_f): Delete.
+	(all_architectures): Delete marvell-f entry.
+	(arm_override_options): Improve diagnostic.  Ignore
+	FL_MARVELL_F when checking CPU feature flags against
+	architecture feature flags.  Don't set arm_arch_marvell_f.
+	Check insn_flags instead of TARGET_MARVELL_F.
+	* config/arm/arm.h (arm_arch_marvell_f): Delete.
+	(TARGET_MARVELL_F): Delete.
+	* doc/invoke.texi: Remove marvell-f entry from -march=
+	documentation.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-20  Carlos O'Donell  <carlos@codesourcery.com>
+
+	Issue #1314
+	gcc/
+	* target.h (calls): Add use_reg_for_func.
+	* function.c (use_register_for_decl): Return true if
+	target hook use_ref_for_func returns true.
+	* target-def.h (TARGET_USE_REG_FOR_FUNC): Define.
+	(TARGET_CALLS): Add TARGET_USE_REG_FOR_FUNC.
+	* config/arm/arm.c (arm_use_reg_for_func): New function.
+	(TARGET_USE_REG_FOR_FUNC): Define as arm_use_reg_for_func.
+	* doc/extend.texi (naked): Naked functions must only have
+	asms without operands.
+	* release-notes-csl.xml: Document #1314 fix.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-05-23  Steven Munroe  <sjmunroe@us.ibm.com>
+
+	* config/rs6000/darwin-ldouble.c (fmsub): Eliminate the full
+	PACK/UNPACK between FP_SUB_Q and FD_TRUNC so that the result
+	is only rounded once.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-18  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* doc/invoke.texi: Document -mmarvell-div.
+	* config/arm/arm.c (arm_override_options): Take setting of
+	-mmarvell-div and TARGET_THUMB2 into account when setting
+	arm_arch_hwdiv.  Cause error if -mmarvell-div is used when
+	not targeting a Marvell core.
+	* config/arm/arm.opt: Add entry for -mmarvell-div option.
+	* config/arm/hwdiv.md: Use only arm_arch_hwdiv to check
+	applicability of instruction patterns.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-18  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/vfp.md: When targeting a Marvell core, only
+	enable patterns involving multiply-accumulate type
+	instructions when optimizing for size.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-12  Sandra Loosemore  <sandra@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.c (arm_final_prescan_insn):  Skip this processing
+	if TARGET_NO_COND_EXEC is true.
+	* config/arm/arm.h (TARGET_NO_COND_EXEC):  Define.
+	* config/arm/arm.md (smaxsi3, *arm_smax_insn):  Disable if
+	TARGET_NO_COND_EXEC is set.
+	(sminsi3, *arm_smin_insn): Likewise.
+	(umaxsi3, *arm_umaxsi3): Likewise.
+	(uminsi3, *arm_uminsi3): Likewise.
+	(*store_minmaxsi): Likewise.
+	(seq, sne, sgt, sle, sge, slt): Likewise.
+	(sgtu, sleu, sgeu, sltu): Likewise.
+	(sunordered, sordered): Likewise.
+	(sungt, sunge, sunlt, sunle): Likewise.
+	(movsicc, movsfcc, movdfcc): Likewise.
+	(*cond_return, *cond_return_inverted): Likewise.
+	(*compare_scc): Likewise.
+	(*cond_arith): Likewise.
+	(movcond): Likewise.
+	(anonymous define_split patterns): Likewise.
+	(define_cond_exec): Likewise.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-02  Mark Shinwell  <shinwell@codesourcery.com>
+		    Richard Earnshaw  <richard.earnshaw@arm.com>
+
+	gcc/
+	* config/arm/arm.c (TARGET_MAX_ANCHOR_OFFSET): New.
+	(TARGET_MIN_ANCHOR_OFFSET): New.
+	(arm_override_options): Set correct anchor ranges for Thumb-1
+	and Thumb-2 if required.
+	(legitimize_pic_address): Handle case involving a TLS symbol
+	reference with an addend.
+	(arm_optimization_options): Enable section anchors at -O1 and
+	above.
+	* config/arm/arm.h (OPTIMIZATION_OPTIONS): New.
+	* config/arm/arm-protos.h (arm_optimization_options): New.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-02  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/arm.md (UNSPEC_STACK_ALIGN): Use a number that
+	does not clash with other unspecs.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-02  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/thumb2.md: Update copyright notice and FSF address.
+	Include hwdiv.md and move instruction patterns for sdiv and udiv
+	to that file.
+	* config/arm/arm.c (arm_arch_marvell_f): New.
+	(all_architectures): Add marvell-f entry.
+	(ARM_ARCH_NAME_SIZE): Define.
+	(arm_arch_name): Allocate ARM_ARCH_NAME_SIZE bytes of space.
+	(arm_override_options): Be more careful writing to arm_arch_name.
+	Set arm_arch_hwdiv if arm_tune_marvell_f is set.
+	* config/arm/arm.h (arm_arch_marvell_f): New.
+	* config/arm/arm_cores.def: Add FL_MARVELL_F for the marvell-f
+	entry.
+	* config/arm/hwdiv.md: New.
+	* config/arm/t-arm (MD_INCLUDES): Add hwdiv.md.
+	* config.gcc: Recognize marvell-f as a supported ARM architecture.
+	* doc/invoke.texi (ARM Options): Document -mcpu=marvell-f and
+	-march=marvell-f.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-01-10  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/marvell-f.md: Fix FSF address and comment
+	capitalization.
+	* config/arm/marvell-f-vfp.md: New.
+	* config/arm/arm-cores.def: Add FL_VFPV2 for marvell-f.
+	* config/arm/arm.md: Include marvell-f-vfp.md.
+	(generic_vfp): Don't set attribute to "yes" for marvell_f tuning.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-01-07  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/vfp.md: Document fmul{s,d} and fmac{s,d} types.
+	Remove documentation entry for fmul type.
+	Use fmuls to annotate single-precision multiplication patterns,
+	fmuld to annotate double-precision multiplication patterns,
+	fmacs to annotate single-precision multiply-accumulate patterns
+	and fmacd to annotate double-precision multiply-accumulate patterns.
+	* config/arm/vfp11.md: Update reservations accordingly.
+	* config/arm/arm.md: Note that certain values of the "type"
+	attribute are documented in vfp.md.  Add fmul{s,d} and fmac{s,d}
+	values for that attribute.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-01-04  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* config/arm/vfp.md: Move pipeline description for VFP11 to...
+	* config/arm/vfp11.md: ...here.  New.
+	* config/arm/arm.md: Include vfp11.md.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-01-03  Mark Shinwell  <shinwell@codesourcery.com>
+
+	NOT ASSIGNED TO FSF
+	Port from Marvell compiler:
+	gcc/
+	* config/arm/arm.c (arm_issue_rate): New.
+	(arm_multipass_dfa_lookahead): New.
+	(TARGET_SCHED_ISSUE_RATE): Define.
+	(TARGET_SCHED_FIRST_CYCLE_MULTIPASS_DFA_LOOKAHEAD): Define.
+	(FL_MARVELL_F): New.
+	(arm_tune_marvell_f): New.
+	(arm_override_options): Set arm_tune_marvell_f as appropriate.
+	* config/arm/arm.h (arm_tune_marvell_f): Declare.
+	* config/arm/arm-cores.def: Add marvell-f entry.
+	* config/arm/arm-tune.md: Regenerate.
+	* config/arm/t-arm (MD_INCLUDES): Add marvell-f.md.
+	* config/arm/arm.md: Don't use generic scheduler for marvell-f.
+	Include marvell-f.md.  Extend "insn" attribute with mov/mvn/
+	and/orr/eor cases and annotate instruction patterns accordingly.
+	* config/arm/vfp.md: Annotate likewise.
+	* config/arm/marvell-f.md: New.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-11-09  Paul Brook  <paul@codesourcery.com>
+
+	Merge from branches/csl/sourcerygxx-4_1.
+	gcc/
+	* config/arm/arm.c (all_architectures): Add iWMMXt2 entry.
+	* config/arm/arm-cores.def: New ARM_CORE entry for iWMMXt2.
+	* config/arm/arm-tune.md: Regenerate.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-11-09  Paul Brook  <paul@codesourcery.com>
+
+	Merge from branches/csl/sourcerygxx-4_1.
+	2006-09-10  Paul Brook  <paul@codesourcery.com>
+	gcc/
+	* config/arm/linux-eabi.h (SYSROOT_SUFFIX_SPEC): Define.
+	* config/arm/t-linux-eabi (MULTILIB_OPTIONS, MULTILIB_DIRNAMES):
+	Add armv4t multilib.
+
+2008-05-23  Julian Brown  <julian@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-11-02  Paul Brook  <paul@codesourcery.com>
+
+	gcc/
+	* config.gcc (arm*-*-eabi*): Add arm/nocrt0.h to tm_file.
+	* config/arm/nocrt0.h: New file.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/e300c2c3.md: Correctly use FSF upstream version,
+	not Sourcery G++ 4.2 version.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	gcc/
+	2008-02-26  Edmar Wienskoski  <edmar@freescale.com>
+
+	* config/rs6000/rs6000.c (processor_costs): Update e300 cache
+	line sizes.
+	* doc/invoke.texi: Add e300c2 and e300c3 to list of cpus.
+
+	gcc/
+	2008-02-24  Edmar Wienskoski  <edmar@freescale.com>
+
+	* config.gcc (powerpc*-*-*): Add new cores e300c2 and e300c3.
+	* config/rs6000/e300c2c3.md: New file.
+	* config/rs6000/rs6000.c (processor_costs): Add new costs for
+	e300c2 and e300c3.
+	(rs6000_override_options): Add e300c2 and e300c3 cases to
+	processor_target_table. Do not allow usage of Altivec or Spe
+	with e300 cores. Initialize rs6000_cost for e300c2 and e300c3.
+	(rs6000_issue_rate): Set issue rate for e300c2 and e300c3.
+	* config/rs6000/rs6000.h (processor_type): Add
+	PROCESSOR_PPCE300C2 and PROCESSOR_PPCE300C3.
+	(ASM_CPU_SPEC): Add e300c2 and e300c3.
+	* config/rs6000/rs6000.md (define_attr "cpu"): Add ppce300c2
+	and ppce300c3. Include e300c2c3.md.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-12-31  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config/rs6000/eabi-cn.asm, config/rs6000/sol-ci.asm,
+	config/rs6000/sol-cn.asm: Remove .file directives.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Backport from mainline:
+
+	2008-03-06  Nathan Froyd  <froydnj@codesourcery.com>
+
+	* dwarf2out.c (dwarf2out_frame_debug_expr): Consult the
+	dwarf_register_span hook when emitting unwind information for
+	register-to-memory saves.
+	* config/rs6000/rs6000.c (spe_synthesize_frame): Delete.
+	(rs6000_frame_related): Remove call to spe_synthesize_frame.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-03-04  Nathan Froyd  <froydnj@codesourcery.com>
+
+	gcc/
+	* config/rs6000/eabi.asm (__eabi): Don't run __init.
+	(__eabi_convert, __eabi_uconvert): Define only if _RELOCATABLE.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* config/rs6000/eabi.asm (.Lfini): New.
+
+2008-05-23  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-12  Nathan Sidwell  <nathan@codesourcery.com>
+		    Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* config/rs6000/eabi-ci.asm (__init): Add _init func start.
+	(__fini): Also declare _fini for newlib.
+
+2008-05-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* function.c (assign_parm_remove_parallels): New.
+	(assign_parm_setup_block_p): Do not return true for non-BLKmode
+	PARALLELs.
+	(assign_parm_setup_block): Do not handle them.
+	(assign_parm_setup_reg, assign_parm_setup_stack): Call
+	assign_parm_remove_parallels.
+
+2008-05-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/
+	* c-typeck.c (convert_for_assignment): Use
+	vector_targets_convertible_p.
+	* c-common.c (vector_targets_convertible_p): New.
+	* c-common.h (vector_targets_convertible_p): New prototype.
+	* config/rs6000/rs6000.c (rs6000_is_opaque_type): Do not check
+	opaque_p_V2SI_type_node.
+
+	gcc/cp/
+	* typeck.c (comp_ptr_ttypes_real): Use vector_targets_convertible_p.
+	(comp_ptr_ttypes_const): Likewise.
+
+	gcc/testsuite/
+	* g++.dg/other/opaque-1.C, g++.dg/other/opaque-2.C,
+	g++.dg/other/opaque-3.C: Also run on powerpc*-*-linux*spe*.
+
+2008-05-22  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Revert (as already fixed in a different way):
+
+	2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	libgcc/
+	* config/t-vxworks:  New file.
+	* config.host (Common parts for widely ported systems): Use it.
+
+2008-05-22  Nathan Sidwell  <nathan@codesourcery.com>
+
+	gcc/testsuite/
+	Backport 2008-05-22  Nathan Sidwell  <nathan@codesourcery.com>
+	* lib/dg-pch.exp (dg-pch): Fix if bracing.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-13  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.1 branch:
+
+	2007-03-27  Mark Mitchell  <mark@codesourcery.com>
+	gcc/testsuite/
+	* gcc.target/i386/sse-10.c: Pass -mno-omit-leaf-frame-pointer.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-26  Mark Mitchell  <mark@codesourcery.com>
+
+	gcc/testsuite/
+	* lib/prune.exp (prune_warnings): Extend the default
+	implementation to prune linker warnings about libm on Solaris.
+	libstdc++-v3/
+	* testsuite/lib/prune.exp (prune_g++_output): Prune linker
+	warnings about libm on Solaris.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-26  Mark Mitchell  <mark@codesourcery.com>
+
+	fixincludes/
+	* inclhack.def (solaris_mutex_init_2): Remove precise machine
+	checks; look at <sys/types.h> to determine whether fix is
+	required.
+	(solaris_rwlock_init_1): Likewise.
+	(solaris_once_init_2): Likewise.
+	* tests/base/sys/types.h: Add output generated by
+	solaris_mutex_init_2.
+	* fixincl.x: Regenerated.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-05  Mark Mitchell  <mark@codesourcery.com>
+
+	* configure.in (*-*-vxworks*): Remove target-libstdc++-v3 from
+	noconfigdirs.
+	* configure: Regenerated.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-12  Richard Sandiford  <richard@codesourcery.com>
+
+	gcc/
+	* config/vx-common.h (TARGET_FLEXLM): Define.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	gcc/testsuite/
+	* g++.dg/other/profile1.C: Use dg-require-profiling.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	libgcc/
+	* config/t-vxworks:  New file.
+	* config.host (Common parts for widely ported systems): Use it.
+
+2008-05-21  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-04-25  Paul Brook  <paul@codesourcery.com>
+
+	Merge from sourcerygxx-4_1
+	2005-03-10  Julian Brown  <julian@codesourcery.com>
+	libstdc++-v3/
+	* configure.ac (LIBSUPCXX_PRONLY): New AM_CONDITIONAL: yes
+	if we are compiling for SymbianOS on ARM.
+	* include/Makefile.am: Don't install C++ headers if
+	LIBSUPCXX_PRONLY is true.
+	* libsupc++/Makefile.am: Include only eh_personality.cc
+	in libsupc++ if LIBSUPCXX_PRONLY is true.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+	* include/Makefile.in: Regenerate.
+	* libmath/Makefile.in: Regenerate.
+	* libsupc++/Makefile.in: Regenerate.
+	* po/Makefile.in: Regenerate.
+	* src/Makefile.in: Regenerate.
+	* testsuite/Makefile.in: Regenerate.
+
+2008-05-21  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-05-02  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	gcc/
+	Backport from mainline.
+	2008-02-19  Christian Bruel  <christian.bruel@st.com>
+	    Zdenek Dvorak  <ook@ucw.cz>
+	* tree-ssa-loop-ivopts.c (may_be_unaligned_p): Check step alignment.
+
+2008-05-21  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-12-05  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	Make scheduler better process end of the blocks.
+
+	gcc/
+	* haifa-sched.c (insn_finishes_cycle_p): New static function.
+	(max_issue): Use it.  Fix handling of number of instruction to try.
+	* sched-int.h (struct sched_info: insn_finished_block_p): New
+	scheduler hook.
+	* sched-rgn.c (rgn_insn_finishes_block_p): Implement it.
+	(region_sched_info): Update.
+	* sched-ebb.c (ebb_sched_info): Update.
+	* modulo-sched.c (sms_sched_info): Update.
+
+2008-05-20  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-03-22  Daniel Jacobowitz  <dan@codesourcery.com>
+
+	libstdc++-v3/
+	* testsuite/27_io/basic_filebuf/sputbackc/char/9425.cc: Use
+	dg-require-fileio.
+	* testsuite/27_io/basic_filebuf/sputbackc/char/1-out.cc: Likewise.
+	* testsuite/27_io/basic_filebuf/sputbackc/char/2-out.cc: Likewise.
+
+2008-05-20  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2008-02-12  Julian Brown  <julian@codesourcery.com>
+
+	Merge from MIPS:
+
+	2007-12-05  Thiemo Seufer  <ths@mips.com>
+
+	libcpp/
+	* Makefile.in ($(srcdir)/config.in): Fix dependency.
+
+2008-05-20  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-03-29  Richard Sandiford  <richard@codesourcery.com>
+	gcc/
+	* config.gcc (tm_file): Update commentary.
+
+2008-05-20  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	* gcc.c-torture/execute/builtins/memops-asm.c: Set inside_main.
+
+	* lib/gcc-dg.exp (cleanup-saved-temps): Add optional list of
+	suffixes not to delete.
+	* gcc.dg/pch/save-temps-1.c: Don't delete ".s" temp.
+	* g++.dg/pch/pch.C: Likewise.
+
+	* g++.old-deja/g++.pt/static11.C: Replace xfail by target requirement.
+
+	* lib/dg-pch.exp (dg-pch): Don't expect .s files if there are
+	dg-errors expected.
+
+2008-05-20  Nathan Sidwell  <nathan@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	* c-incpath.c (INO_T_EQ): Do not define on non-inode systems.
+	(DIRS_EQ): New.
+	(remove_duplicates): Do not set inode on non-inode systems.  Use
+	DIRS_EQ.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-12  Mark Shinwell  <shinwell@codesourcery.com>
+
+	gcc/
+	* target.h (gcc_target): Add adjust_reg_alloc_order member.
+	* target-def.h (TARGET_ADJUST_REG_ALLOC_ORDER): New.
+	(TARGET_INITIALIZER): Add TARGET_ADJUST_REG_ALLOC_ORDER.
+	* regclass.c (init_reg_sets): Don't initialize
+	inv_reg_alloc_order.
+	(init_reg_sets_1): Call adjust_reg_alloc_order hook and
+	then initialize inv_reg_alloc_order.
+	* hooks.c (hook_intp_void): New.
+	* hooks.h (hook_intp_void): New.
+	* doc/tm.texi: Document TARGET_ADJUST_REG_ALLOC_ORDER.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-02  Mark Shinwell  <shinwell@codesourcery.com>
+	    Richard Earnshaw  <richard.earnshaw@arm.com>
+
+	gcc/
+	* varasm.c (use_object_blocks_p): Prevent use of object blocks
+	if -fno-toplevel-reorder is specified.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-02-16  Richard Sandiford  <richard@codesourcery.com>
+
+	gcc/
+	* Makefile.in (postreload.o): Depend on addresses.h.
+	* addresses.h (index_reg_class, ok_for_index_p_1): New functions.
+	(regno_ok_for_index_p): New function.
+	* postreload.c: Include addresses.h.
+	(reload_combine): Use index_reg_class instead of INDEX_REG_CLASS.
+	* regclass.c (ok_for_index_p_nonstrict): Add a mode argument.
+	Use ok_for_index_p_1 instead of REGNO_OK_FOR_INDEX_P.
+	(record_address_regs): Use index_reg_class instead of INDEX_REG_CLASS.
+	Update calls to ok_for_index_p_nonstrict.
+	* regrename.c (scan_rtx_address): Use regno_ok_for_index_p instead of
+	REGNO_OK_FOR_INDEX_P and index_reg_class instead of INDEX_REG_CLASS.
+	(replace_oldest_value_addr): Likewise.
+	* reload.c (find_reloads_address): Use index_reg_class instead
+	of INDEX_REG_CLASS.  Do not push an index register reload if
+	index_reg_class returns NO_REGS.
+	(find_reloads_address_1): Use index_reg_class instead
+	of INDEX_REG_CLASS and regno_ok_for_index_p instead of
+	REGNO_OK_FOR_INDEX_P.
+	* doc/tm.texi (MODE_INDEX_REG_CLASS): Document new macro.
+	(REGNO_MODE_OK_FOR_INDEX_P): Likewise.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-06-05  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* release-notes-csl.xml (Register allocation bug fix): New.
+
+	gcc/
+	* reload1.c (emit_reload_insns): Upon discovery of an input
+	reload whose reload register is not a spill register,
+	invalidate any existing reloads involving that register.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-10-24  Mark Shinwell  <shinwell@codesourcery.com>
+	gcc/
+	* final.c (asm_insn_count): Return zero for an empty asm body.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2006-12-15  Richard Sandiford  <richard@codesourcery.com>
+	gcc/testsuite/
+	* gcc.c-torture/compile/20061214-1.c: New test.
+
+2008-05-19  Sandra Loosemore  <sandra@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-05-02  Mark Shinwell  <shinwell@codesourcery.com>
+
+	* release-notes-csl.xml (Forced alignment of array variables):
+	New.
+
+	gcc/
+	* doc/tm.texi: Document that LOCAL_ALIGNMENT and
+	DATA_ALIGNMENT should not be used directly.
+	* doc/invoke.texi (-falign-arrays): Document.
+	* function.c (DATA_ALIGNMENT): Define to a default if
+	undefined.
+	(alignment_for_aligned_arrays): New.
+	(calculate_local_alignment): New.
+	(calculate_global_alignment): New.
+	* function.h (calculate_local_alignment): New.
+	(calculate_global_alignment): New.
+	* cfgexpand.c (LOCAL_ALIGNMENT): Don't define to a default.
+	(get_decl_align_unit): Use calculate_local_alignment.
+	* common.opt (-falign-arrays): New.
+	* varasm.c (assemble_variable): Use calculate_data_alignment,
+	and use it irrespective of whether DATA_ALIGNMENT is defined.
+
+2008-05-16  Nathan Froyd  <froydnj@codesourcery.com>
+	    Kazu Hirata <kazu@codesourcery.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+	    Nathan Sidwell  <nathan@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config/rs6000/linux.h (CC1_EXTRA_SPEC, ASM_DEFAULT_SPEC,
+	SYSROOT_SUFFIX_SPEC): Define.
+	* config/rs6000/eabi.h (CC1_EXTRA_SPEC, ASM_DEFAULT_SPEC): Define.
+	* config/rs6000/t-linux: New file.
+	* config/rs6000/t-ppcgas (MULTILIB_OPTIONS): Add te500v1/te500v2/te600.
+	(MULTILIB_DIRNAMES): Add te500v1 te500v2 te600.
+	(MULTILIB_EXCEPTIONS): New.
+	(MULTILIB_EXTRA_OPTS): Remove mrelocatable-lib.
+
+2008-05-16  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-09-07  Daniel Jacobowitz  <dan@codesourcery.com>
+ 	gcc/
+ 	* config/rs6000/rs6000.c (rs6000_dwarf_register_span): Fix
+ 	debug output for other floating point modes.
+
+2008-05-16  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	2007-08-16  Daniel Jacobowitz  <dan@codesourcery.com>
+	gcc/
+	* config/rs6000/rs6000.c (rs6000_conditional_register_usage): Mark
+	call-saved AltiVec registers call-used if ! TARGET_ALTIVEC_ABI.
+	* config/rs6000/rs6000.h (CALL_USED_REGISTERS): Mark the first 20
+	AltiVec registers call-used.
+	(CALL_REALLY_USED_REGISTERS): Likewise.
+
+	gcc/testsuite/
+	* gcc.target/powerpc/altivec-consts.c: Remove -mabi=altivec.
+	* gcc.target/powerpc/altivec-varargs-1.c: Likewise.
+	* gcc.dg/vmx/vmx.exp: Likewise.
+
+2008-05-16  Nathan Froyd  <froydnj@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config.gcc (powerpc-timesys-linux-gnu): Handle new target.
+	* config/rs6000/timesys-linux.h: New file.
+	* config/rs6000/t-timesys: New file.
+
+2008-05-14  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	fixincludes/
+	2008-05-14  Joseph Myers  <joseph@codesourcery.com>
+	* inclhack.def (AAB_fd_zero_asm_posix_types_h): Bypass on
+	posix_types_64.
+	* fixincl.x: Regenerate.
+
+2008-05-09  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Backport from mainline.
+
+	gcc/
+	2008-05-09  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	* rtl-factoring.c (collect_pattern_seqs): Fix typo.
+
+2008-05-09  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Backport from mainline.
+
+	gcc/
+	2008-05-07  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Cleanup ColdFire scheduling support and add V4 pipeline model.
+
+	* config/m68k/m68k.md (UNSPEC_TIE): New constant.
+	(define_attr cpu): Add cfv4 value.
+	(define_attr type, define_attr type1): Merge into a single 'type'
+	attribute.  Update all uses.
+	(define_attr opx_type, define_attr opy_type, define_attr opx_access):
+	Rearrange and update.  Rename value 'reg' to 'Rn', add value 'FPn'.
+	Update all uses.
+	(define_attr opx_mem, define_attr opy_mem): Remove.
+	(define_attr op_mem): Clean up, update comment.
+	(define_attr size): Use specific values instead of general int.
+	(define_attr guess, define_attr split): Remove.  Update all uses.
+	(movdf_internal, tstsi_internal, tsthi_internal, tstqi_internal,
+	tst<mode>_68881, pushexthisi_const, movsi_const0_68000_10,
+	movsi_const0_68040_60, movsi_const0, movsi_cf, movstrictqi_cf,
+	zero_extendhisi2_cf, zero_extendqisi2_cfv4, cfv4_extendhisi2,
+	68k_extendhisi2, extendqihi2, cfv4_extendqisi2, 68k_extendqisi2,
+	floatsi<mode>2_68881, ftrunc<mode>2_68881, ftrunc<mode>2_cf,
+	fix<mode>qi2_68881, fix<mode>hi2_68881, fix<mode>si2_68881,
+	adddi_dishl32, addsi3_5200, add<mode>3_floatsi_68881,
+	add<mode>3_floathi_68881, add<mode>3_floatqi_68881,
+	add<mode>3_68881, add<mode>3_cf, subdi_dishl32, subsi3,
+	sub<mode>3_floatsi_68881, sub<mode>3_floathi_68881,
+	sub<mode>3_floatqi_68881, sub<mode>3_68881, sub<mode>3_cf,
+	mulhi3, mulhisi3, mulhisisi3_s, mulsi3_68020, mulsi3_cf,
+	umulhisi3, mulhisisi3_z, mul<mode>3_floatsi_68881,
+	mul<mode>3_floathi_68881, mul<mode>3_floatqi_68881, fmul<mode>3_cf,
+	div<mode>3_cf, sqrt<mode>2_cf, abs<mode>2_cf, clzsi2,
+	one_cmplsi2_5200, subreghi1ashrdi_const32, ashrsi3, lshrsi3,
+	bsetmemqi, bsetmemqi_ext, bclrmemqi, bclrmemqi_ext,
+	beq, bne, bgt, blt, bordered, bunordered, buneq, bunge, bungt, bunle,
+	bunlt, bltgt, tablejump_internal, call, non_symbolic_call_value,
+	symbolic_call_value_jsr, symbolic_call_value_bsr, link):
+	Update or set attributes.
+	(stack_tie): New fake instruction.
+
+	* config/m68k/m68k.h (TUNE_CFV4): New macro.
+	(m68k_sched_attr_size): Update declaration.
+	(m68k_sched_attr_type2): Remove.
+	(m68k_sched_address_bypass_p, m68k_sched_indexed_address_bypass_p):
+	Declare new bypass predicates.
+
+	* config/m68k/m68k.c (m68k_sched_issue_rate,
+	m68k_sched_first_cycle_multipass_dfa_lookahead): Declare hook
+	implementations.
+	(TARGET_SCHED_ISSUE_RATE,
+	TARGET_SCHED_FIRST_CYCLE_MULTIPASS_DFA_LOOKAHEAD): Override hooks.
+	(override_options): Handle scheduling for ColdFire V4 core.
+	(m68k_expand_prologue): Emit stack_tie.
+	(enum attr_op_type): Split value 'OP_TYPE_REG' to 'OP_TYPE_RN' and
+	'OP_TYPE_FPN'.  Update all uses.
+	(sched_guess_p): Remove.
+	(sched_address_type): Handle symbolic addresses.
+	(sched_get_operand): New static function.
+	(sched_operand_type): Merge into sched_attr_op_type.
+	(sched_attr_op_type): Handle FP registers, handle quick constants,
+	update.
+	(m68k_sched_attr_opx_type, m68k_sched_attr_opy_type): Update.
+	(m68k_sched_attr_size): Update.  Move logic to ...
+	(sched_get_attr_size_int): New static function.
+	(sched_get_opxy_mem_type): New static function.
+	(m68k_sched_attr_op_mem): Update.
+	(m68k_sched_attr_type2): Remove.
+	(sched_cfv4_bypass_data): New static variable.
+	(m68k_sched_adjust_cost): Handle ColdFire V4 bypass.
+	(m68k_sched_issue_rate): Implement scheduler hook.
+	(struct _sched_ib: enabled_p): New field.
+	(m68k_sched_variable_issue): Update.  Handle V4.
+	(SCHED_DUMP_TODO, SCHED_DUMP_DONE, SCHED_DUMP_NOTHING,
+	sched_dump_class_func_t, sched_dump_split_class,
+	sched_dump_dfa_guess_unit_code, sched_dump_dfa_state,
+	sched_dump_dfa_class, m68k_sched_dump): Remove.
+	(m68k_sched_first_cycle_multipass_dfa_lookahead): Implement scheduler
+	hook.
+	(m68k_sched_init_global): Remove statisctics dumping, introduce
+	sanity check that all instructions have pipeline reservations.  Handle
+	ColdFire V4 core.
+	(m68k_sched_dfa_pre_advance_cycle, m68k_sched_dfa_post_advance_cycle):
+	Handle ColdFire V4 core.
+	(sched_mem_operand_p, sched_get_reg_operand, sched_get_mem_operand):
+	New static functions.
+	(m68k_sched_address_bypass_p): New bypass predicate.
+	(sched_get_indexed_address_scale): New static function.
+	(m68k_sched_indexed_address_bypass_p): New bypass predicate.
+
+	* cf.md: Update comments.
+	(define_attr type2): Remove.  Use 'type' attribute instead.
+	Update all uses.
+	(cf_ib): Rename to cfv123_ib.  Update all uses.
+	(cf_oep): Rename to cfv123_oep.  Update all uses.
+	(cf_chr): Rename to cfv123_chr.  Update all uses.
+	(cf_mem): Rename to cfv123_mem.  Update all uses.
+	(cf_mac): Move to more appropriate place.
+	(cfv123_guess): New automaton and cpu_unit.
+	(cfv123_*, cfv12_*, cfv1_*, cfv2_*, cfv3_*): Use type attribute.
+	Update uses of 'size' attribute.  Handle before reload scheduling.
+	(cfv123_guess): New dummy reservation for unhandled instructions.
+	(cfv4_*): Pipeline description of ColdFire V4 core.
+	(ignore): New reservation to handle 'ignore' type.
+
+2008-05-09  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Backport from mainline.
+
+	gcc/
+
+	2008-04-22  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Support scheduling for ColdFire V1 and V3 microarchitecture.
+	Improve scheduling of multiplication instructions.
+
+	* config/m68k/m68k.md (cpu): Add cfv1 and cfv3.  Rename cf_v2 to cfv1.
+	(mac): New instruction attribute.
+	* config/m68k/m68k.c (override_options): Handle cfv1, cfv3 and mac.
+	(m68k_sched_mac): New variable.
+	(m68k_sched_attr_type2, m68k_sched_md_init_global): Update.
+	Handle cfv1 and cfv3.
+	(max_insn_size): New static variable.
+	(struct _sched_ib): New type.
+	(sched_ib): New static variable.
+	(sched_ib_size, sched_ib_filled, sched_ib_insn): Convert variables
+	to fields of 'struct _sched_ib sched_ib'.  Update all uses.
+	(m68k_sched_variable_issue): Add modeling of cfv3 instruction buffer.
+	Update.
+	(m68k_sched_md_init_global, m68k_sched_md_finish_global,
+	m68k_sched_md_init, m68k_sched_md_finish): Handle cfv1 and cfv3.  Init
+	new variables.  Update.
+	(m68k_sched_dfa_pre_advance_cycle, m68k_sched_dfa_post_advance_cycle):
+	Add modeling of cfv3 instruction buffer.  Update.
+	* config/m68k/m68k-protos.h (m68k_sched_mac): Declare.
+	* config/m68k/m68k.h (TUNE_CFV3): New macro.
+	* config/m68k/cf.md: Change substrings 'cf_v2' to 'cfv12' or 'cfv123'.
+	(cf_* reservations): Rename to cfv12 or cfv123 to indicate cores
+	a particular reservation applies to.
+	(type2): Reorganize attribute values.  Rename alu to alu_reg,
+	alu_l to alu, move_l to omove.  Join move to alu.  Split mul
+	to mul_l and mul_w.
+	(cf_ib_*): Simplify description of instruction buffer.
+	(cf_ib_w0, cf_ib_w4, cf_ib_w5, cf_ib_w6): Remove.
+	(cf_mem): Split into cf_mem1 and cf_mem2.
+	(cf_v2_move_??): Rename to cfv12_alu_??.
+	(cf_v2_move_l_??): Rename to cfv12_omove_??.
+	(cf_v2_mul_??): Remove reservations.
+	(cfv12_mul_l_??, cfv12_mul_w_??, cfv12_mac_w_??, cfv12_mac_l_??,
+	cfv12_emac_??, cfv12_emac_w_i0): New reservations.
+	(cfv12_rts, cfv12_call, cfv12_bcc, cfv12_bra, cfv12_jmp): Move to
+	appropriate place.
+	(cfv3_alu_10, cfv3_omove_10, cfv3_alu_i0, cfv3_omove_i0, cfv3_alu_01,
+	cfv3_alu_0i, cfv3_alu_11, cfv3_omove_11, cfv3_alu_i1, cfv3_omove_i1,
+	cfv3_alu_1i, cfv3_omove_1i, cfv3_pea_11, cfv3_pea_i1, cfv3_mul_w_10,
+	cfv3_mul_l_10, cfv3_mul_w_i0, cfv3_mac_w_10, cfv3_mac_l_10,
+	cfv3_mac_w_i0, cfv3_emac_10, cfv3_emac_w_i0, cfv3_rts, cfv3_call,
+	cfv3_bcc, cfv3_bra, cfv3_jmp): New reservations.
+	(cfv3_*_1, cfv3_*_2, cfv3_*_3): New instruction reservations that are
+	expansions of the above reservations for instructions of sizes
+	1, 2 and 3 words.
+
+2008-05-09  Maxim Kuvyrkov  <maxim@codesourcery.com>
+
+	Backport from mainline.
+
+	gcc/
+	2008-04-22  Maxim Kuvyrkov  <maxim@codesourcery.com>
+	* rtl-factoring.c (collect_patterns_seqs): Handle CC0 targets.
+
+2008-05-05  Mark Mitchell  <mark@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+	    Mark Shinwell  <shinwell@codesourcery.com>
+	    Vladimir Prus  <vladimir@codesourcery.com>
+	    Paul Brook  <paul@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config.gcc (arm-wrs-linux-gnueabi, i586-wrs-linux-gnu,
+	mips-wrs-linux-gnu, powerpc-wrs-linux-gnu, sparc-wrs-linux-gnu):
+	Handle new targets.
+	* config/arm/t-wrs-linux, config/arm/wrs-linux.h,
+	config/mips/t-wrs-linux, config/mips/wrs-linux.h,
+	config/rs6000/t-wrs-linux, config/rs6000/wrs-linux.h: New.
+	* config/sparc/linux64.h (TARGET_DEFAULT): Define differently for
+	BIARCH_32BIT_DEFAULT.
+
+	libcpp/
+	* configure.ac (sparc-wrs-linux-gnu): Add to need_64bit_hwint=yes
+	targets.
+	* configure: Regenerate.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config/sparc/linux64.h (LINK_ARCH32_SPEC, LINK_ARCH64_SPEC,
+	LINK_SPEC): Use %R in -Y P argument.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config/rs6000/rs6000.h (OPTION_DEFAULT_SPECS): Handle -te500v1,
+	-te500v2 and -te600.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config/rs6000/sysv4.h (CC1_EXTRA_SPEC): Define and use.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/testsuite/
+	* g++.dg/compat/struct-layout-1.exp: Compile generator on build
+	system.
+	* gcc.dg/compat/struct-layout-1.exp: Likewise.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/testsuite/
+	* lib/gcc-dg.exp (remove-build-file): Remove files on remote host
+	as well as on build.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-03-04  Joseph Myers  <joseph@codesourcery.com>
+	* config/i386/i386.c (override_options): Force
+	-maccumulate-outgoing-args on if TARGET_STACK_PROBE.
+
+	gcc/testsuite/
+	2008-03-04  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.target/i386/sse-10.c: Don't use
+	-mno-accumulate-outgoing-args on *-*-mingw* *-*-cygwin*.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	config/
+	* config/mh-mingw (LDFLAGS): Define.
+
+	gcc/
+	* configure.ac: Use empty LDFLAGS when running configure for the
+	build system.
+	* configure: Regenerate.
+	* Makefile.in (BUILD_LDFLAGS): Do not define to $(LDFLAGS) unless
+	host == build.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* libgcc2.c (__do_global_dtors): Do not call
+	__deregister_frame_info on MinGW.
+	(__do_global_ctors): Call atexit before calling constructors.  Do
+	not call __register_frame_info on MinGW.
+	* config/i386/mingw32.h (LIBGCC_SPEC): Start with -lgcc.
+
+2008-05-05  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	2007-06-13  Joseph Myers  <joseph@codesourcery.com>
+	* common.opt (--Wno-poison-system-directories): New.
+	* doc/invoke.texi (-Wno-poison-system-directories): Document.
+	* c-incpath.c: Include flags.h.
+	(merge_include_chains): Check flag_poison_system_directories.
+	* gcc.c (LINK_COMMAND_SPEC): Pass --no-poison-system-directories
+	to linker if -Wno-poison-system-directories.
+	* Makefile.in (c-incpath.o): Depend on $(FLAGS_H).
+
+	2007-03-20  Daniel Jacobowitz  <dan@codesourcery.com>
+		    Joseph Myers  <joseph@codesourcery.com>
+	* configure.ac (--enable-poison-system-directories): New option.
+	* configure, config.in: Regenerate.
+	* c-incpath.c (merge_include_chains): If
+	ENABLE_POISON_SYSTEM_DIRECTORIES defined, warn for use of
+	/usr/include, /usr/local/include or /usr/X11R6/include.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	gcc/
+	2008-02-23  Joseph Myers  <joseph@codesourcery.com>
+	* explow.c (memory_address): Assert that the generated address is
+	valid.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	Backport:
+
+	libstdc++-v3/
+	2008-03-04  Joseph Myers  <joseph@codesourcery.com>
+	* crossconfig.m4 (*-mingw32*): Define HAVE_STRTOF and
+	HAVE_STRTOLD.
+	* configure: Regenerate.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* collect2.c (find_a_file): Use IS_ABSOLUTE_PATH.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	gcc/
+	* config.gcc (i[34567]86-*-* | x86_64-*-*): Support arch32 arch64.
+	* config/i386/i386.h (OPT_ARCH32, OPT_ARCH64): Define.
+	(OPTION_DEFAULT_SPECS): Add arch32 and arch64.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config.gcc (mips*-*-*): Support arch32 arch64 tune32 tune64.
+	(powerpc*-*-* | rs6000-*-*): Support cpu32 cpu64.
+	(all_defaults): Add arch32 arch64 cpu32 cpu64 tune32 tune64.
+	* config/mips/mips.h (OPTION_DEFAULT_SPECS): Add support for
+	arch32 arch64 tune32 tune64.
+	* gcc/config/rs6000/rs6000.h (OPTION_DEFAULT_SPECS): Add cpu32 and
+	cpu64.
+
+2008-05-02  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	* config.gcc (i[34567]86-*-linux*): Use extra config files if
+	--enable-extra-sgxx-multilibs.
+	* config/i386/cs-linux.h, config/i386/cs-linux.opt,
+	config/i386/t-cs-linux: New.
+
+2008-05-01  Mark Mitchell  <mark@codesourcery.com>
+	    Vladimir Prus  <vladimir@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+	    Carlos O'Donell  <carlos@codesourcery.com>
+	    Daniel Jacobowitz  <dan@codesourcery.com>
+	    Kazu Hirata  <kazu@codesourcery.com>
+
+	libiberty/
+	* configure.ac: Add cygpath for mingw hosts.
+	* configure: Regenerate.
+	* Makefile.in: Add cygpath.
+	* cygpath.c: New.
+	* pex-win32.c (pex_win32_open_read, pex_win32_open_write): Use
+	open not _open.
+
+	include/
+	* libiberty.h (cygpath): Declare.
+
+2008-05-01  Carlos O'Donell  <carlos@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	* Makefile.tpl (install): Call install-html and install-pdf.
+	* Makefile.in: Regenerate.
+
+	gcc/
+	* Makefile.in (install): Depend on install-html and install-pdf.
+
+2008-05-01  Joseph Myers  <joseph@codesourcery.com>
+
+	Merge from Sourcery G++ 4.2:
+
+	gcc/
+	2007-10-16  Joseph Myers  <joseph@codesourcery.com>
+	* gcc.c (license_me_flag): Define to 1 if not TARGET_FLEXLM.
+
+	2007-08-10  Nathan Froyd  <froydnj@codesourcery.com>
+	* gcc.c (main): Consult license_me_flag to see if failure to
+	acquire a license implies bailing out entirely.
+
+	2007-08-24  Nathan Froyd  <froydnj@codesourcery.com>
+	Issue #1892
+	* gcc.c (main): Check license_me_flag before declaring failure.
+
+	2007-08-30  Nathan Sidwell  <nathan@codesourcery.com>
+	Issue #1892
+	* gcc.c (main): Don't complain if license fails without -flicense-me
+
+	2007-04-12  Richard Sandiford  <richard@codesourcery.com>
+	* gcc.c (main): If find_a_file fails, pass the original subproc
+	to csl_subproc_license_new.
+
+	2006-12-27  Mark Mitchell  <mark@codesourcery.com>
+	NOT ASSIGNED TO FSF
+	COPYRIGHT CODESOURCERY
+	* gcc.c (main): If the license check fails, remove the generated
+	file.
+
+	2006-12-22  Mark Mitchell  <mark@codesourcery.com>
+	NOT ASSIGNED TO FSF
+	COPYRIGHT CODESOURCERY
+	* aclocal.m4: Move licensing options ...
+	* acinclude.m4: ... here.
+
+	2006-12-13  Mark Mitchell  <mark@codesourcery.com>
+	NOT ASSIGNED TO FSF
+	COPYRIGHT CODESOURCERY
+	* gcc.c (csl/license.h): Include, if required.
+	(license_checked): New variable.
+	(no_license): Remove.
+	(process_command): Set license_checked, not no_license.
+	(main): Use CodeSourcery license library.  Remove most
+	TARGET_FLEXLM code.
+	* aclocal.m4 (--with-license): New option.
+	(--with-csl-license-feature): Likewise.
+	(--with-csl-license-version): Likewise.
+	* Makefile.in (CSL_LICENSEINC): Define it.
+	(CSL_LICENSELIB): Likewise.
+	(CSL_LICENSE_PROG): Likewise.
+	(LIBS): Depend on CSL_LICENSELIB.
+	(GCC_PASSES): Depend on CSL_LICENSE_PROG.
+	(INCLUDES): Add CSL_LICENSEINC.
+	* configure.ac (CSL_AC_LICENSE_VERSION): Use it.
+	(CSL_AC_LICENSE): Likewise.
+	(CSL_AC_LICENSE_FEATURE): Likewise.
+	* config.in: Regenerated.
+	* configure: Regenerated.
+
+	2006-10-29  Richard Sandiford  <richard@codesourcery.com>
+		    Joseph Myers  <joseph@codesourcery.com>
+	* gcc.c (license_me_flag): New variable.
+	(feature_proxy_flag): New variable.
+	(no_license): New variable.
+	(process_command): Handle -flicense-me, -ffeature-proxy and
+	-fno-feature-proxy.  Initialize no_license.
+	(main): Check licenses.
+
+2008-05-01  Joseph Myers  <joseph@codesourcery.com>
+
+	* release-notes-csl.xml: New.
+
+
+Local Variables:
+mode: change-log
+change-log-default-name: "ChangeLog.csl"
+End:
