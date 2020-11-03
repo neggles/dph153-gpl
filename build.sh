@@ -83,8 +83,8 @@ tar jxvf ../src/gcc-2008q3-72.tar.bz2
 pushd gcc-4.3
 mkdir build
 pushd build
-../configure --with-mpfr=/usr/local --with-gmp=/usr/local --disable-multilib | tee -a ../../../build.log 
-make | tee -a ../../../build.log 
+../configure --with-mpfr=/usr/local --with-gmp=/usr/local --disable-multilib | tee -a ../../../build.log
+make | tee -a ../../../build.log
 popd
 popd
 
@@ -95,7 +95,7 @@ pushd glibc-2008q3-72/
 tar jxvf glibc-2008q3-72.tar.bz2
 pushd glibc-2.8/
 cp ../../../src/579.11.114/glibc-2008q3-72-ipa.patch.gz .
-gunzip glibc-2008q3-72-ipa.patch.gz 
+gunzip glibc-2008q3-72-ipa.patch.gz
 patch -p1 <glibc-2008q3-72-ipa.patch
 mkdir build && pushd build
 ../configure --disable-sanity-checks | tee -a ../../../../build.log
@@ -122,9 +122,9 @@ pushd gmp-4.2.1
 make | tee -a ../../build.log
 popd
 
-echo -e "\nsrc package linux-2.6.28.tar.bz2..." | tee -a ../build.log
+echo -e "\nsrc package linux-2.6.28.tar.gz..." | tee -a ../build.log
 echo "________________________________________________________________________________" | tee -a ../build.log
-tar jxvf ../src/linux-2.6.28.tar.bz2
+tar zxvf ../src/linux-2.6.28.tar.gz
 pushd linux-2.6.28/
 cp ../../src/579.11.114/linux* .
 gunzip *.gz
@@ -169,7 +169,7 @@ popd
 
 echo -e "\nsrc package i2c-tools-3.0.2.tar.bz2..." | tee -a ../build.log
 echo "________________________________________________________________________________" | tee -a ../build.log
-tar jxvf ../src/i2c-tools-3.0.2.tar.bz2 
+tar jxvf ../src/i2c-tools-3.0.2.tar.bz2
 pushd i2c-tools-3.0.2
 make | tee -a ../../build.log
 popd
