@@ -34,6 +34,7 @@
 #include <linux/ipv6.h>
 #include <net/checksum.h>
 #include <net/ip6_checksum.h>
+#include <net/timestamping.h>
 #include <linux/mii.h>
 #include <linux/ethtool.h>
 #include <linux/if_vlan.h>
@@ -179,6 +180,61 @@ MODULE_DESCRIPTION("Intel(R) Gigabit Ethernet Network Driver");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(DRV_VERSION);
 
+/**
+ * Scale the NIC clock cycle by a large factor so that
+ * relatively small clock corrections can be added or
+ * substracted at each clock tick. The drawbacks of a
+ * large factor are a) that the clock register overflows
+ * more quickly (not such a big deal) and b) that the
+ * increment per tick has to fit into 24 bits.
+ *
+ * Note that
+ *   TIMINCA = IGB_TSYNC_CYCLE_TIME_IN_NANOSECONDS *
+ *             IGB_TSYNC_SCALE
+ *   TIMINCA += TIMINCA * adjustment [ppm] / 1e9
+ *
+ * The base scale factor is intentionally a power of two
+ * so that the division in clocksource can be done with
+ * a shift.
+ */
+#define IGB_TSYNC_SHIFT (19)
+#define IGB_TSYNC_SCALE (1<<IGB_TSYNC_SHIFT)
+
+/**
+ * The duration of one clock cycle of the NIC.
+ *
+ * @todo This hard-coded value is part of the specification and might change
+ * in future hardware revisions. Add revision check.
+ */
+#define IGB_TSYNC_CYCLE_TIME_IN_NANOSECONDS 16
+
+#if (IGB_TSYNC_SCALE * IGB_TSYNC_CYCLE_TIME_IN_NANOSECONDS) >= (1<<24)
+# error IGB_TSYNC_SCALE and/or IGB_TSYNC_CYCLE_TIME_IN_NANOSECONDS are too large to fit into TIMINCA
+#endif
+
+/**
+ * igb_read_clock - read raw cycle counter (to be used by clocksource)
+ */
+static cycle_t igb_read_clock(struct clocksource *cs)
+{
+	struct igb_adapter *adapter =
+		container_of(cs, struct igb_adapter, clock);
+	struct e1000_hw *hw = &adapter->hw;
+	u64 stamp;
+
+	stamp =  rd32(E1000_SYSTIML);
+	stamp |= (u64)rd32(E1000_SYSTIMH) << 32ULL;
+
+	return stamp;
+}
+
+static ktime_t igb_hwtstamp_raw2sys(struct net_device *netdev,
+					ktime_t stamp)
+{
+	struct igb_adapter *adapter = netdev_priv(netdev);
+	return clocksync_hw2sys(&adapter->sync, ktime_to_ns(stamp));
+}
+
 #ifdef DEBUG
 /**
  * igb_get_hw_dev_name - return device name string
@@ -188,6 +244,29 @@ char *igb_get_hw_dev_name(struct e1000_hw *hw)
 {
 	struct igb_adapter *adapter = hw->back;
 	return adapter->netdev->name;
+}
+
+/**
+ * igb_get_time_str - format current NIC and system time as string
+ */
+static char *igb_get_time_str(struct igb_adapter *adapter,
+			char buffer[160])
+{
+	cycle_t hw = clocksource_read(&adapter->clock);
+        struct timespec nic = ns_to_timespec(clocksource_read_time(&adapter->clock));
+	struct timespec sys;
+	struct timespec delta;
+	getnstimeofday(&sys);
+
+	delta = timespec_sub(nic, sys);
+
+	ssprintf(buffer, "HW %llu, NIC %ld.%09lus, SYS %ld.%09lus, NIC-SYS %lds + %09luns",
+		 hw,
+		(long)nic.tv_sec, nic.tv_nsec,
+		(long)sys.tv_sec, sys.tv_nsec,
+		(long)delta.tv_sec, delta.tv_nsec);
+
+	return buffer;
 }
 #endif
 
@@ -1270,6 +1349,55 @@ static int __devinit igb_probe(struct pci_dev *pdev,
 		 * in the CB driver. */
 		wr32(E1000_DCA_CTRL, 2);
 		igb_setup_dca(adapter);
+	}
+#endif
+
+	/*
+	 * Initialize hardware timer: we keep it running just in case
+	 * that some program needs it later on.
+	 */
+	memset(&adapter->clock, 0, sizeof(adapter->clock));
+	adapter->clock.read_clock = igb_read_clock;
+	adapter->clock.mask = (u64)(s64)-1;
+	adapter->clock.mult = 1;
+	adapter->clock.shift = IGB_TSYNC_SHIFT;
+	wr32(E1000_TIMINCA, (1<<24) | IGB_TSYNC_CYCLE_TIME_IN_NANOSECONDS * IGB_TSYNC_SCALE);
+#if 0
+	/*
+	 * Avoid rollover while we initialize by resetting the time counter.
+	 */
+	wr32(E1000_SYSTIML, 0x00000000);
+	wr32(E1000_SYSTIMH, 0x00000000);
+#else
+	/*
+	 * Set registers so that rollover occurs soon to test this.
+	 */
+	wr32(E1000_SYSTIML, 0x00000000);
+	wr32(E1000_SYSTIMH, 0xFF800000);
+#endif
+	wrfl();
+	clocksource_init_time(&adapter->clock, ktime_to_ns(ktime_get_real()));
+
+	/*
+	 * Synchronize our NIC clock against system wall clock. NIC
+	 * time stamp reading requires ~3us per sample, each sample
+	 * was pretty stable even under load => only require 10
+	 * samples for each offset comparison.
+	 */
+	memset(&adapter->sync, 0, sizeof(adapter->sync));
+	adapter->sync.clock = &adapter->clock;
+	adapter->sync.systime = ktime_get_real;
+	adapter->sync.num_samples = 10;
+	clocksync_update(&adapter->sync, 0);
+	netdev->hwtstamp_raw2sys = igb_hwtstamp_raw2sys;
+
+#ifdef DEBUG
+	{
+		char buffer[160];
+		printk(KERN_DEBUG
+			"igb: %s: hw %p initialized timer\n",
+			igb_get_time_str(adapter, buffer),
+			&adapter->hw);
 	}
 #endif
 
@@ -2630,6 +2758,7 @@ set_itr_now:
 #define IGB_TX_FLAGS_VLAN		0x00000002
 #define IGB_TX_FLAGS_TSO		0x00000004
 #define IGB_TX_FLAGS_IPV4		0x00000008
+#define IGB_TX_FLAGS_TSTAMP             0x00000010
 #define IGB_TX_FLAGS_VLAN_MASK	0xffff0000
 #define IGB_TX_FLAGS_VLAN_SHIFT	16
 
@@ -2850,7 +2979,10 @@ static inline void igb_tx_queue_adv(struct igb_adapter *adapter,
 	if (tx_flags & IGB_TX_FLAGS_VLAN)
 		cmd_type_len |= E1000_ADVTXD_DCMD_VLE;
 
-	if (tx_flags & IGB_TX_FLAGS_TSO) {
+	if (tx_flags & IGB_TX_FLAGS_TSTAMP)
+		cmd_type_len |= E1000_ADVTXD_MAC_TSTAMP;
+
+        if (tx_flags & IGB_TX_FLAGS_TSO) {
 		cmd_type_len |= E1000_ADVTXD_DCMD_TSE;
 
 		/* insert tcp checksum */
@@ -2962,9 +3094,29 @@ static int igb_xmit_frame_ring_adv(struct sk_buff *skb,
 		/* this is a hard error */
 		return NETDEV_TX_BUSY;
 	}
-	skb_orphan(skb);
 
-	if (adapter->vlgrp && vlan_tx_tag_present(skb)) {
+	/*
+	 * TODO: check that there currently is no other packet with
+	 * time stamping in the queue
+	 *
+	 * when doing time stamping, keep the connection to the socket
+	 * a while longer, it is still needed by skb_hwtstamp_tx(), either
+	 * in igb_clean_tx_irq() or
+	 */
+	if (skb_hwtstamp_check_tx_hardware(skb)) {
+		skb_hwtstamp_set_tx_in_progress(skb);
+		tx_flags |= IGB_TX_FLAGS_TSTAMP;
+	} else if (!skb_hwtstamp_check_tx_software(skb)) {
+		/*
+		 * TODO: can this be solved in dev.c:dev_hard_start_xmit()?
+		 * There are probably unmodified driver which do something
+		 * like this and thus don't work in combination with
+		 * SOF_TIMESTAMPING_TX_SOFTWARE.
+		 */
+		skb_orphan(skb);
+	}
+
+        if (adapter->vlgrp && vlan_tx_tag_present(skb)) {
 		tx_flags |= IGB_TX_FLAGS_VLAN;
 		tx_flags |= (vlan_tx_tag_get(skb) << IGB_TX_FLAGS_VLAN_SHIFT);
 	}
@@ -3653,6 +3805,28 @@ static bool igb_clean_tx_irq(struct igb_ring *tx_ring)
 					    skb->len;
 				total_packets += segs;
 				total_bytes += bytecount;
+
+				/*
+				 * if we were asked to do hardware
+				 * stamping and such a time stamp is
+				 * available, then it must have been
+				 * for this one here because we only
+				 * allow only one such packet into the
+				 * queue
+				 */
+				if (skb_hwtstamp_check_tx_hardware(skb)) {
+					u32 valid = rd32(E1000_TSYNCTXCTL) & E1000_TSYNCTXCTL_VALID;
+					if (valid) {
+						u64 tstamp = rd32(E1000_TXSTMPL);
+						tstamp |= (u64)rd32(E1000_TXSTMPH) << 32;
+						clocksync_update(&adapter->sync, tstamp);
+						skb_hwtstamp_tx(skb,
+								ns_to_ktime(clocksource_cyc2time(&adapter->clock,
+													tstamp)),
+								netdev);
+					}
+					skb_orphan(skb);
+				}
 			}
 
 			igb_unmap_and_free_tx_resource(adapter, buffer_info);
@@ -3835,7 +4009,8 @@ static bool igb_clean_rx_irq_adv(struct igb_ring *rx_ring,
 {
 	struct igb_adapter *adapter = rx_ring->adapter;
 	struct net_device *netdev = adapter->netdev;
-	struct pci_dev *pdev = adapter->pdev;
+	struct e1000_hw *hw = &adapter->hw;
+        struct pci_dev *pdev = adapter->pdev;
 	union e1000_adv_rx_desc *rx_desc , *next_rxd;
 	struct igb_buffer *buffer_info , *next_buffer;
 	struct sk_buff *skb;
@@ -3924,7 +4099,39 @@ send_up:
 			goto next_desc;
 		}
 
-		if (staterr & E1000_RXDEXT_ERR_FRAME_ERR_MASK) {
+		/*
+		 * If this bit is set, then the RX registers contain
+		 * the time stamp. No other packet will be time
+		 * stamped until we read these registers, so read the
+		 * registers to make them available again. Because
+		 * only one packet can be time stamped at a time, we
+		 * know that the register values must belong to this
+		 * one here and therefore we don't need to compare
+		 * any of the additional attributes stored for it.
+		 *
+		 * TODO: can time stamping be triggered (thus locking
+		 * the registers) without the packet reaching this point
+		 * here? In that case RX time stamping would get stuck.
+		 *
+		 * TODO: in "time stamp all packets" mode this bit is
+		 * not set. Need a global flag for this mode and then
+		 * always read the registers. Cannot be done without
+		 * a race condition.
+		 */
+		if (staterr & E1000_RXD_STAT_TS) {
+			u64 tstamp;
+
+			WARN(!(rd32(E1000_TSYNCRXCTL) & E1000_TSYNCRXCTL_VALID),
+				"igb: no RX time stamp available for time stamped packet");
+			tstamp = rd32(E1000_RXSTMPL);
+			tstamp |= (u64)rd32(E1000_RXSTMPH) << 32;
+			clocksync_update(&adapter->sync, tstamp);
+			skb_hwtstamp_set(skb,
+					ns_to_ktime(clocksource_cyc2time(&adapter->clock,
+										tstamp)));
+		}
+
+                if (staterr & E1000_RXDEXT_ERR_FRAME_ERR_MASK) {
 			dev_kfree_skb_irq(skb);
 			goto next_desc;
 		}
@@ -4115,6 +4322,155 @@ static int igb_mii_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
 }
 
 /**
+ * igb_hwtstamp_ioctl - control hardware time stamping
+ * @netdev:
+ * @ifreq:
+ * @cmd:
+ *
+ * Outgoing time stamping can be enabled and disabled. Play nice and
+ * disable it when requested, although it shouldn't case any overhead
+ * when no packet needs it. At most one packet in the queue may be
+ * marked for time stamping, otherwise it would be impossible to tell
+ * for sure to which packet the hardware time stamp belongs.
+ *
+ * Incoming time stamping has to be configured via the hardware
+ * filters. Not all combinations are supported, in particular event
+ * type has to be specified. Matching the kind of event packet is
+ * not supported, with the exception of "all V2 events regardless of
+ * level 2 or 4".
+ *
+**/
+static int igb_hwtstamp_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
+{
+	struct igb_adapter *adapter = netdev_priv(netdev);
+	struct e1000_hw *hw = &adapter->hw;
+        struct hwtstamp_config config;
+	u32 tsync_tx_ctl_bit = E1000_TSYNCTXCTL_ENABLED;
+	u32 tsync_rx_ctl_bit = E1000_TSYNCRXCTL_ENABLED;
+	u32 tsync_rx_ctl_type = 0;
+	u32 tsync_rx_cfg = 0;
+	int is_l4 = 0;
+	int is_l2 = 0;
+	short port = 319; /* PTP */
+	u32 regval;
+
+	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+		return -EFAULT;
+
+	/* reserved for future extensions */
+	if (config.flags)
+		return -EINVAL;
+
+	switch (config.tx_type) {
+	case HWTSTAMP_TX_OFF:
+		tsync_tx_ctl_bit = 0;
+		break;
+	case HWTSTAMP_TX_ON:
+		tsync_tx_ctl_bit = E1000_TSYNCTXCTL_ENABLED;
+		break;
+	default:
+		return -ERANGE;
+	}
+
+	switch (config.rx_filter_type) {
+	case HWTSTAMP_FILTER_NONE:
+		tsync_rx_ctl_bit = 0;
+		break;
+	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
+	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+	case HWTSTAMP_FILTER_ALL:
+		/*
+		 * register TSYNCRXCFG must be set, therefore it is not
+		 * possible to time stamp both Sync and Delay_Req messages
+		 * => fall back to time stamping all packets
+		 */
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_ALL;
+		config.rx_filter_type = HWTSTAMP_FILTER_ALL;
+		break;
+	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_L4_V1;
+		tsync_rx_cfg = E1000_TSYNCRXCFG_PTP_V1_SYNC_MESSAGE;
+		is_l4 = 1;
+		break;
+	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_L4_V1;
+		tsync_rx_cfg = E1000_TSYNCRXCFG_PTP_V1_DELAY_REQ_MESSAGE;
+		is_l4 = 1;
+		break;
+	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_L2_L4_V2;
+		tsync_rx_cfg = E1000_TSYNCRXCFG_PTP_V2_SYNC_MESSAGE;
+		is_l2 = 1;
+		is_l4 = 1;
+		config.rx_filter_type = HWTSTAMP_FILTER_SOME;
+		break;
+	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
+	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_L2_L4_V2;
+		tsync_rx_cfg = E1000_TSYNCRXCFG_PTP_V2_DELAY_REQ_MESSAGE;
+		is_l2 = 1;
+		is_l4 = 1;
+		config.rx_filter_type = HWTSTAMP_FILTER_SOME;
+		break;
+	case HWTSTAMP_FILTER_PTP_V2_EVENT:
+	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+		tsync_rx_ctl_type = E1000_TSYNCRXCTL_TYPE_EVENT_V2;
+		config.rx_filter_type = HWTSTAMP_FILTER_PTP_V2_EVENT;
+		is_l2 = 1;
+		break;
+	default:
+		return -ERANGE;
+	}
+
+	/* enable/disable TX */
+	regval = rd32(E1000_TSYNCTXCTL);
+	regval = (regval & ~E1000_TSYNCTXCTL_ENABLED) | tsync_tx_ctl_bit;
+	wr32(E1000_TSYNCTXCTL, regval);
+
+	/* enable/disable RX, define which PTP packets are time stamped */
+	regval = rd32(E1000_TSYNCRXCTL);
+	regval = (regval & ~E1000_TSYNCRXCTL_ENABLED) | tsync_rx_ctl_bit;
+	regval = (regval & ~0xE) | tsync_rx_ctl_type;
+	wr32(E1000_TSYNCRXCTL, regval);
+	wr32(E1000_TSYNCRXCFG, tsync_rx_cfg);
+
+	/*
+	 * Ethertype Filter Queue Filter[0][15:0] = 0x88F7 (Ethertype to filter on)
+	 * Ethertype Filter Queue Filter[0][26] = 0x1 (Enable filter)
+	 * Ethertype Filter Queue Filter[0][30] = 0x1 (Enable Timestamping)
+	 */
+	wr32(E1000_ETQF0, is_l2 ? 0x440088f7 : 0);
+
+	/* L4 Queue Filter[0]: only filter by source and destination port */
+	wr32(E1000_SPQF0, htons(port));
+	wr32(E1000_IMIREXT(0), is_l4 ?
+		((1<<12) | (1<<19) /* bypass size and control flags */) : 0);
+	wr32(E1000_IMIR(0), is_l4 ?
+		(htons(port)
+			| (0<<16) /* immediate interrupt disabled */
+			| 0 /* (1<<17) bit cleared: do not bypass destination port check */)
+		: 0);
+	wr32(E1000_FTQF0, is_l4 ?
+		(0x11 /* UDP */
+			| (1<<15) /* VF not compared */
+			| (1<<27) /* Enable Timestamping */
+			| (7<<28) /* only source port filter enabled, source/target address and protocol masked */ )
+		: ( (1<<15) | (15<<28) /* all mask bits set = filter not enabled */));
+
+	wrfl();
+
+	/* clear TX/RX time stamp registers, just to be sure */
+	regval = rd32(E1000_TXSTMPH);
+	regval = rd32(E1000_RXSTMPH);
+
+	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
+		-EFAULT : 0;
+}
+
+/**
  * igb_ioctl -
  * @netdev:
  * @ifreq:
@@ -4127,6 +4483,8 @@ static int igb_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
 	case SIOCGMIIREG:
 	case SIOCSMIIREG:
 		return igb_mii_ioctl(netdev, ifr, cmd);
+	case SIOCSHWTSTAMP:
+		return igb_hwtstamp_ioctl(netdev, ifr, cmd);
 	default:
 		return -EOPNOTSUPP;
 	}

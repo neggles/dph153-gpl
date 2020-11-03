@@ -115,6 +115,13 @@ config SBC8560
 	help
 	  This option enables support for the Wind River SBC8560 board
 
+config PICOHDP203
+        bool "picoHDP 203"
+        help
+        The picoChip HDP203 board is a Freescale 8560 based target with
+        4 picoChip PC203 devices.  Say Y to support it.
+        For more information see <http://www.picochip.com/>
+
 endif # MPC85xx
 
 config TQM85xx

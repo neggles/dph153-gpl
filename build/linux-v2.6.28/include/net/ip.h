@@ -55,6 +55,7 @@ struct ipcm_cookie
 	__be32			addr;
 	int			oif;
 	struct ip_options	*opt;
+	union sk_buff_hwtstamp	tstamp_tx;
 };
 
 #define IPCB(skb) ((struct inet_skb_parm*)((skb)->cb))

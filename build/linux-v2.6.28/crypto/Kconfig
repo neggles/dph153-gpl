@@ -735,6 +735,24 @@ config CRYPTO_ANSI_CPRNG
 	  for cryptographic modules.  Uses the Algorithm specified in
 	  ANSI X9.31 A.2.4
 
+config KEYSTREAM
+        tristate "Configfs based keystream generator"
+        select CONFIGFS_FS
+        help
+          This option enables the keystream generator that provides a configfs
+          based API to use block ciphers to generate a keystream that can be
+          read into userspace applications and XOR'd with plaintext/ciphertext
+          to perform encryption/decryption in a stream cipher mode.
+
+config IPA_KEYSTREAM
+        tristate "ioctl/mmap based keystream generator"
+        select CONFIGFS_FS
+        help
+          This option enables the keystream generator that provides an ioctl/mmap
+          based API to use block ciphers to generate a keystream that can be
+          read into userspace applications and XOR'd with plaintext/ciphertext
+          to perform encryption/decryption in a stream cipher mode.
+
 source "drivers/crypto/Kconfig"
 
 endif	# if CRYPTO

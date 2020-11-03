@@ -46,6 +46,15 @@ config TCG_ATMEL
 	  will be accessible from within Linux.  To compile this driver 
 	  as a module, choose M here; the module will be called tpm_atmel.
 
+config TCG_ATMEL_TWI
+	tristate "Atmel TWI TPM Interface"
+	depends on I2C
+	---help---
+	  If you have a TPM security chip from Atmel that uses the Two Wire
+	  Interface say Yes and it will be accessible from within Linux.
+	  To compile this driver as a module, choose M here; the module
+	  will be called tpm_atmel_twi.
+
 config TCG_INFINEON
 	tristate "Infineon Technologies TPM Interface"
 	depends on PNP

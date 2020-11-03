@@ -218,6 +218,19 @@ config MACB
 	  To compile this driver as a module, choose M here: the module
 	  will be called macb.
 
+config PC302_EMAC
+	tristate "picoChip PC302 Ethernet support"
+	depends on ARCH_PC302
+	help
+          This driver provides Ethernet support for the picoChip PC302 device.
+
+config PC302_MICREL_VLAN_SWITCH
+       depends on PC302_EMAC && I2C
+       bool "Micrel KSZ8863/8873 is fitted"
+       help
+         Select this if the Micrel KSZ8863/8873 VLAN switch is fitted.
+         The switch will provide the Ethernet PHY, configured via I2C
+          
 source "drivers/net/arm/Kconfig"
 
 config AX88796

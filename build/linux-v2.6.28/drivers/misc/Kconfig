@@ -498,6 +498,32 @@ config SGI_GRU_DEBUG
 	This option enables addition debugging code for the SGI GRU driver. If
 	you are unsure, say N.
 
+config PC302_FRACN
+        tristate "Frac-N Synth driver for picoChip PC302"
+        depends on ARCH_PC302 && PICOIF && PC302_GPIO
+        default n
+        help
+          This driver enables a driver for the PC302 Frac-N synth.
+
+config PC302_FUSEBLOCK
+        tristate "Fuseblock driver for picoChip PC302"
+        depends on ARCH_PC302
+        default n
+        help
+          This driver enables reading and writing of fuses in the PC302 device.
+
+config PC302_GPIO
+        tristate "picoChip PC302 GPIO driver"
+        depends on ARCH_PC302
+        ---help---
+            This option enables the PC302 GPIO driver.
+
+config PC202_GPIO
+        tristate "picoChip PC202 GPIO driver"
+        depends on ARCH_FIRECRACKER
+        ---help---
+            This option enables the PC202 GPIO driver.
+
 source "drivers/misc/c2port/Kconfig"
 
 endif # MISC_DEVICES

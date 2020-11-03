@@ -18,10 +18,13 @@
 #include <asm/cacheflush.h>
 #include <mach/hardware.h>
 #include <asm/mach-types.h>
+#include <asm/unified.h>
 
 #include <mach/board-eb.h>
 #include <mach/board-pb11mp.h>
 #include <mach/scu.h>
+
+#include "core.h"
 
 extern void realview_secondary_startup(void);
 
@@ -31,15 +34,23 @@ extern void realview_secondary_startup(void);
  */
 volatile int __cpuinitdata pen_release = -1;
 
+static void __iomem *scu_base_addr(void)
+{
+	if (machine_is_realview_eb_mp())
+		return __io_address(REALVIEW_EB11MP_SCU_BASE);
+	else if (machine_is_realview_pb11mp())
+		return __io_address(REALVIEW_TC11MP_SCU_BASE);
+	else if (machine_is_realview_pbx() &&
+		 (core_tile_pbx11mp() || core_tile_pbxa9mp()))
+		return __io_address(REALVIEW_PBX_TILE_SCU_BASE);
+	else
+		return (void __iomem *)0;
+}
+
 static unsigned int __init get_core_count(void)
 {
 	unsigned int ncores;
-	void __iomem *scu_base = 0;
-
-	if (machine_is_realview_eb() && core_tile_eb11mp())
-		scu_base = __io_address(REALVIEW_EB11MP_SCU_BASE);
-	else if (machine_is_realview_pb11mp())
-		scu_base = __io_address(REALVIEW_TC11MP_SCU_BASE);
+	void __iomem *scu_base = scu_base_addr();
 
 	if (scu_base) {
 		ncores = __raw_readl(scu_base + SCU_CONFIG);
@@ -56,18 +67,14 @@ static unsigned int __init get_core_count(void)
 static void scu_enable(void)
 {
 	u32 scu_ctrl;
-	void __iomem *scu_base;
-
-	if (machine_is_realview_eb() && core_tile_eb11mp())
-		scu_base = __io_address(REALVIEW_EB11MP_SCU_BASE);
-	else if (machine_is_realview_pb11mp())
-		scu_base = __io_address(REALVIEW_TC11MP_SCU_BASE);
-	else
-		BUG();
+	void __iomem *scu_base = scu_base_addr();
 
 	scu_ctrl = __raw_readl(scu_base + SCU_CTRL);
-	scu_ctrl |= 1;
-	__raw_writel(scu_ctrl, scu_base + SCU_CTRL);
+	if (!(scu_ctrl & 1)) {
+		/* not enabled yet */
+		scu_ctrl |= 1;
+		__raw_writel(scu_ctrl, scu_base + SCU_CTRL);
+	}
 }
 
 static DEFINE_SPINLOCK(boot_lock);
@@ -88,10 +95,7 @@ void __cpuinit platform_secondary_init(unsigned int cpu)
 	 * core (e.g. timer irq), then they will not have been enabled
 	 * for us: do so
 	 */
-	if (machine_is_realview_eb() && core_tile_eb11mp())
-		gic_cpu_init(0, __io_address(REALVIEW_EB11MP_GIC_CPU_BASE));
-	else if (machine_is_realview_pb11mp())
-		gic_cpu_init(0, __io_address(REALVIEW_TC11MP_GIC_CPU_BASE));
+	gic_cpu_init(0, gic_cpu_base_addr);
 
 	/*
 	 * let the primary processor know we're out of the
@@ -125,8 +129,11 @@ int __cpuinit boot_secondary(unsigned int cpu, struct task_struct *idle)
 	 * Note that "pen_release" is the hardware CPU ID, whereas
 	 * "cpu" is Linux's internal ID.
 	 */
+	flush_cache_all();
+	outer_clean_range(__pa(&secondary_data), __pa(&secondary_data + 1));
 	pen_release = cpu;
 	flush_cache_all();
+	outer_clean_range(__pa(&pen_release), __pa(&pen_release + 1));
 
 	/*
 	 * XXX
@@ -160,26 +167,20 @@ int __cpuinit boot_secondary(unsigned int cpu, struct task_struct *idle)
 
 static void __init poke_milo(void)
 {
-	extern void secondary_startup(void);
-
 	/* nobody is to be released from the pen yet */
 	pen_release = -1;
 
 	/*
-	 * write the address of secondary startup into the system-wide
-	 * flags register, then clear the bottom two bits, which is what
-	 * BootMonitor is waiting for
+	 * Write the address of secondary startup into the system-wide flags
+	 * register. The BootMonitor waits for this register to become
+	 * non-zero.
 	 */
-#if 1
+
 #define REALVIEW_SYS_FLAGSS_OFFSET 0x30
-	__raw_writel(virt_to_phys(realview_secondary_startup),
+#define REALVIEW_SYS_FLAGSC_OFFSET 0x34
+	__raw_writel(BSYM(virt_to_phys(realview_secondary_startup)),
 		     __io_address(REALVIEW_SYS_BASE) +
 		     REALVIEW_SYS_FLAGSS_OFFSET);
-#define REALVIEW_SYS_FLAGSC_OFFSET 0x34
-	__raw_writel(3,
-		     __io_address(REALVIEW_SYS_BASE) +
-		     REALVIEW_SYS_FLAGSC_OFFSET);
-#endif
 
 	mb();
 }
@@ -232,9 +233,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	 * dummy (!CONFIG_LOCAL_TIMERS), it was already registers in
 	 * realview_timer_init
 	 */
-	if ((machine_is_realview_eb() && core_tile_eb11mp()) ||
-	    machine_is_realview_pb11mp())
-		local_timer_setup(cpu);
+	local_timer_setup();
 #endif
 
 	/*
@@ -253,6 +252,11 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
 	 */
 	if (max_cpus > 1) {
 		scu_enable();
+		/*
+		 * Ensure that the data accessed by CPU0 before the SCU was
+		 * initialised is visible to the other CPUs.
+		 */
+		flush_cache_all();
 		poke_milo();
 	}
 }

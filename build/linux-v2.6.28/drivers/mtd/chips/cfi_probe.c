@@ -158,6 +158,10 @@ static int __xipram cfi_chip_setup(struct map_info *map,
 	__u32 base = 0;
 	int num_erase_regions = cfi_read_query(map, base + (0x10 + 28)*ofs_factor);
 	int i;
+	int extendedId1 = 0;
+	int extendedId2 = 0;
+	int extendedId3 = 0;
+	int addr_unlock1 = 0x555, addr_unlock2 = 0x2AA;
 
 	xip_enable(base, map, cfi);
 #ifdef DEBUG_CFI
@@ -180,29 +184,6 @@ static int __xipram cfi_chip_setup(struct map_info *map,
 	xip_disable_qry(base, map, cfi);
 	for (i=0; i<(sizeof(struct cfi_ident) + num_erase_regions * 4); i++)
 		((unsigned char *)cfi->cfiq)[i] = cfi_read_query(map,base + (0x10 + i)*ofs_factor);
-
-	/* Note we put the device back into Read Mode BEFORE going into Auto
-	 * Select Mode, as some devices support nesting of modes, others
-	 * don't. This way should always work.
-	 * On cmdset 0001 the writes of 0xaa and 0x55 are not needed, and
-	 * so should be treated as nops or illegal (and so put the device
-	 * back into Read Mode, which is a nop in this case).
-	 */
-	cfi_send_gen_cmd(0xf0,     0, base, map, cfi, cfi->device_type, NULL);
-	cfi_send_gen_cmd(0xaa, 0x555, base, map, cfi, cfi->device_type, NULL);
-	cfi_send_gen_cmd(0x55, 0x2aa, base, map, cfi, cfi->device_type, NULL);
-	cfi_send_gen_cmd(0x90, 0x555, base, map, cfi, cfi->device_type, NULL);
-	cfi->mfr = cfi_read_query16(map, base);
-	cfi->id = cfi_read_query16(map, base + ofs_factor);
-
-	/* Get AMD/Spansion extended JEDEC ID */
-	if (cfi->mfr == CFI_MFR_AMD && (cfi->id & 0xff) == 0x7e)
-		cfi->id = cfi_read_query(map, base + 0xe * ofs_factor) << 8 |
-			  cfi_read_query(map, base + 0xf * ofs_factor);
-
-	/* Put it back into Read Mode */
-	cfi_qry_mode_off(base, map, cfi);
-	xip_allowed(base, map);
 
 	/* Do any necessary byteswapping */
 	cfi->cfiq->P_ID = le16_to_cpu(cfi->cfiq->P_ID);
@@ -228,9 +209,57 @@ static int __xipram cfi_chip_setup(struct map_info *map,
 #endif
 	}
 
-	printk(KERN_INFO "%s: Found %d x%d devices at 0x%x in %d-bit bank\n",
+	if (cfi->cfiq->P_ID == P_ID_SST_OLD) {
+		addr_unlock1 = 0x5555;
+		addr_unlock2 = 0x2AAA;
+	}
+
+	/*
+	 * Note we put the device back into Read Mode BEFORE going into Auto
+	 * Select Mode, as some devices support nesting of modes, others
+	 * don't. This way should always work.
+	 * On cmdset 0001 the writes of 0xaa and 0x55 are not needed, and
+	 * so should be treated as nops or illegal (and so put the device
+	 * back into Read Mode, which is a nop in this case).
+	 */
+	cfi_send_gen_cmd(0xf0,     0, base, map, cfi, cfi->device_type, NULL);
+	cfi_send_gen_cmd(0xaa, addr_unlock1, base, map, cfi, cfi->device_type, NULL);
+	cfi_send_gen_cmd(0x55, addr_unlock2, base, map, cfi, cfi->device_type, NULL);
+	cfi_send_gen_cmd(0x90, addr_unlock1, base, map, cfi, cfi->device_type, NULL);
+	cfi->mfr = cfi_read_query16(map, base);
+	cfi->id = cfi_read_query16(map, base + ofs_factor);
+        
+	/* Get device ID cycle 1,2,3 for Micron/ST devices */
+	if ((cfi->mfr == CFI_MFR_NMX || cfi->mfr == CFI_MFR_ST)
+			&& ((cfi->id & 0xff) == 0x7e)
+			&& (le16_to_cpu(cfi->cfiq->P_ID) == 0x0002)) {
+		extendedId1 = cfi_read_query16(map, base + 0x1 * ofs_factor);
+		extendedId2 = cfi_read_query16(map, base + 0xe * ofs_factor);
+		extendedId3 = cfi_read_query16(map, base + 0xf * ofs_factor);
+	}
+        
+	/* If the device is a M29EW used in 8-bit mode, adjust buffer size */
+	if (	(cfi->cfiq->MaxBufWriteSize > 0x8) &&
+		(cfi->mfr == CFI_MFR_NMX || cfi->mfr == CFI_MFR_ST) &&
+		(extendedId1 == 0x7E) &&
+		(extendedId2 == 0x22 || extendedId2 == 0x23 || extendedId2 == 0x28) &&
+		(extendedId3 == 0x01)) {
+		cfi->cfiq->MaxBufWriteSize = 0x8;
+		pr_warning("Adjusted buffer size on Micron Flash M29EW family in 8 bit mode\n");
+	}
+
+	/* Get AMD/Spansion extended JEDEC ID */
+	if (cfi->mfr == CFI_MFR_AMD && (cfi->id & 0xff) == 0x7e)
+		cfi->id = cfi_read_query(map, base + 0xe * ofs_factor) << 8 |
+			  cfi_read_query(map, base + 0xf * ofs_factor);
+
+	/* Put it back into Read Mode */
+	cfi_qry_mode_off(base, map, cfi);
+	xip_allowed(base, map);
+
+	printk(KERN_INFO "%s: Found %d x%d devices at 0x%x in %d-bit bank. ID is 0x%x. Mfr is 0x%x\n",
 	       map->name, cfi->interleave, cfi->device_type*8, base,
-	       map->bankwidth*8);
+	       map->bankwidth*8, cfi->id, cfi->mfr);
 
 	return 1;
 }
@@ -268,6 +297,9 @@ static char *vendorname(__u16 vendor)
 
 	case P_ID_SST_PAGE:
 		return "SST Page Write";
+
+	case P_ID_SST_OLD:
+		return "SST 39VF160x/39VF320x";
 
 	case P_ID_INTEL_PERFORMANCE:
 		return "Intel Performance Code";

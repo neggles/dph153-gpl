@@ -24,6 +24,9 @@ struct clocksource;
 /**
  * struct clocksource - hardware abstraction for a free running counter
  *	Provides mostly state-free accessors to the underlying hardware.
+ *      Also provides utility functions which convert the underlying
+ *      hardware cycle values into a non-decreasing count of nanoseconds
+ *      ("time").
  *
  * @name:		ptr to clocksource name
  * @list:		list head for registration
@@ -43,6 +46,9 @@ struct clocksource;
  *				The ideal clocksource. A must-use where
  *				available.
  * @read:		returns a cycle value
+ * @read_clock:         alternative to read which gets a pointer to the clock
+ *                      source so that the same code can read different clocks;
+ *                      either read or read_clock must be set
  * @mask:		bitmask for two's complement
  *			subtraction of non 64 bit counters
  * @mult:		cycle to nanosecond multiplier (adjusted by NTP)
@@ -62,6 +68,7 @@ struct clocksource {
 	struct list_head list;
 	int rating;
 	cycle_t (*read)(void);
+        cycle_t (*read_clock)(struct clocksource *cs);
 	cycle_t mask;
 	u32 mult;
 	u32 mult_orig;
@@ -170,7 +177,7 @@ static inline u32 clocksource_hz2mult(u32 hz, u32 shift_constant)
  */
 static inline cycle_t clocksource_read(struct clocksource *cs)
 {
-	return cs->read();
+	return (cs->read ? cs->read() : cs->read_clock(cs));
 }
 
 /**
@@ -187,6 +194,116 @@ static inline s64 cyc2ns(struct clocksource *cs, cycle_t cycles)
 	u64 ret = (u64)cycles;
 	ret = (ret * cs->mult) >> cs->shift;
 	return ret;
+}
+
+/**
+ * clocksource_read_ns - get nanoseconds since last call of this function
+ *                       (never negative)
+ * @cs:         Pointer to clocksource
+ *
+ * When the underlying cycle counter runs over, this will be handled
+ * correctly as long as it does not run over more than once between
+ * calls.
+ *
+ * The first call to this function for a new clock source initializes
+ * the time tracking and returns bogus results.
+ */
+static inline s64 clocksource_read_ns(struct clocksource *cs)
+{
+	cycle_t cycle_now, cycle_delta;
+	s64 ns_offset;
+
+	/* read clocksource: */
+	cycle_now = clocksource_read(cs);
+
+	/* calculate the delta since the last clocksource_read_ns: */
+	cycle_delta = (cycle_now - cs->cycle_last) & cs->mask;
+
+	/* convert to nanoseconds: */
+	ns_offset = cyc2ns(cs, cycle_delta);
+
+	/* update time stamp of clocksource_read_ns call: */
+	cs->cycle_last = cycle_now;
+
+	return ns_offset;
+}
+
+/**
+ * clocksource_init_time - initialize a clock source for use with
+ *                         %clocksource_read_time() and
+ *                         %clocksource_cyc2time()
+ * @cs:            Pointer to clocksource.
+ * @start_tstamp:  Arbitrary initial time stamp.
+ *
+ * After this call the current cycle register (roughly) corresponds to
+ * the initial time stamp. Every call to %clocksource_read_time()
+ * increments the time stamp counter by the number of elapsed
+ * nanoseconds.
+ */
+static inline void clocksource_init_time(struct clocksource *cs,
+					u64 start_tstamp)
+{
+	cs->cycle_last = clocksource_read(cs);
+	cs->xtime_nsec = start_tstamp;
+}
+
+/**
+ * clocksource_read_time - return nanoseconds since %clocksource_init_time()
+ *                         plus the initial time stamp
+ * @cs:          Pointer to clocksource.
+ *
+ * In other words, keeps track of time since the same epoch as
+ * the function which generated the initial time stamp. Don't mix
+ * with calls to %clocksource_read_ns()!
+ */
+static inline u64 clocksource_read_time(struct clocksource *cs)
+{
+	u64 nsec;
+
+	/* increment time by nanoseconds since last call */
+	nsec = clocksource_read_ns(cs);
+	nsec += cs->xtime_nsec;
+	cs->xtime_nsec = nsec;
+
+	return nsec;
+}
+
+/**
+ * clocksource_cyc2time - convert an absolute cycle time stamp to same
+ *                        time base as values returned by
+ *                        %clocksource_read_time()
+ * @cs:            Pointer to clocksource.
+ * @cycle_tstamp:  a value returned by cs->read()
+ *
+ * Cycle time stamps that are converted correctly as long as they
+ * fall into the time interval [-1/2 max cycle count, 1/2 cycle count],
+ * with "max cycle count" == cs->mask+1.
+ *
+ * This avoids situations where a cycle time stamp is generated, the
+ * current cycle counter is updated, and then when transforming the
+ * time stamp the value is treated as if it was in the future. Always
+ * updating the cycle counter would also work, but incurr additional
+ * overhead.
+ */
+static inline u64 clocksource_cyc2time(struct clocksource *cs,
+				cycle_t cycle_tstamp)
+{
+	u64 cycle_delta = (cycle_tstamp - cs->cycle_last) & cs->mask;
+	u64 nsec;
+
+	/*
+	 * Instead of always treating cycle_tstamp as more recent
+	 * than cs->cycle_last, detect when it is too far in the
+	 * future and treat it as old time stamp instead.
+	 */
+	if (cycle_delta > cs->mask / 2) {
+		cycle_delta = (cs->cycle_last - cycle_tstamp) & cs->mask;
+		nsec = cs->xtime_nsec - cyc2ns(cs, cycle_delta);
+	} else {
+		nsec = cyc2ns(cs, cycle_delta) + cs->xtime_nsec;
+	}
+
+	return nsec;
 }
 
 /**

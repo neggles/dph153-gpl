@@ -127,6 +127,10 @@ Code	Seq#	Include File		Comments
 'e'	00-1F	linux/video_encoder.h	conflict!
 'e'	00-1F	net/irda/irtty.h	conflict!
 'f'	00-1F	linux/ext2_fs.h
+'g'	00-05	linux/pc302gpio.h       picoChip PC302 GPIO device
+                                        <mailto:support@picochip.com>
+'g'	00-05	linux/pc202gpio.h       picoChip PC"02 GPIO device
+                                        <mailto:support@picochip.com>
 'h'	00-7F				Charon filesystem
 					<mailto:zapman@interlan.net>
 'i'	00-3F	linux/i2o.h
@@ -147,6 +151,8 @@ Code	Seq#	Include File		Comments
 'p'	40-7F	linux/nvram.h
 'p'	80-9F				user-space parport
 					<mailto:tim@cyberelk.net>
+'p'     A0-AF   linux/pc302fuse.h       picoChip PC302 Fuse device
+                                        <mailto:support@picochip.com>
 'q'	00-1F	linux/serio.h
 'q'	80-FF				Internet PhoneJACK, Internet LineJACK
 					<http://www.quicknet.net>

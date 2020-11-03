@@ -1,3 +1,16 @@
+################################################################################
+# 
+# Copyright (c) 2009 ip.access Ltd.
+#
+#  This program is free software; you can redistribute  it and/or modify it
+#  under  the terms of  the GNU General  Public License as published by the
+#  Free Software Foundation;  either version 2 of the  License, or (at your
+#  option) any later version.
+#
+# 22 Apr 2009 Created by Simon D Hughes.
+##############################################################################
+# Filename: 
+##############################################################################
 config ARCH
 	string
 	option env="ARCH"
@@ -935,3 +948,49 @@ config CLASSIC_RCU
 	  designed for best read-side performance on non-realtime
 	  systems.  Classic RCU is the default.  Note that the
 	  PREEMPT_RCU symbol is used to select/deselect this option.
+
+menu "IPAccess 3GAP Oyster Product Variant Options"
+
+config IPACCESS_IP202FF
+	bool "Enable configuration define for Oyster 3GAP PC202 Variant"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+	  
+config IPACCESS_IP202FF_686
+	bool "Enable configuration define for Oyster 3GAP Split System Build"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+	  
+config IPACCESS_IP202FF_XC
+	bool "Enable configuration define for 202 xc variant"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+	  
+config IPACCESS_IP202FF_XE
+	bool "Enable configuration define for 202 xe variant"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+
+config IPACCESS_IP302FF
+	bool "Enable configuration define for Oyster 3GAP PC302 Variant"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+	  
+config IPACCESS_IP302FF_XC
+	bool "Enable configuration define for 302 xc variant"
+	help
+	  Note that the kernel is variant agnostic (almost) and
+	  this defined is for system and application variant
+	  specific compile behaviour
+	  
+endmenu

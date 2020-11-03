@@ -540,5 +540,13 @@ config MTD_PLATRAM
 
 	  This selection automatically selects the map_ram driver.
 
+config MTD_PICOHDP
+	tristate "picoHDP Flash driver"
+	depends on MTD_CFI && (PICOHDP || PICOHDP203 || ARCH_FIRECRACKER || ARCH_PC302)
+	help
+	 This enables support for the on-board parallel flash memory on
+         picoChip hardware platforms.
+	 If you have one of these boards, say Y.
+
 endmenu
 

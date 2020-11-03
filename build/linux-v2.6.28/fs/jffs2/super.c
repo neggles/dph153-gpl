@@ -53,9 +53,22 @@ static void jffs2_i_init_once(void *foo)
 	inode_init_once(&f->vfs_inode);
 }
 
+static void jffs2_write_super(struct super_block *sb)
+{
+	struct jffs2_sb_info *c = JFFS2_SB_INFO(sb);
+	sb->s_dirt = 0;
+
+	if (!(sb->s_flags & MS_RDONLY)) {
+		D1(printk(KERN_DEBUG "jffs2_write_super()\n"));
+		jffs2_flush_wbuf_gc(c, 0);
+	}
+}
+
 static int jffs2_sync_fs(struct super_block *sb, int wait)
 {
 	struct jffs2_sb_info *c = JFFS2_SB_INFO(sb);
+
+	jffs2_write_super(sb);
 
 	mutex_lock(&c->alloc_sem);
 	jffs2_flush_wbuf_pad(c);
@@ -103,7 +116,7 @@ static struct dentry *jffs2_get_parent(struct dentry *child)
 	return d_obtain_alias(jffs2_iget(child->d_inode->i_sb, pino));
 }
 
-static struct export_operations jffs2_export_ops = {
+static const struct export_operations jffs2_export_ops = {
 	.get_parent = jffs2_get_parent,
 	.fh_to_dentry = jffs2_fh_to_dentry,
 	.fh_to_parent = jffs2_fh_to_parent,
@@ -173,6 +186,9 @@ static void jffs2_put_super (struct super_block *sb)
 	struct jffs2_sb_info *c = JFFS2_SB_INFO(sb);
 
 	D2(printk(KERN_DEBUG "jffs2: jffs2_put_super()\n"));
+
+	if (sb->s_dirt)
+		jffs2_write_super(sb);
 
 	mutex_lock(&c->alloc_sem);
 	jffs2_flush_wbuf_pad(c);

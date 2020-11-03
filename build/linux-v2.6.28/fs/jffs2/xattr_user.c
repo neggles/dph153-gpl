@@ -45,7 +45,7 @@ static size_t jffs2_user_listxattr(struct inode *inode, char *list, size_t list_
 	return retlen;
 }
 
-struct xattr_handler jffs2_user_xattr_handler = {
+const struct xattr_handler jffs2_user_xattr_handler = {
 	.prefix = XATTR_USER_PREFIX,
 	.list = jffs2_user_listxattr,
 	.set = jffs2_user_setxattr,

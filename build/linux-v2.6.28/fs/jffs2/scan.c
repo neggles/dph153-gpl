@@ -130,9 +130,9 @@ int jffs2_scan_medium(struct jffs2_sb_info *c)
 	if (jffs2_sum_active()) {
 		s = kzalloc(sizeof(struct jffs2_summary), GFP_KERNEL);
 		if (!s) {
-			kfree(flashbuf);
 			JFFS2_WARNING("Can't allocate memory for summary\n");
-			return -ENOMEM;
+			ret = -ENOMEM;
+			goto out;
 		}
 	}
 
@@ -196,7 +196,7 @@ int jffs2_scan_medium(struct jffs2_sb_info *c)
 				if (c->nextblock) {
 					ret = file_dirty(c, c->nextblock);
 					if (ret)
-						return ret;
+						goto out;
 					/* deleting summary information of the old nextblock */
 					jffs2_sum_reset_collected(c->summary);
 				}
@@ -207,7 +207,7 @@ int jffs2_scan_medium(struct jffs2_sb_info *c)
 			} else {
 				ret = file_dirty(c, jeb);
 				if (ret)
-					return ret;
+					goto out;
 			}
 			break;
 
@@ -260,7 +260,9 @@ int jffs2_scan_medium(struct jffs2_sb_info *c)
 			ret = -EIO;
 			goto out;
 		}
-		jffs2_erase_pending_trigger(c);
+		spin_lock(&c->erase_completion_lock);
+		jffs2_garbage_collect_trigger(c);
+		spin_unlock(&c->erase_completion_lock);
 	}
 	ret = 0;
  out:
@@ -437,6 +439,8 @@ static int jffs2_scan_eraseblock (struct jffs2_sb_info *c, struct jffs2_eraseblo
 	uint32_t hdr_crc, buf_ofs, buf_len;
 	int err;
 	int noise = 0;
+	int node_fault = 0;
+	int buffer_gap = 0;
 
 
 #ifdef CONFIG_JFFS2_FS_WRITEBUFFER
@@ -651,6 +655,16 @@ scan_more:
 					       empty_start, ofs);
 					if ((err = jffs2_scan_dirty_space(c, jeb, ofs-empty_start)))
 						return err;
+					if ((ofs | 63) != (empty_start | 63))
+					{
+						/* If the first erased byte and the next non-erased byte are
+						 * not part of the same write buffer region then something has
+						 * probably gone amiss with the erase/program of this sector.
+						 * We'd be better to clean it up, rather than allow JFFS2 to
+						 * write to an area that might not be properly erased.
+						 */
+						buffer_gap = 1;
+					}
 					goto scan_more;
 				}
 
@@ -664,8 +678,9 @@ scan_more:
 			   bail now */
 			if (buf_ofs == jeb->offset && jeb->used_size == PAD(c->cleanmarker_size) &&
 			    c->cleanmarker_size && !jeb->dirty_size && !ref_next(jeb->first_node)) {
-				D1(printk(KERN_DEBUG "%d bytes at start of block seems clean... assuming all clean\n", EMPTY_SCAN_SIZE(c->sector_size)));
-				return BLK_STATE_CLEANMARKER;
+				printk(KERN_DEBUG "%d bytes at start of block seems clean.  Checking remainder of block.\n", EMPTY_SCAN_SIZE(c->sector_size));
+				/* D1(printk(KERN_DEBUG "%d bytes at start of block seems clean... but not assuming all clean\n", EMPTY_SCAN_SIZE(c->sector_size)));
+				return BLK_STATE_CLEANMARKER; */
 			}
 			if (!buf_size && (scan_end != buf_len)) {/* XIP/point case */
 				scan_end = buf_len;
@@ -675,10 +690,23 @@ scan_more:
 			/* See how much more there is to read in this eraseblock... */
 			buf_len = min_t(uint32_t, buf_size, jeb->offset + c->sector_size - ofs);
 			if (!buf_len) {
-				/* No more to read. Break out of main loop without marking
-				   this range of empty space as dirty (because it's not) */
-				D1(printk(KERN_DEBUG "Empty flash at %08x runs to end of block. Treating as free_space\n",
-					  empty_start));
+				if (node_fault && buffer_gap) {
+					/* Although there's empty space at the end of this block there were
+					   signs of trouble before that, namely at least one node with the wrong
+					   Magic/CRC and a gap that couldn't be accounted for by an interrupted
+					   write using the write buffer; that fills from the top of the buffer
+					   on some devices.  Assume the block has unstable bits and mark the
+					   remaining free space as dirty. */
+					printk(KERN_WARNING "Empty flash at %08x runs to end of block. Treating as dirty due to previous errors\n",
+						  empty_start);
+					if ((err = jffs2_scan_dirty_space(c, jeb, ofs-empty_start)))
+						return err;
+				} else {
+					/* No more to read. Break out of main loop without marking
+					   this range of empty space as dirty (because it's not) */
+					D1(printk(KERN_DEBUG "Empty flash at %08x runs to end of block. Treating as free_space\n",
+						  empty_start));
+   				}
 				break;
 			}
 			/* point never reaches here */
@@ -696,6 +724,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 		if (je16_to_cpu(node->magic) == JFFS2_DIRTY_BITMASK) {
@@ -703,6 +732,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 		if (je16_to_cpu(node->magic) == JFFS2_OLD_MAGIC_BITMASK) {
@@ -711,6 +741,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 		if (je16_to_cpu(node->magic) != JFFS2_MAGIC_BITMASK) {
@@ -721,6 +752,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 		/* We seem to have a node of sorts. Check the CRC */
@@ -739,6 +771,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 
@@ -750,6 +783,7 @@ scan_more:
 			if ((err = jffs2_scan_dirty_space(c, jeb, 4)))
 				return err;
 			ofs += 4;
+			node_fault = 1;
 			continue;
 		}
 

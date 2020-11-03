@@ -77,6 +77,8 @@ obj-$(CONFIG_CRYPTO_RNG2) += rng.o
 obj-$(CONFIG_CRYPTO_RNG2) += krng.o
 obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
 obj-$(CONFIG_CRYPTO_TEST) += tcrypt.o
+obj-$(CONFIG_KEYSTREAM) += keystream.o
+obj-$(CONFIG_IPA_KEYSTREAM) += ipa_keystream.o
 
 #
 # generic algorithms and the async_tx api

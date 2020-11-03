@@ -91,6 +91,12 @@ static struct map_desc realview_pb1176_io_desc[] __initdata = {
 		.pfn		= __phys_to_pfn(REALVIEW_PB1176_L220_BASE),
 		.length		= SZ_8K,
 		.type		= MT_DEVICE,
+	}, {
+		/* needed for SD/MMC detection */
+		.virtual	= IO_ADDRESS(REALVIEW_GPIO2_BASE),
+		.pfn		= __phys_to_pfn(REALVIEW_GPIO2_BASE),
+		.length		= SZ_4K,
+		.type		= MT_DEVICE,
 	},
 #ifdef CONFIG_DEBUG_LL
 	{
@@ -152,6 +158,8 @@ static void __init realview_pb1176_map_io(void)
 #define PB1176_UART3_DMA	{ 0x86, 0x87 }
 #define PB1176_SSP_IRQ		{ IRQ_PB1176_SSP, NO_IRQ }
 #define PB1176_SSP_DMA		{ 9, 8 }
+#define PB1176_IEC_IRQ	{ IRQ_DC1176_IEC, NO_IRQ }
+#define PB1176_IEC_DMA	{ 0, 0 }
 
 /* FPGA Primecells */
 AMBA_DEVICE(aaci,	"fpga:04",	AACI,		NULL);
@@ -173,6 +181,7 @@ AMBA_DEVICE(uart0,	"dev:f1",	PB1176_UART0,	NULL);
 AMBA_DEVICE(uart1,	"dev:f2",	PB1176_UART1,	NULL);
 AMBA_DEVICE(uart2,	"dev:f3",	PB1176_UART2,	NULL);
 AMBA_DEVICE(ssp0,	"dev:f4",	PB1176_SSP,	NULL);
+AMBA_DEVICE(iec,	"dev:f5",	PB1176_IEC,	NULL);
 
 /* Primecells on the NEC ISSP chip */
 AMBA_DEVICE(clcd,	"issp:20",	PB1176_CLCD,	&clcd_plat_data);
@@ -198,16 +207,29 @@ static struct amba_device *amba_devs[] __initdata = {
 	&mmc0_device,
 	&kmi0_device,
 	&kmi1_device,
+	&iec_device,
 };
 
 /*
  * RealView PB1176 platform devices
  */
-static struct resource realview_pb1176_flash_resource = {
-	.start			= REALVIEW_PB1176_FLASH_BASE,
-	.end			= REALVIEW_PB1176_FLASH_BASE + REALVIEW_PB1176_FLASH_SIZE - 1,
-	.flags			= IORESOURCE_MEM,
+static struct resource realview_pb1176_flash_resources[] = {
+	[0] = {
+		.start		= REALVIEW_PB1176_FLASH_BASE,
+		.end		= REALVIEW_PB1176_FLASH_BASE + REALVIEW_PB1176_FLASH_SIZE - 1,
+		.flags		= IORESOURCE_MEM,
+	},
+	[1] = {
+		.start		= REALVIEW_PB1176_SEC_FLASH_BASE,
+		.end		= REALVIEW_PB1176_SEC_FLASH_BASE + REALVIEW_PB1176_SEC_FLASH_SIZE - 1,
+		.flags		= IORESOURCE_MEM,
+	},
 };
+#ifdef CONFIG_REALVIEW_PB1176_SECURE_FLASH
+#define PB1176_FLASH_BLOCKS	2
+#else
+#define PB1176_FLASH_BLOCKS	1
+#endif
 
 static struct resource realview_pb1176_smsc911x_resources[] = {
 	[0] = {
@@ -222,11 +244,17 @@ static struct resource realview_pb1176_smsc911x_resources[] = {
 	},
 };
 
-static struct platform_device realview_pb1176_smsc911x_device = {
-	.name		= "smc911x",
-	.id		= 0,
-	.num_resources	= ARRAY_SIZE(realview_pb1176_smsc911x_resources),
-	.resource	= realview_pb1176_smsc911x_resources,
+static struct resource realview_pb1176_isp1761_resources[] = {
+	[0] = {
+		.start		= REALVIEW_PB1176_USB_BASE,
+		.end		= REALVIEW_PB1176_USB_BASE + SZ_128K - 1,
+		.flags		= IORESOURCE_MEM,
+	},
+	[1] = {
+		.start		= IRQ_PB1176_USB,
+		.end		= IRQ_PB1176_USB,
+		.flags		= IORESOURCE_IRQ,
+	},
 };
 
 static void __init gic_init_irq(void)
@@ -267,8 +295,11 @@ static void __init realview_pb1176_init(void)
 
 	clk_register(&realview_clcd_clk);
 
-	realview_flash_register(&realview_pb1176_flash_resource, 1);
-	platform_device_register(&realview_pb1176_smsc911x_device);
+	realview_flash_register(realview_pb1176_flash_resources,
+				PB1176_FLASH_BLOCKS);
+	realview_eth_register(NULL, realview_pb1176_smsc911x_resources);
+	platform_device_register(&realview_i2c_device);
+	realview_usb_register(realview_pb1176_isp1761_resources);
 
 	for (i = 0; i < ARRAY_SIZE(amba_devs); i++) {
 		struct amba_device *d = amba_devs[i];
@@ -284,7 +315,7 @@ MACHINE_START(REALVIEW_PB1176, "ARM-RealView PB1176")
 	/* Maintainer: ARM Ltd/Deep Blue Solutions Ltd */
 	.phys_io	= REALVIEW_PB1176_UART0_BASE,
 	.io_pg_offst	= (IO_ADDRESS(REALVIEW_PB1176_UART0_BASE) >> 18) & 0xfffc,
-	.boot_params	= 0x00000100,
+	.boot_params	= PHYS_OFFSET + 0x00000100,
 	.map_io		= realview_pb1176_map_io,
 	.init_irq	= gic_init_irq,
 	.timer		= &realview_pb1176_timer,

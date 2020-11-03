@@ -14,6 +14,7 @@
 #include <linux/signal.h>
 #include <linux/sched.h>
 #include <linux/init.h>
+#include <linux/rcupdate.h>
 
 #include <asm/thread_notify.h>
 #include <asm/vfp.h>
@@ -49,14 +50,21 @@ static int vfp_notifier(struct notifier_block *self, unsigned long cmd, void *v)
 
 #ifdef CONFIG_SMP
 		/*
+		 * RCU locking is needed in case last_VFP_context[cpu] is
+		 * released on a different CPU.
+		 */
+		rcu_read_lock();
+		vfp = last_VFP_context[cpu];
+		/*
 		 * On SMP, if VFP is enabled, save the old state in
 		 * case the thread migrates to a different CPU. The
 		 * restoring is done lazily.
 		 */
-		if ((fpexc & FPEXC_EN) && last_VFP_context[cpu]) {
-			vfp_save_state(last_VFP_context[cpu], fpexc);
-			last_VFP_context[cpu]->hard.cpu = cpu;
+		if ((fpexc & FPEXC_EN) && vfp) {
+			vfp_save_state(vfp, fpexc);
+			vfp->hard.cpu = cpu;
 		}
+		rcu_read_unlock();
 		/*
 		 * Thread migration, just force the reloading of the
 		 * state on the new CPU in case the VFP registers
@@ -91,8 +99,19 @@ static int vfp_notifier(struct notifier_block *self, unsigned long cmd, void *v)
 	}
 
 	/* flush and release case: Per-thread VFP cleanup. */
+#ifndef CONFIG_SMP
 	if (last_VFP_context[cpu] == vfp)
 		last_VFP_context[cpu] = NULL;
+#else
+	/*
+	 * Since release_thread() may be called from a different CPU, we use
+	 * cmpxchg() here to avoid a race with the vfp_support_entry() code
+	 * which modifies last_VFP_context[cpu]. Note that on SMP systems, a
+	 * STR instruction on a different CPU clears the global exclusive
+	 * monitor state.
+	 */
+	(void)cmpxchg(&last_VFP_context[cpu], vfp, NULL);
+#endif
 
 	return NOTIFY_DONE;
 }
@@ -266,7 +285,7 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 		 * on VFP subarch 1.
 		 */
 		 vfp_raise_exceptions(VFP_EXCEPTION_ERROR, trigger, fpscr, regs);
-		 return;
+		goto exit;
 	}
 
 	/*
@@ -297,7 +316,7 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	 * the FPEXC.FP2V bit is valid only if FPEXC.EX is 1.
 	 */
 	if (fpexc ^ (FPEXC_EX | FPEXC_FP2V))
-		return;
+		goto exit;
 
 	/*
 	 * The barrier() here prevents fpinst2 being read
@@ -310,6 +329,8 @@ void VFP_bounce(u32 trigger, u32 fpexc, struct pt_regs *regs)
 	exceptions = vfp_emulate_instruction(trigger, orig_fpscr, regs);
 	if (exceptions)
 		vfp_raise_exceptions(exceptions, trigger, orig_fpscr, regs);
+ exit:
+	preempt_enable();
 }
 
 static void vfp_enable(void *unused)
@@ -321,6 +342,55 @@ static void vfp_enable(void *unused)
 	 */
 	set_copro_access(access | CPACC_FULL(10) | CPACC_FULL(11));
 }
+
+/*
+ * Synchronise the hardware VFP state of a thread other than current with the
+ * saved one. This function is used by the ptrace mechanism.
+ */
+#ifdef CONFIG_SMP
+void vfp_sync_state(struct thread_info *thread)
+{
+	/*
+	 * On SMP systems, the VFP state is automatically saved at every
+	 * context switch. We mark the thread VFP state as belonging to a
+	 * non-existent CPU so that the saved one will be reloaded when
+	 * needed.
+	 */
+	thread->vfpstate.hard.cpu = NR_CPUS;
+}
+#else
+void vfp_sync_state(struct thread_info *thread)
+{
+	unsigned int cpu = get_cpu();
+	u32 fpexc = fmrx(FPEXC);
+
+	/*
+	 * If VFP is enabled, the previous state was already saved and
+	 * last_VFP_context updated.
+	 */
+	if (fpexc & FPEXC_EN)
+		goto out;
+
+	if (!last_VFP_context[cpu])
+		goto out;
+
+	/*
+	 * Save the last VFP state on this CPU.
+	 */
+	fmxr(FPEXC, fpexc | FPEXC_EN);
+	vfp_save_state(last_VFP_context[cpu], fpexc);
+	fmxr(FPEXC, fpexc);
+
+	/*
+	 * Set the context to NULL to force a reload the next time the thread
+	 * uses the VFP.
+	 */
+	last_VFP_context[cpu] = NULL;
+
+out:
+	put_cpu();
+}
+#endif
 
 #include <linux/smp.h>
 
@@ -371,6 +441,27 @@ static int __init vfp_init(void)
 		 * in place; report VFP support to userspace.
 		 */
 		elf_hwcap |= HWCAP_VFP;
+#ifdef CONFIG_VFPv3
+		if (VFP_arch >= 3) {
+			elf_hwcap |= HWCAP_VFPv3;
+
+			/*
+			 * Check for VFPv3 D16. CPUs in this configuration
+			 * only have 16 x 64bit registers.
+			 */
+			if (((fmrx(MVFR0) & MVFR0_A_SIMD_MASK)) == 1)
+				elf_hwcap |= HWCAP_VFPv3D16;
+		}
+#endif
+#ifdef CONFIG_NEON
+		/*
+		 * Check for the presence of the Advanced SIMD
+		 * load/store instructions, integer and single
+		 * precision floating point operations.
+		 */
+		if ((fmrx(MVFR1) & 0x000fff00) == 0x00011100)
+			elf_hwcap |= HWCAP_NEON;
+#endif
 	}
 	return 0;
 }

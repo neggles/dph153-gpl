@@ -772,7 +772,16 @@ void __devinit pci_process_bridge_OF_ranges(struct pci_controller *hose,
 			 * space starting at 0 so we factor in pci_addr
 			 */
 			hose->pci_io_size = pci_addr + size;
+
+/* picoHDP has a 1->1 mapping of PCI->CPU addresses and we need this to make
+ * it work.
+ */
+#ifdef CONFIG_PICOHDP
+			hose->io_base_phys = pci_addr;
+#else
 			hose->io_base_phys = cpu_addr - pci_addr;
+
+#endif
 
 			/* Build resource */
 			res = &hose->io_resource;

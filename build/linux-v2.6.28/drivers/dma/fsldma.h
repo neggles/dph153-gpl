@@ -153,26 +153,26 @@ struct fsl_dma_chan {
 #define tx_to_fsl_desc(tx) container_of(tx, struct fsl_desc_sw, async_tx)
 
 #ifndef __powerpc64__
-static u64 in_be64(const u64 __iomem *addr)
+static inline u64 in_be64(const u64 __iomem *addr)
 {
 	return ((u64)in_be32((u32 __iomem *)addr) << 32) |
 		(in_be32((u32 __iomem *)addr + 1));
 }
 
-static void out_be64(u64 __iomem *addr, u64 val)
+static inline void out_be64(u64 __iomem *addr, u64 val)
 {
 	out_be32((u32 __iomem *)addr, val >> 32);
 	out_be32((u32 __iomem *)addr + 1, (u32)val);
 }
 
 /* There is no asm instructions for 64 bits reverse loads and stores */
-static u64 in_le64(const u64 __iomem *addr)
+static inline u64 in_le64(const u64 __iomem *addr)
 {
 	return ((u64)in_le32((u32 __iomem *)addr + 1) << 32) |
 		(in_le32((u32 __iomem *)addr));
 }
 
-static void out_le64(u64 __iomem *addr, u64 val)
+static inline void out_le64(u64 __iomem *addr, u64 val)
 {
 	out_le32((u32 __iomem *)addr + 1, val >> 32);
 	out_le32((u32 __iomem *)addr, (u32)val);

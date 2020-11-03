@@ -24,6 +24,14 @@ struct op_arm_model_spec {
 extern struct op_arm_model_spec op_xscale_spec;
 #endif
 
+#ifdef CONFIG_FIRECRACKER_ASYNC_OPROF
+extern struct op_arm_model_spec op_firecracker_spec;
+#endif
+
+#ifdef CONFIG_PC302_ASYNC_OPROF
+extern struct op_arm_model_spec op_pc302_spec;
+#endif
+
 extern struct op_arm_model_spec op_armv6_spec;
 extern struct op_arm_model_spec op_mpcore_spec;
 extern struct op_arm_model_spec op_armv7_spec;

@@ -1899,3 +1899,6 @@ rut100			MACH_RUT100		RUT100			1908
 asusp535		MACH_ASUSP535		ASUSP535		1909
 htcraphael		MACH_HTCRAPHAEL		HTCRAPHAEL		1910
 sygdg1			MACH_SYGDG1		SYGDG1			1911
+pc7302                  MACH_PC7302             PC7302                  2220
+pc7802                  MACH_PC7802             PC7802                  2436
+pc72052_i10_revb	MACH_PC72052_I10_REVB 	PC72052_I10_REVB	9997

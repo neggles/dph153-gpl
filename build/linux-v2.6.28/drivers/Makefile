@@ -1,9 +1,22 @@
+################################################################################
+# 
+# Copyright (c) 2009 ip.access Ltd.
+#
+#  This program is free software; you can redistribute  it and/or modify it
+#  under  the terms of  the GNU General  Public License as published by the
+#  Free Software Foundation;  either version 2 of the  License, or (at your
+#  option) any later version.
+#
+# 22 Apr 2009 Created by Simon D Hughes.
 #
 # Makefile for the Linux kernel device drivers.
 #
 # 15 Sep 2000, Christoph Hellwig <hch@infradead.org>
 # Rewritten to use lists instead of if-statements.
 #
+##############################################################################
+# Filename: 
+##############################################################################
 
 obj-y				+= gpio/
 obj-$(CONFIG_PCI)		+= pci/
@@ -33,6 +46,10 @@ obj-$(CONFIG_FB_INTEL)          += video/intelfb/
 
 obj-y				+= serial/
 obj-$(CONFIG_PARPORT)		+= parport/
+
+# picochip/ needed before misc/ and picochip/ needs dma/
+obj-$(CONFIG_DMA_ENGINE)	+= dma/
+obj-y				+= picochip/
 obj-y				+= base/ block/ misc/ mfd/ net/ media/
 obj-$(CONFIG_NUBUS)		+= nubus/
 obj-$(CONFIG_ATM)		+= atm/
@@ -93,7 +110,6 @@ obj-y				+= firmware/
 obj-$(CONFIG_CRYPTO)		+= crypto/
 obj-$(CONFIG_SUPERH)		+= sh/
 obj-$(CONFIG_GENERIC_TIME)	+= clocksource/
-obj-$(CONFIG_DMA_ENGINE)	+= dma/
 obj-$(CONFIG_DCA)		+= dca/
 obj-$(CONFIG_HID)		+= hid/
 obj-$(CONFIG_PPC_PS3)		+= ps3/
@@ -102,3 +118,5 @@ obj-$(CONFIG_SSB)		+= ssb/
 obj-$(CONFIG_VIRTIO)		+= virtio/
 obj-$(CONFIG_REGULATOR)		+= regulator/
 obj-$(CONFIG_STAGING)		+= staging/
+obj-y				+= perfcounters/
+obj-$(CONFIG_IPACCESS)		+= ipa/

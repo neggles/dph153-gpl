@@ -267,6 +267,7 @@ image-$(CONFIG_TQM8560)			+= cuImage.tqm8560
 image-$(CONFIG_SBC8548)			+= cuImage.sbc8548
 image-$(CONFIG_SBC8560)			+= cuImage.sbc8560
 image-$(CONFIG_KSI8560)			+= cuImage.ksi8560
+image-$(CONFIG_PICOHDP203)		+= cuImage.picohdp203
 
 # Board ports in arch/powerpc/platform/embedded6xx/Kconfig
 image-$(CONFIG_STORCENTER)		+= cuImage.storcenter

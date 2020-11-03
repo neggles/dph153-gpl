@@ -117,6 +117,8 @@ while [ "$#" -gt 0 ]; do
     shift
 done
 
+echo "DTS is $dts"
+
 if [ -n "$dts" ]; then
     if [ ! -r "$dts" -a -r "$object/dts/$dts" ]; then
 	dts="$object/dts/$dts"
@@ -180,7 +182,7 @@ cuboot*)
     *-mpc83*|*-asp834x*)
         platformo=$object/cuboot-83xx.o
         ;;
-    *-tqm8541|*-mpc8560*|*-tqm8560|*-tqm8555|*-ksi8560*)
+    *-tqm8541|*-mpc8560*|*-tqm8560|*-tqm8555|*-ksi8560*|*-picohdp*)
         platformo=$object/cuboot-85xx-cpm2.o
         ;;
     *-mpc85*|*-tqm85*|*-sbc85*)

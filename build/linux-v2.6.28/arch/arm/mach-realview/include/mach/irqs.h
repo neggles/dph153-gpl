@@ -25,6 +25,8 @@
 #include <mach/board-eb.h>
 #include <mach/board-pb11mp.h>
 #include <mach/board-pb1176.h>
+#include <mach/board-pba8.h>
+#include <mach/board-pbx.h>
 
 #define IRQ_LOCALTIMER		29
 #define IRQ_LOCALWDOG		30

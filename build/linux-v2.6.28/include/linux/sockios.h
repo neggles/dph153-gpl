@@ -122,6 +122,9 @@
 #define SIOCBRADDIF	0x89a2		/* add interface to bridge      */
 #define SIOCBRDELIF	0x89a3		/* remove interface from bridge */
 
+/* hardware time stamping: parameters in net/timestamping.h */
+#define SIOCSHWTSTAMP   0x89b0
+
 /* Device private ioctl calls */
 
 /*

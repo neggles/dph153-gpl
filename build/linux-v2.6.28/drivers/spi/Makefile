@@ -29,12 +29,18 @@ obj-$(CONFIG_SPI_S3C24XX)		+= spi_s3c24xx.o
 obj-$(CONFIG_SPI_TXX9)			+= spi_txx9.o
 obj-$(CONFIG_SPI_XILINX)		+= xilinx_spi.o
 obj-$(CONFIG_SPI_SH_SCI)		+= spi_sh_sci.o
+obj-$(CONFIG_SPI_FIRECRACKER)		+= spi_pc202_gpio.o
+obj-$(CONFIG_SPI_PC302)                 += pc302_spi.o
+obj-$(CONFIG_SPI_PC302_GPIO)		+= spi_pc302_gpio.o
+obj-$(CONFIG_SPI_PC302_IPA)		+= spi_pc302.o
 # 	... add above this line ...
 
 # SPI protocol drivers (device/link on bus)
 obj-$(CONFIG_SPI_AT25)		+= at25.o
 obj-$(CONFIG_SPI_SPIDEV)	+= spidev.o
 obj-$(CONFIG_SPI_TLE62X0)	+= tle62x0.o
+obj-$(CONFIG_SPI_MAX6662)	+= spi_max6662.o
+obj-$(CONFIG_SPI_DAC7512)	+= spi_dac7512.o
 # 	... add above this line ...
 
 # SPI slave controller drivers (upstream link)

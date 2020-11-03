@@ -1130,7 +1130,6 @@ typedef struct im_idma {
 #define FCC1_MEM_OFFSET FCC_MEM_OFFSET(0)
 #define FCC2_MEM_OFFSET FCC_MEM_OFFSET(1)
 #define FCC3_MEM_OFFSET FCC_MEM_OFFSET(2)
-
 /* Clocks and GRG's */
 
 enum cpm_clk_dir {

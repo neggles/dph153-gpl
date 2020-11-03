@@ -324,5 +324,14 @@
 #define UART_OMAP_SYSC		0x15	/* System configuration register */
 #define UART_OMAP_SYSS		0x16	/* System status register */
 
+/* 
+ * Extra serial register definitions for the Synopsys UARTs in
+ * picoChip Firecracker processors.
+ */
+#define UART_FIRECRACKER_USR            0x1f    /* UART Status Register */
+
+#define UART_IIR_FIRECRACKER_BUSY	0x07    /* Busy interrupt ID */
+#define UART_IIR_ID_MASK		0x0F    /* Interrupt ID mask */
+
 #endif /* _LINUX_SERIAL_REG_H */
 

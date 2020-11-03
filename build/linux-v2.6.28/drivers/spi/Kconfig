@@ -100,6 +100,13 @@ config SPI_BUTTERFLY
 	  inexpensive battery powered microcontroller evaluation board.
 	  This same cable can be used to flash new firmware.
 
+config SPI_FIRECRACKER
+	tristate "Firecracker SPI by GPIO"
+	depends on SPI_MASTER && ARCH_FIRECRACKER && SPI_BITBANG && EXPERIMENTAL
+	help
+	  SPI driver for picoChip Firecracker series ARM SoCs using
+	  GPIO lines to provide the SPI bus.
+
 config SPI_IMX
 	tristate "Freescale iMX SPI controller"
 	depends on ARCH_IMX && EXPERIMENTAL
@@ -154,6 +161,27 @@ config SPI_ORION
 	depends on PLAT_ORION && EXPERIMENTAL
 	help
 	  This enables using the SPI master controller on the Orion chips.
+
+config SPI_PC302
+	tristate "picoChip PC302 SPI support"
+	depends on ARCH_PC302
+	help
+	  Enables using the SPI master controller the on picoChip PC302 device.
+          
+config SPI_PC302_GPIO
+	tristate "PC302 SPI by GPIO"
+	depends on SPI_MASTER && ARCH_PC302 && EXPERIMENTAL
+	select SPI_BITBANG
+	help
+	  SPI driver for picoChip PC302 series ARM SoCs using
+	  GPIO lines to provide the SPI bus.
+
+config SPI_PC302_IPA
+	tristate "PC302 SPI for IPA boards"
+	depends on SPI_MASTER && ARCH_PC302 && EXPERIMENTAL
+	help
+	  SPI driver for picoChip PC302 series ARM SoCs using
+	  the integrated SSI peripheral to perform the transfer.
 
 config SPI_PXA2XX
 	tristate "PXA2xx SSP SPI master"
@@ -224,6 +252,22 @@ config SPI_AT25
 
 	  This driver can also be built as a module.  If so, the module
 	  will be called at25.
+
+config SPI_DAC7512
+	tristate "Burr-Brown DAC7512"
+	depends on SYSFS
+	help
+	  SPI driver for the Burr-Brown DAC7512 DAC (dac7512).
+	  This provides both a sysfs interface and a misc device that
+	  can be controlled via ioctls.
+
+config SPI_MAX6662
+	tristate "Maxim MAX6662"
+	depends on SYSFS
+	help
+	  SPI driver for the MAX6662 Temperature Sensor (max6662).
+	  This provides both a sysfs interface and a misc device that
+	  can be controlled via ioctls.
 
 config SPI_SPIDEV
 	tristate "User mode SPI device driver support"

@@ -637,7 +637,27 @@ static inline int cpu_of(struct rq *rq)
 #define this_rq()		(&__get_cpu_var(runqueues))
 #define task_rq(p)		cpu_rq(task_cpu(p))
 #define cpu_curr(cpu)		(cpu_rq(cpu)->curr)
+unsigned long ret_nr_running()
+{
+	unsigned long num_running;
+	int cpu = smp_processor_id();
+	struct rq *rq = cpu_rq(cpu);
 
+	num_running = rq->cfs.nr_running; 
+	return num_running;
+}
+
+EXPORT_SYMBOL(ret_nr_running);
+
+unsigned long long ret_now(pid_t pid)
+{
+	unsigned long long now;
+	struct task_struct *t = find_task_struct_by_pid(pid);
+	now = task_rq(t)->clock;
+	return now;
+}
+
+EXPORT_SYMBOL(ret_now);
 static inline void update_rq_clock(struct rq *rq)
 {
 	rq->clock = sched_clock_cpu(cpu_of(rq));
@@ -4485,6 +4505,12 @@ need_resched_nonpreemptible:
 
 	if (likely(prev != next)) {
 		sched_info_switch(prev, next);
+		prev->preempt_pid = next;
+		prev->preempt_flag = (prev->state == TASK_RUNNING);
+		if (!prev->preempt_flag)
+		{
+			prev->incompleteTicks = 0;
+		}
 
 		rq->nr_switches++;
 		rq->curr = next;
@@ -5107,6 +5133,17 @@ static struct task_struct *find_process_by_pid(pid_t pid)
 {
 	return pid ? find_task_by_vpid(pid) : current;
 }
+
+/**
+ * find_task_struct_by_pid - this is similar to the above function
+ * The only difference is that this is a non static function
+ */
+struct task_struct *find_task_struct_by_pid(pid_t pid)
+{
+	return pid ? find_task_by_vpid(pid) : current;
+}
+
+EXPORT_SYMBOL(find_task_struct_by_pid);
 
 /* Actually do priority change: must hold rq lock. */
 static void

@@ -320,6 +320,23 @@ static const u8 tpm_ordinal_duration[TPM_MAX_ORDINAL] = {
 	TPM_MEDIUM,
 };
 
+/* The TPM code was written for PC platforms.  Those allow misaligned
+ * access to 32-bit numbers.  Other platforms, including the ARM, are
+ * not always so tolerant, so we need to extract the numbers byte by byte.
+ */
+static u32 tpm_getbe32(const void *buf)
+{
+    const u8 *p = (const u8*)buf;
+	u32 ret = *p++;
+	ret <<= 8;
+	ret |= *p++;
+	ret <<= 8;
+	ret |= *p++;
+	ret <<= 8;
+	ret |= *p;
+	return ret;
+}
+
 static void user_reader_timeout(unsigned long ptr)
 {
 	struct tpm_chip *chip = (struct tpm_chip *) ptr;
@@ -373,8 +390,8 @@ static ssize_t tpm_transmit(struct tpm_chip *chip, const char *buf,
 	u32 count, ordinal;
 	unsigned long stop;
 
-	count = be32_to_cpu(*((__be32 *) (buf + 2)));
-	ordinal = be32_to_cpu(*((__be32 *) (buf + 6)));
+	count = tpm_getbe32(buf + 2);
+	ordinal = tpm_getbe32(buf + 6);
 	if (count == 0)
 		return -ENODATA;
 	if (count > bufsiz) {
@@ -481,7 +498,7 @@ static ssize_t transmit_cmd(struct tpm_chip *chip, u8 *data, int len,
 	if (len <  0)
 		return len;
 	if (len == TPM_ERROR_SIZE) {
-		err = be32_to_cpu(*((__be32 *) (data + TPM_RET_CODE_IDX)));
+		err = tpm_getbe32(data + TPM_RET_CODE_IDX);
 		dev_dbg(chip->dev, "A TPM error (%d) occurred %s\n", err, desc);
 		return err;
 	}
@@ -517,25 +534,21 @@ void tpm_get_timeouts(struct tpm_chip *chip)
 	if (rc)
 		goto duration;
 
-	if (be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_SIZE_IDX)))
+	if (tpm_getbe32(data + TPM_GET_CAP_RET_SIZE_IDX)
 	    != 4 * sizeof(u32))
 		goto duration;
 
 	/* Don't overwrite default if value is 0 */
-	timeout =
-	    be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_1_IDX)));
+	timeout = tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_1_IDX);
 	if (timeout)
 		chip->vendor.timeout_a = usecs_to_jiffies(timeout);
-	timeout =
-	    be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_2_IDX)));
+	timeout = tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_2_IDX);
 	if (timeout)
 		chip->vendor.timeout_b = usecs_to_jiffies(timeout);
-	timeout =
-	    be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_3_IDX)));
+	timeout = tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_3_IDX);
 	if (timeout)
 		chip->vendor.timeout_c = usecs_to_jiffies(timeout);
-	timeout =
-	    be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_4_IDX)));
+	timeout = tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_4_IDX);
 	if (timeout)
 		chip->vendor.timeout_d = usecs_to_jiffies(timeout);
 
@@ -549,14 +562,13 @@ duration:
 	if (rc)
 		return;
 
-	if (be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_SIZE_IDX)))
+	if (tpm_getbe32(data + TPM_GET_CAP_RET_SIZE_IDX)
 	    != 3 * sizeof(u32))
 		return;
 
 	chip->vendor.duration[TPM_SHORT] =
-	    usecs_to_jiffies(be32_to_cpu
-			     (*((__be32 *) (data +
-					    TPM_GET_CAP_RET_UINT32_1_IDX))));
+	    usecs_to_jiffies(tpm_getbe32(data +
+					    TPM_GET_CAP_RET_UINT32_1_IDX));
 	/* The Broadcom BCM0102 chipset in a Dell Latitude D820 gets the above
 	 * value wrong and apparently reports msecs rather than usecs. So we
 	 * fix up the resulting too-small TPM_SHORT value to make things work.
@@ -565,13 +577,11 @@ duration:
 		chip->vendor.duration[TPM_SHORT] = HZ;
 
 	chip->vendor.duration[TPM_MEDIUM] =
-	    usecs_to_jiffies(be32_to_cpu
-			     (*((__be32 *) (data +
-					    TPM_GET_CAP_RET_UINT32_2_IDX))));
+	    usecs_to_jiffies(tpm_getbe32(data +
+					    TPM_GET_CAP_RET_UINT32_2_IDX));
 	chip->vendor.duration[TPM_LONG] =
-	    usecs_to_jiffies(be32_to_cpu
-			     (*((__be32 *) (data +
-					    TPM_GET_CAP_RET_UINT32_3_IDX))));
+	    usecs_to_jiffies(tpm_getbe32(data +
+					    TPM_GET_CAP_RET_UINT32_3_IDX));
 }
 EXPORT_SYMBOL_GPL(tpm_get_timeouts);
 
@@ -580,12 +590,27 @@ void tpm_continue_selftest(struct tpm_chip *chip)
 	u8 data[] = {
 		0, 193,			/* TPM_TAG_RQU_COMMAND */
 		0, 0, 0, 10,		/* length */
-		0, 0, 0, 83,		/* TPM_ORD_GetCapability */
+		0, 0, 0, 83,		/* TPM_ORD_ContinueSelfTest */
 	};
 
 	tpm_transmit(chip, data, sizeof(data));
 }
 EXPORT_SYMBOL_GPL(tpm_continue_selftest);
+
+/* The BIOS should do this, but until it is capable of doing so, we
+ * will add the capability to do it from here */
+void tpm_startup(struct tpm_chip *chip)
+{
+	u8 data[] = {
+		0, 193,			/* TPM_TAG_RQU_COMMAND */
+		0, 0, 0, 12,		/* length */
+		0, 0, 0, 153,		/* TPM_ORD_Startup */
+		0, 1,			/* TPM_ST_CLEAR */
+	};
+
+	tpm_transmit(chip, data, sizeof(data));
+}
+EXPORT_SYMBOL_GPL(tpm_startup);
 
 #define  TPM_INTERNAL_RESULT_SIZE 200
 
@@ -752,7 +777,7 @@ ssize_t tpm_show_pcrs(struct device *dev, struct device_attribute *attr,
 		return 0;
 	}
 
-	num_pcrs = be32_to_cpu(*((__be32 *) (data + 14)));
+	num_pcrs = tpm_getbe32(data + 14);
 	for (i = 0; i < num_pcrs; i++) {
 		memcpy(data, pcrread, sizeof(pcrread));
 		index = cpu_to_be32(i);
@@ -823,7 +848,7 @@ ssize_t tpm_show_pubek(struct device *dev, struct device_attribute *attr,
 		    data[15], data[16], data[17], data[22], data[23],
 		    data[24], data[25], data[26], data[27], data[28],
 		    data[29], data[30], data[31], data[32], data[33],
-		    be32_to_cpu(*((__be32 *) (data + 34))));
+		    tpm_getbe32(data + 34));
 
 	for (i = 0; i < 256; i++) {
 		str += sprintf(str, "%02X ", data[i + 38]);
@@ -875,7 +900,7 @@ ssize_t tpm_show_caps(struct device *dev, struct device_attribute *attr,
 	}
 
 	str += sprintf(str, "Manufacturer: 0x%x\n",
-		       be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_1_IDX))));
+		       tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_1_IDX));
 
 	memcpy(data, cap_version, sizeof(cap_version));
 	data[CAP_VERSION_IDX] = CAP_VERSION_1_1;
@@ -918,13 +943,13 @@ ssize_t tpm_show_caps_1_2(struct device * dev,
 	if (len <= TPM_ERROR_SIZE) {
 		dev_dbg(chip->dev, "A TPM error (%d) occurred "
 			"attempting to determine the manufacturer\n",
-			be32_to_cpu(*((__be32 *) (data + TPM_RET_CODE_IDX))));
+			tpm_getbe32(data + TPM_RET_CODE_IDX));
 		kfree(data);
 		return 0;
 	}
 
 	str += sprintf(str, "Manufacturer: 0x%x\n",
-		       be32_to_cpu(*((__be32 *) (data + TPM_GET_CAP_RET_UINT32_1_IDX))));
+		       tpm_getbe32(data + TPM_GET_CAP_RET_UINT32_1_IDX));
 
 	memcpy(data, cap_version, sizeof(cap_version));
 	data[CAP_VERSION_IDX] = CAP_VERSION_1_2;
@@ -933,7 +958,7 @@ ssize_t tpm_show_caps_1_2(struct device * dev,
 	if (len <= TPM_ERROR_SIZE) {
 		dev_err(chip->dev, "A TPM error (%d) occurred "
 			"attempting to determine the 1.2 version\n",
-			be32_to_cpu(*((__be32 *) (data + TPM_RET_CODE_IDX))));
+			tpm_getbe32(data + TPM_RET_CODE_IDX));
 		goto out;
 	}
 	str += sprintf(str,

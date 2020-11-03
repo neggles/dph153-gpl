@@ -44,6 +44,7 @@
 #include <linux/in.h>
 #include <linux/inet.h>
 #include <linux/slab.h>
+#include <linux/inetdevice.h>
 #include <linux/netdevice.h>
 #ifdef CONFIG_NET_CLS_ACT
 #include <net/pkt_sched.h>
@@ -55,6 +56,7 @@
 #include <linux/rtnetlink.h>
 #include <linux/init.h>
 #include <linux/scatterlist.h>
+#include <linux/errqueue.h>
 
 #include <net/protocol.h>
 #include <net/dst.h>
@@ -146,14 +148,6 @@ void skb_under_panic(struct sk_buff *skb, int sz, void *here)
 	       skb->dev ? skb->dev->name : "<NULL>");
 	BUG();
 }
-
-void skb_truesize_bug(struct sk_buff *skb)
-{
-	WARN(net_ratelimit(), KERN_ERR "SKB BUG: Invalid truesize (%u) "
-	       "len=%u, sizeof(sk_buff)=%Zd\n",
-	       skb->truesize, skb->len, sizeof(struct sk_buff));
-}
-EXPORT_SYMBOL(skb_truesize_bug);
 
 /* 	Allocate a new skbuff. We do this ourselves so we can fill in a few
  *	'private' fields and also do memory statistics to find all the
@@ -496,6 +490,7 @@ EXPORT_SYMBOL(skb_recycle_check);
 static void __copy_skb_header(struct sk_buff *new, const struct sk_buff *old)
 {
 	new->tstamp		= old->tstamp;
+	new->hwtstamp		= old->hwtstamp;
 	new->dev		= old->dev;
 	new->transport_header	= old->transport_header;
 	new->network_header	= old->network_header;
@@ -2394,6 +2389,41 @@ err:
 
 EXPORT_SYMBOL_GPL(skb_segment);
 
+int skb_hwtstamp_raw(const struct sk_buff *skb, struct timespec *ts)
+{
+	if (skb_hwtstamp_available(skb)) {
+		*ts = ktime_to_timespec(skb->hwtstamp.hwtstamp);
+		return 1;
+	}
+	return 0;
+}
+
+EXPORT_SYMBOL_GPL(skb_hwtstamp_raw);
+
+int skb_hwtstamp_transformed(const struct sk_buff *skb, struct timespec *ts)
+{
+	struct rtable *rt;
+	struct in_device *idev;
+	struct net_device *netdev;
+
+        if (skb_hwtstamp_available(skb) &&
+		(rt = skb->rtable) != NULL &&
+		(idev = rt->idev) != NULL &&
+		(netdev = idev->dev) != NULL  &&
+		netdev->hwtstamp_raw2sys) {
+		ktime_t hwtstamp_sys =
+			netdev->hwtstamp_raw2sys(netdev,
+						skb->hwtstamp.hwtstamp);
+		if (hwtstamp_sys.tv64) {
+			*ts = ktime_to_timespec(hwtstamp_sys);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+EXPORT_SYMBOL_GPL(skb_hwtstamp_transformed);
+
 void __init skb_init(void)
 {
 	skbuff_head_cache = kmem_cache_create("skbuff_head_cache",
@@ -2599,6 +2629,40 @@ int skb_cow_data(struct sk_buff *skb, int tailbits, struct sk_buff **trailer)
 
 	return elt;
 }
+
+void skb_hwtstamp_tx(struct sk_buff *orig_skb,
+		ktime_t stamp,
+		struct net_device *dev)
+{
+	struct sock *sk = orig_skb->sk;
+	struct sock_exterr_skb *serr;
+	struct sk_buff *skb;
+	int err = -ENOMEM;
+
+	if (!sk)
+		return;
+
+	skb = skb_clone(orig_skb, GFP_ATOMIC);
+	if (!skb)
+		return;
+
+	if (dev) {
+		skb->hwtstamp.hwtstamp = stamp;
+	} else {
+		skb->tstamp = stamp;
+		skb->hwtstamp.hwtstamp.tv64 = 0;
+	}
+
+	serr = SKB_EXT_ERR(skb);
+	memset(serr, 0, sizeof(serr));
+	serr->ee.ee_errno = ENOMSG;
+	serr->ee.ee_origin = SO_EE_ORIGIN_TIMESTAMPING;
+	err = sock_queue_err_skb(sk, skb);
+	if (err)
+		kfree_skb(skb);
+}
+EXPORT_SYMBOL_GPL(skb_hwtstamp_tx);
+
 
 /**
  * skb_partial_csum_set - set up and verify partial csum values for packet

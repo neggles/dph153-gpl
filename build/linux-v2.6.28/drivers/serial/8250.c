@@ -7,6 +7,8 @@
  *
  *  Copyright (C) 2001 Russell King.
  *
+ * Additional PC202 (firecracker) fixes Copyright (C) 2010 ip.access Ltd
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -43,6 +45,8 @@
 #include <asm/irq.h>
 
 #include "8250.h"
+
+#define IPA_VERSION "(3) "
 
 #ifdef CONFIG_SPARC
 #include "suncore.h"
@@ -522,6 +526,45 @@ static void serial_dl_write(struct uart_8250_port *up, int value)
 		_serial_dl_write(up, value);
 	}
 }
+#elif defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+
+/* Don't worry about serial_dl_read - its only used in autoconf */
+#define serial_dl_read(up) _serial_dl_read(up)
+
+static void serial_dl_write(struct uart_8250_port *up, int value)
+{
+	unsigned int lo=0, hi=0;
+	unsigned int out_lo = value & 0xff;
+	unsigned int out_hi = value >> 8 & 0xff;
+	unsigned int v;
+
+	v = serial_inp(up, UART_LCR);
+	if ((v & 0x80) == 0) {
+		/* LCR bit 7 must be 1 to write DL regs */
+		if (up->port.irq != 9) printk("8250.c: serial_dl_write: LCR=%02X\n", v);
+		return;
+	}
+
+	v = serial_inp(up, UART_FIRECRACKER_USR);
+	if (v & 0x01) {
+		/* USR bit 0 must be 0 to write DL regs */
+		if (up->port.irq != 9) printk("8250.c: serial_dl_write: USR=%02X\n", v);
+	}
+
+	serial_outp(up, UART_DLL, out_lo);
+	serial_outp(up, UART_DLM, out_hi);
+
+	lo = serial_inp(up, UART_DLL);
+	hi = serial_inp(up, UART_DLM);
+
+	/* verify */
+	if ((lo != out_lo) || (hi != out_hi)) {
+		if (up->port.irq != 9)
+			printk("8250.c: serial_dl_write: couldn't write DL regs, wrote %02X,%02X, read %02X,%02X\n",
+			      out_hi, out_lo, hi, lo);
+	}
+
+}
 #else
 #define serial_dl_read(up) _serial_dl_read(up)
 #define serial_dl_write(up, value) _serial_dl_write(up, value)
@@ -582,6 +625,134 @@ static void serial8250_set_sleep(struct uart_8250_port *p, int sleep)
 		}
 	}
 }
+
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+/* Wait for UART to go to idle */
+#define FIRECRACKER_IDLE_TIMEOUT ((HZ+9)/10)
+static unsigned int firecracker_wait_for_idle(struct uart_8250_port *up)
+{
+	unsigned int count=0;
+	unsigned long j;
+	unsigned int lsr=0, usr=0, iir=0;
+
+	j = jiffies;
+	while (1) {
+		/* We seem to need all these register reads to get UART to go IDLE */
+		lsr = serial_inp(up, UART_LSR);
+		(void)serial_inp(up, UART_RX);
+		iir = serial_inp(up, UART_IIR);
+		usr = serial_inp(up, UART_FIRECRACKER_USR);
+
+		if ((usr & 1) == 0) {
+			break;
+		}
+
+		if ((jiffies - j) > FIRECRACKER_IDLE_TIMEOUT) {
+			if (up->port.irq != 9) {
+			    printk("8250.c: timeout waiting for UART idle, lsr=%02X usr=%02X, iir=%02X\n",
+				   lsr, usr, iir);
+			}
+			break;
+		}
+		count++;
+		udelay(1);
+	}
+
+	return count;
+}
+
+
+#define FIRECRACKER_RESET_TIMEOUT ((HZ+99)/100)
+static void firecracker_reset_uart(struct uart_8250_port *up)
+{
+	unsigned int lcr, lsr;
+	unsigned long j;
+
+	/* Reset as much as we can and put into loop back mode */
+	/* This seems necessary to get UART to go to IDLE */
+	serial_outp(up, UART_MCR, UART_MCR_LOOP);
+	serial_outp(up, UART_IER, 0);
+	/* clear any break condition in tx (this bit DOES work!) */
+	lcr = serial_inp(up, UART_LCR);
+	serial_outp(up, UART_LCR, lcr & ~UART_LCR_SBC);
+	serial_outp(up, UART_FCR, 6);
+
+	/* 
+	 * The UART could have just started processing a rx character and
+	 * it won't show in the USR BUSY bit for half a character time.
+	 * So we need to pause for at least that long.
+	 * Half a bit time @ 600 baud is 0.4 ms.
+	 * NOTE: I increased this to 10 before adding the drain loop below, so
+	 * it could probably be reduced back down to 1ms, but there isn't time
+	 * for another round of testing.
+	 */
+	mdelay(10);
+
+	/* Drain any chars in rx or tx buffers */	
+	j = jiffies;
+	while (1) {
+		lsr = serial_inp(up, UART_LSR);
+		serial_inp(up, UART_RX);
+		serial_inp(up, UART_IIR);
+
+		/* 
+		 * We're looking for:
+		 *	TEMT=1
+		 *	THRE=1
+		 *	BI  =0
+		 *	DR  =0
+		 */
+#define FIRECRACKER_LSR_IDLE_MASK  (UART_LSR_TEMT | UART_LSR_THRE | UART_LSR_BI | UART_LSR_DR)
+#define FIRECRACKER_LSR_IDLE_VALUE (UART_LSR_TEMT | UART_LSR_THRE)
+		if ((lsr & FIRECRACKER_LSR_IDLE_MASK) == FIRECRACKER_LSR_IDLE_VALUE)
+		{
+		    break;
+		}
+
+		/* Safety timeout check so we don't spin for ever */
+		if ((jiffies - j) > FIRECRACKER_RESET_TIMEOUT)
+		{
+			if (up->port.irq != 9) {
+			    printk("8250.c: timeout draining UART, lsr=%02X\n", lsr);
+			}
+			break;
+		}
+	}
+}
+
+#define FIRECRACKER_LCR_MAX_RETRIES 10
+static void firecracker_set_lcr(struct uart_8250_port *up, unsigned int cval)
+{
+	unsigned int v;
+	int try;
+
+	/* Mask out reserved bit (just being cautious) */
+	cval &= 0xDF;
+
+	/* 
+	 * The loop is defensive, if the other measures to detect
+	 * UART Busy have worked, we should successfully write LCR first time.
+	 */
+	for (try = 0; try < FIRECRACKER_LCR_MAX_RETRIES; try++) {
+		firecracker_wait_for_idle(up);
+		serial_outp(up, UART_LCR, cval);
+		/* verify */
+		v = serial_inp(up, UART_LCR);
+		if (v == cval) {
+			/* Success! */
+			break;
+		}
+
+		/* Failed, try resetting again */
+		if (up->port.irq != 9) {
+			printk("Failed to write LCR: tried %02X, actual %02X, usr=%02X\n",
+			       cval, v, serial_inp(up, UART_FIRECRACKER_USR));
+		}
+		firecracker_reset_uart(up);
+	}
+}
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
+
 
 #ifdef CONFIG_SERIAL_8250_RSA
 /*
@@ -1510,6 +1681,23 @@ static irqreturn_t serial8250_interrupt(int irq, void *dev_id)
 			handled = 1;
 
 			end = NULL;
+
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+		/* 
+		 * If we are supporting the Synopsys UART in the 
+		 * Firecracker, we need to handle the additional 
+		 * 'busy' interrupt. We simply reset the interrupt
+		 * condition and handle the interrupt.
+		 * 
+		 */
+		} else if ((iir & UART_IIR_ID_MASK) == 
+				UART_IIR_FIRECRACKER_BUSY) {
+			/* Read USR to clear busy interrupt */
+			serial_in(up, UART_FIRECRACKER_USR);
+			handled = 1;
+			end = NULL;
+#endif
+
 		} else if (end == NULL)
 			end = l;
 
@@ -2208,7 +2396,31 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
 	 * Ok, we're now changing the port state.  Do it with
 	 * interrupts disabled.
 	 */
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+	/* 
+	 * We must disable interrupts to prevent the UART starting up again
+	 * if an application writes data to the device.
+	 * Also programming the LCR can take a long time (1 character time).
+	 * So we disable just the UART interrupt to allow the rest of the 
+	 * kernel to continue to operate.
+	 */
+	disable_irq(up->port.irq);
+
+	/* Should be safe to lock unconditionally with interrupts disabled */
+	spin_lock(&up->port.lock);
+
+	/* 
+	 * Do a software reset. This will clear all regs and stop the UART
+	 * so its not busy when we write to the DLL, DLH and LCR registers.
+	 * The rest of the code fully reconfigures the UART.
+	 */
+	firecracker_reset_uart(up);
+
+	/* Silence compiler warning */
+	(void)flags;
+#else
 	spin_lock_irqsave(&up->port.lock, flags);
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
 
 	/*
 	 * Update the per-port timeout.
@@ -2280,12 +2492,16 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
 	}
 #endif
 
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+	firecracker_set_lcr(up, cval | UART_LCR_DLAB);/* set DLAB */
+#else
 	if (up->capabilities & UART_NATSEMI) {
 		/* Switch to bank 2 not bank 1, to avoid resetting EXCR2 */
 		serial_outp(up, UART_LCR, 0xe0);
 	} else {
 		serial_outp(up, UART_LCR, cval | UART_LCR_DLAB);/* set DLAB */
 	}
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
 
 	serial_dl_write(up, quot);
 
@@ -2296,7 +2512,11 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
 	if (up->port.type == PORT_16750)
 		serial_outp(up, UART_FCR, fcr);
 
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+	firecracker_set_lcr(up, cval);			/* reset DLAB */
+#else
 	serial_outp(up, UART_LCR, cval);		/* reset DLAB */
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
 	up->lcr = cval;					/* Save LCR */
 	if (up->port.type != PORT_16750) {
 		if (fcr & UART_FCR_ENABLE_FIFO) {
@@ -2306,7 +2526,12 @@ serial8250_set_termios(struct uart_port *port, struct ktermios *termios,
 		serial_outp(up, UART_FCR, fcr);		/* set fcr */
 	}
 	serial8250_set_mctrl(&up->port, up->port.mctrl);
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+	spin_unlock(&up->port.lock);
+	enable_irq(up->port.irq);
+#else
 	spin_unlock_irqrestore(&up->port.lock, flags);
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
 	/* Don't rewrite B0 */
 	if (tty_termios_baud_rate(termios))
 		tty_termios_encode_baud_rate(termios, baud, baud);
@@ -2976,6 +3201,11 @@ int serial8250_register_port(struct uart_port *port)
 		if (port->dev)
 			uart->port.dev = port->dev;
 
+#if defined(CONFIG_SERIAL_8250_FIRECRACKER) || defined(CONFIG_ARCH_PC302)
+		/* Only allow loopback bit to be set */
+		uart->mcr_mask = 0x10;
+#endif /* CONFIG_SERIAL_8250_FIRECRACKER || CONFIG_ARCH_PC302 */
+
 		ret = uart_add_one_port(&serial8250_reg, &uart->port);
 		if (ret == 0)
 			ret = uart->port.line;
@@ -3018,7 +3248,7 @@ static int __init serial8250_init(void)
 	if (nr_uarts > UART_NR)
 		nr_uarts = UART_NR;
 
-	printk(KERN_INFO "Serial: 8250/16550 driver"
+	printk(KERN_INFO "Serial: 8250/16550 driver" IPA_VERSION
 		"%d ports, IRQ sharing %sabled\n", nr_uarts,
 		share_irqs ? "en" : "dis");
 

@@ -80,6 +80,13 @@ config MTD_NAND_TS7250
 	help
 	  Support for NAND flash on Technologic Systems TS-7250 platform.
 
+config MTD_NAND_PC7302
+        tristate "NAND Flash device on the picoChip PC7302 platform"
+	depends on MACH_PC7302
+	help
+	  Support for NAND flash on the picoChip PC7302 platform.
+
+
 config MTD_NAND_IDS
 	tristate
 

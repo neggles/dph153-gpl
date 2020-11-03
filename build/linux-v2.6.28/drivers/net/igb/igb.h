@@ -34,6 +34,9 @@
 #include "e1000_mac.h"
 #include "e1000_82575.h"
 
+#include <linux/clocksource.h>
+#include <linux/clocksync.h>
+
 struct igb_adapter;
 
 #ifdef CONFIG_IGB_LRO
@@ -262,6 +265,8 @@ struct igb_adapter {
 	struct napi_struct napi;
 	struct pci_dev *pdev;
 	struct net_device_stats net_stats;
+        struct clocksource clock;
+        struct clocksync sync;
 
 	/* structs defined in e1000_hw.h */
 	struct e1000_hw hw;

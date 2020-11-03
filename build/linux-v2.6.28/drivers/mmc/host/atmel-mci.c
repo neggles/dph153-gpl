@@ -55,7 +55,6 @@ enum atmel_mci_state {
 
 struct atmel_mci_dma {
 #ifdef CONFIG_MMC_ATMELMCI_DMA
-	struct dma_client		client;
 	struct dma_chan			*chan;
 	struct dma_async_tx_descriptor	*data_desc;
 #endif
@@ -593,10 +592,8 @@ atmci_submit_data_dma(struct atmel_mci *host, struct mmc_data *data)
 
 	/* If we don't have a channel, we can't do DMA */
 	chan = host->dma.chan;
-	if (chan) {
-		dma_chan_get(chan);
+	if (chan)
 		host->data_chan = chan;
-	}
 
 	if (!chan)
 		return -ENODEV;
@@ -1599,6 +1596,18 @@ static void __exit atmci_cleanup_slot(struct atmel_mci_slot *slot,
 	slot->host->slot[id] = NULL;
 	mmc_free_host(slot->mmc);
 }
+
+#ifdef CONFIG_MMC_ATMELMCI_DMA
+static bool filter(struct dma_chan *chan, void *slave)
+{
+	struct dw_dma_slave *dws = slave;
+
+	if (dws->dma_dev == chan->device->dev)
+		return true;
+	else
+		return false;
+}
+#endif
 
 static int __init atmci_probe(struct platform_device *pdev)
 {

@@ -33,3 +33,7 @@ obj-$(CONFIG_SGI_XP)		+= sgi-xp/
 obj-$(CONFIG_SGI_GRU)		+= sgi-gru/
 obj-$(CONFIG_HP_ILO)		+= hpilo.o
 obj-$(CONFIG_C2PORT)		+= c2port/
+obj-$(CONFIG_PC302_FUSEBLOCK)	+= pc302fuse.o
+obj-$(CONFIG_PC302_GPIO)	+= pc302gpio.o
+obj-$(CONFIG_PC302_FRACN)	+= pc302fracn.o
+obj-$(CONFIG_PC202_GPIO)	+= pc202gpio.o

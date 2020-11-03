@@ -764,6 +764,17 @@ struct net_device
 	/* for setting kernel sock attribute on TCP connection setup */
 #define GSO_MAX_SIZE		65536
 	unsigned int		gso_max_size;
+
+#define HAVE_HW_TIME_STAMP
+	/* Transforms original raw hardware time stamp to
+	 * system time base. Always required when supporting
+	 * hardware time stamping.
+	 *
+	 * Returns empty stamp (= all zero) if conversion wasn't
+	 * possible.
+	 */
+	ktime_t             (*hwtstamp_raw2sys)(struct net_device *dev,
+						ktime_t hwstamp);
 };
 #define to_net_dev(d) container_of(d, struct net_device, dev)
 

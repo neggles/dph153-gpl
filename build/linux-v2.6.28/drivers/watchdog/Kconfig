@@ -233,6 +233,16 @@ config ORION5X_WATCHDOG
 	  To compile this driver as a module, choose M here: the
 	  module will be called orion5x_wdt.
 
+config PC302_WATCHDOG
+	tristate "PC302 watchdog"
+	depends on ARCH_PC302
+        select WATCHDOG_NOWAYOUT
+	help
+	  Say Y here if to include support for the watchdog timer
+	  in the picoChip PC302 processors.
+	  To compile this driver as a module, choose M here: the
+	  module will be called pc302_wdt.
+
 # ARM26 Architecture
 
 # AVR32 Architecture

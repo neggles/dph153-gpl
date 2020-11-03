@@ -82,6 +82,9 @@
 #define I2C_DRIVERID_M52790 	95      /* Mitsubishi M52790SP/FP AV switch */
 #define I2C_DRIVERID_CS5345	96	/* cs5345 audio processor	*/
 
+#define I2C_DRIVERID_AT97SC3204T	198	/* Atmel AT97SC3204T TPM	*/
+#define I2C_DRIVERID_AD7995		199	/* Analog Devices 7995 ADC	*/
+
 #define I2C_DRIVERID_OV7670 1048	/* Omnivision 7670 camera */
 
 /*

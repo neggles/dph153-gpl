@@ -286,11 +286,22 @@ static int eth_mac_addr(struct net_device *dev, void *p)
 {
 	struct sockaddr *addr = p;
 
+    printk("Attempt to change %s hw address to %02X:%02X:%02X:%02X:%02X:%02X in pid=%d\n",
+           dev->name,
+           addr->sa_data[0], addr->sa_data[1], addr->sa_data[2],
+           addr->sa_data[3], addr->sa_data[4], addr->sa_data[5],
+           current->pid);
+    show_stack(0, NULL);
+    
 	if (netif_running(dev))
 		return -EBUSY;
 	if (!is_valid_ether_addr(addr->sa_data))
 		return -EADDRNOTAVAIL;
 	memcpy(dev->dev_addr, addr->sa_data, ETH_ALEN);
+    printk("Attempt to change %s hw address to %02X:%02X:%02X:%02X:%02X:%02X was successful\n",
+           dev->name,
+           addr->sa_data[0], addr->sa_data[1], addr->sa_data[2],
+           addr->sa_data[3], addr->sa_data[4], addr->sa_data[5]);
 	return 0;
 }
 

@@ -48,7 +48,9 @@ static struct early_serial8250_device early_device;
 
 static unsigned int __init serial_in(struct uart_port *port, int offset)
 {
-	if (port->iotype == UPIO_MEM)
+        if (port->iotype == UPIO_MEM32)
+                return readl(port->membase + offset);
+        else if (port->iotype == UPIO_MEM)
 		return readb(port->membase + offset);
 	else
 		return inb(port->iobase + offset);
@@ -56,6 +58,8 @@ static unsigned int __init serial_in(struct uart_port *port, int offset)
 
 static void __init serial_out(struct uart_port *port, int offset, int value)
 {
+        if (port->iotype == UPIO_MEM32)
+                writel(value, port->membase + offset);
 	if (port->iotype == UPIO_MEM)
 		writeb(value, port->membase + offset);
 	else

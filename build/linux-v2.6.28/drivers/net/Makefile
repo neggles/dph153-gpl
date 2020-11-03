@@ -230,6 +230,8 @@ obj-$(CONFIG_ENC28J60) += enc28j60.o
 obj-$(CONFIG_XTENSA_XT2000_SONIC) += xtsonic.o
 
 obj-$(CONFIG_MACB) += macb.o
+obj-$(CONFIG_PC302_EMAC) += pc302_emac_ipa.o
+pc302_emac_ipa-objs := pc302_emac.o pc302_i2c_phy.o
 
 obj-$(CONFIG_ARM) += arm/
 obj-$(CONFIG_DEV_APPLETALK) += appletalk/

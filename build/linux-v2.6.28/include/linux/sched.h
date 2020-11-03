@@ -1356,6 +1356,9 @@ struct task_struct {
 	unsigned long default_timer_slack_ns;
 
 	struct list_head	*scm_work_list;
+	int			preempt_flag;
+	int			preempt_pid;
+	int			incompleteTicks;
 };
 
 /*
@@ -2301,5 +2304,9 @@ static inline void mm_init_owner(struct mm_struct *mm, struct task_struct *p)
 #define TASK_STATE_TO_CHAR_STR "RSDTtZX"
 
 #endif /* __KERNEL__ */
+
+struct task_struct *find_task_struct_by_pid(pid_t pid);
+unsigned long long ret_now(pid_t pid);
+unsigned long ret_nr_running(void);
 
 #endif

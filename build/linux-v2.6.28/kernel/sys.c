@@ -375,6 +375,10 @@ asmlinkage long sys_reboot(int magic1, int magic2, unsigned int cmd, void __user
 		kernel_restart(NULL);
 		break;
 
+	case LINUX_REBOOT_CMD_HARD:
+		kernel_restart("cpld");
+		break;
+
 	case LINUX_REBOOT_CMD_CAD_ON:
 		C_A_D = 1;
 		break;

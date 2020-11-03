@@ -618,6 +618,7 @@ static int raw_sendmsg(struct kiocb *iocb, struct socket *sock,
 	struct raw_sock *ro = raw_sk(sk);
 	struct sk_buff *skb;
 	struct net_device *dev;
+	union sk_buff_hwtstamp tstamp_tx;
 	int ifindex;
 	int err;
 
@@ -639,6 +640,10 @@ static int raw_sendmsg(struct kiocb *iocb, struct socket *sock,
 	if (!dev)
 		return -ENXIO;
 
+	err = sock_tx_timestamp(msg, sk, &tstamp_tx);
+	if (err < 0)
+		return err;
+
 	skb = sock_alloc_send_skb(sk, size, msg->msg_flags & MSG_DONTWAIT,
 				  &err);
 	if (!skb) {
@@ -654,6 +659,7 @@ static int raw_sendmsg(struct kiocb *iocb, struct socket *sock,
 	}
 	skb->dev = dev;
 	skb->sk  = sk;
+	skb->hwtstamp = tstamp_tx;
 
 	err = can_send(skb, ro->loopback);
 

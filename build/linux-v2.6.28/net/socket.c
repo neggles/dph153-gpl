@@ -546,6 +546,18 @@ void sock_release(struct socket *sock)
 	sock->file = NULL;
 }
 
+int sock_tx_timestamp(struct msghdr *msg, struct sock *sk,
+		union sk_buff_hwtstamp *tstamp_tx)
+{
+	tstamp_tx->hwtstamp.tv64 = 0;
+	tstamp_tx->tstamp_tx_hardware =
+		sock_flag(sk, SOCK_TIMESTAMPING_TX_HARDWARE);
+	tstamp_tx->tstamp_tx_software =
+		sock_flag(sk, SOCK_TIMESTAMPING_TX_SOFTWARE);
+	return 0;
+}
+EXPORT_SYMBOL(sock_tx_timestamp);
+
 static inline int __sock_sendmsg(struct kiocb *iocb, struct socket *sock,
 				 struct msghdr *msg, size_t size)
 {
@@ -602,26 +614,49 @@ int kernel_sendmsg(struct socket *sock, struct msghdr *msg,
 void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
 	struct sk_buff *skb)
 {
-	ktime_t kt = skb->tstamp;
+	int need_software_tstamp = sock_flag(sk, SOCK_RCVTSTAMP);
 
-	if (!sock_flag(sk, SOCK_RCVTSTAMPNS)) {
-		struct timeval tv;
-		/* Race occurred between timestamp enabling and packet
-		   receiving.  Fill in the current time for now. */
-		if (kt.tv64 == 0)
-			kt = ktime_get_real();
-		skb->tstamp = kt;
-		tv = ktime_to_timeval(kt);
-		put_cmsg(msg, SOL_SOCKET, SCM_TIMESTAMP, sizeof(tv), &tv);
-	} else {
-		struct timespec ts;
-		/* Race occurred between timestamp enabling and packet
-		   receiving.  Fill in the current time for now. */
-		if (kt.tv64 == 0)
-			kt = ktime_get_real();
-		skb->tstamp = kt;
-		ts = ktime_to_timespec(kt);
-		put_cmsg(msg, SOL_SOCKET, SCM_TIMESTAMPNS, sizeof(ts), &ts);
+	/* Race occurred between timestamp enabling and packet
+	   receiving.  Fill in the current time for now. */
+	if (need_software_tstamp && skb->tstamp.tv64 == 0)
+		__net_timestamp(skb);
+
+	if (need_software_tstamp) {
+		if (!sock_flag(sk, SOCK_RCVTSTAMPNS)) {
+			struct timeval tv;
+			skb_get_timestamp(skb, &tv);
+			put_cmsg(msg, SOL_SOCKET, SCM_TIMESTAMP,
+				sizeof(tv), &tv);
+		} else {
+			struct timespec ts;
+			skb_get_timestampns(skb, &ts);
+			put_cmsg(msg, SOL_SOCKET, SCM_TIMESTAMPNS,
+				sizeof(ts), &ts);
+		}
+	}
+
+	if (sock_flag(sk, SOCK_TIMESTAMPING_SOFTWARE) ||
+		sock_flag(sk, SOCK_TIMESTAMPING_SYS_HARDWARE) ||
+		sock_flag(sk, SOCK_TIMESTAMPING_RAW_HARDWARE)) {
+		struct timespec ts[3];
+		int empty = 1;
+		memset(ts, 0, sizeof(ts));
+		if (skb->tstamp.tv64 &&
+			sock_flag(sk, SOCK_TIMESTAMPING_SOFTWARE)) {
+			skb_get_timestampns(skb, ts + 0);
+			empty = 0;
+		}
+		if (skb_hwtstamp_available(skb)) {
+			if (sock_flag(sk, SOCK_TIMESTAMPING_SYS_HARDWARE) &&
+				skb_hwtstamp_transformed(skb, ts + 1))
+				empty = 0;
+			if (sock_flag(sk, SOCK_TIMESTAMPING_RAW_HARDWARE) &&
+				skb_hwtstamp_raw(skb, ts + 2))
+				empty = 0;
+		}
+		if (!empty)
+			put_cmsg(msg, SOL_SOCKET,
+				SCM_TIMESTAMPING, sizeof(ts), &ts);
 	}
 }
 

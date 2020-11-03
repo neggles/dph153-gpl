@@ -411,6 +411,14 @@ static int cpm_uart_startup(struct uart_port *port)
 	if (retval)
 		return retval;
 
+	if (!(pinfo->flags & FLAG_CONSOLE)) {
+		if (IS_SMC(pinfo))
+			cpm_uart_init_smc(pinfo);
+		else
+			cpm_uart_init_scc(pinfo);
+	}
+
+
 	/* Startup rx-int */
 	if (IS_SMC(pinfo)) {
 		setbits8(&pinfo->smcp->smc_smcm, SMCM_RX);

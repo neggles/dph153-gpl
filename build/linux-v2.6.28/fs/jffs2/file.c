@@ -99,7 +99,7 @@ static int jffs2_do_readpage_nolock (struct inode *inode, struct page *pg)
 	kunmap(pg);
 
 	D2(printk(KERN_DEBUG "readpage finished\n"));
-	return 0;
+	return ret;
 }
 
 int jffs2_do_readpage_unlock(struct inode *inode, struct page *pg)
@@ -132,7 +132,7 @@ static int jffs2_write_begin(struct file *filp, struct address_space *mapping,
 	uint32_t pageofs = index << PAGE_CACHE_SHIFT;
 	int ret = 0;
 
-	pg = __grab_cache_page(mapping, index);
+	pg = grab_cache_page_write_begin(mapping, index, flags);
 	if (!pg)
 		return -ENOMEM;
 	*pagep = pg;

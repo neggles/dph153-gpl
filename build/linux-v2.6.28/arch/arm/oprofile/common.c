@@ -149,6 +149,30 @@ int __init oprofile_arch_init(struct oprofile_operations *ops)
 	spec = &op_armv7_spec;
 #endif
 
+#ifdef CONFIG_FIRECRACKER_ASYNC_OPROF
+	printk(KERN_INFO "oprofile: using async timer\n");
+	spec = NULL;
+	ops->create_files = NULL;
+	ops->setup = NULL;
+	ops->shutdown = NULL;
+	ops->start = op_firecracker_spec.start;
+	ops->stop = op_firecracker_spec.stop;
+	ops->cpu_type = "timer";
+	ret = 0;
+#endif
+
+#ifdef CONFIG_PC302_ASYNC_OPROF
+	printk(KERN_INFO "oprofile: using async timer\n");
+	spec = NULL;
+	ops->create_files = NULL;
+	ops->setup = NULL;
+	ops->shutdown = NULL;
+	ops->start = op_pc302_spec.start;
+	ops->stop = op_pc302_spec.stop;
+	ops->cpu_type = "timer";
+	ret = 0;
+#endif
+
 	if (spec) {
 		ret = spec->init();
 		if (ret < 0)

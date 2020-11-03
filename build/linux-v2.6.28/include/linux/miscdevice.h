@@ -30,6 +30,11 @@
 #define TUN_MINOR	     200
 #define	HPET_MINOR	     228
 #define KVM_MINOR            232
+#define AD7995_MINOR     245
+#define MAX6635_MINOR    246
+#define DAC7512_MINOR    247
+#define MAX6662_MINOR    248
+#define PICOIF_MINOR     249
 
 struct device;
 
