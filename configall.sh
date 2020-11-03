@@ -3,6 +3,8 @@ LOG_FILE="buildall.log"
 
 export ARCH=arm
 export CROSS_COMPILE=arm-none-eabi-
+export TYPE=xc
+export IPV=420.69 # ha ha, yes, very funny, self
 
 >${LOG_FILE}
 mkdir build && pushd build
@@ -28,7 +30,7 @@ echo "__________________________________________________________________________
 pushd cramfs-1.1/
 tar zxvf ../../src/579.11.114/cramfs-1.1-local-patch.tar.gz
 cp -rf ipa-diff/* .
-export OBJDIR=$PWD
+#export OBJDIR=$PWD
 #make -f GNUmakefile | tee -a ../../${LOG_FILE}
 popd
 
@@ -40,7 +42,7 @@ cp ../../src/579.11.114/u-boot-1.3.4-picochip-3.2.4-patch.gz .
 gunzip *.gz
 patch -p1 <u-boot-1.3.4-picochip-3.2.4-patch
 patch -p1 <u-boot-1.3.4-local-patch-224
-export TYPE=xc && make ipaccessip202ff_config | tee -a ../../${LOG_FILE}
+make ipaccessip302ff_config | tee -a ../../${LOG_FILE}
 cat >>common/main.c<<EOF
 unsigned long long get_ticks(void)
 {

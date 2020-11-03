@@ -1436,3 +1436,15 @@ int do_run (cmd_tbl_t * cmdtp, int flag, int argc, char *argv[])
 	return 0;
 }
 #endif
+unsigned long long get_ticks(void)
+{
+       return get_timer(0);
+}
+ulong get_tbclk (void)
+{
+       ulong tbclk;
+
+       tbclk = CFG_HZ;
+       return tbclk;
+}
+int raise() { return 0; }

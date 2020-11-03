@@ -4,6 +4,7 @@ LOG_FILE="buildall.log"
 export ARCH=arm
 export CROSS_COMPILE=arm-none-eabi-
 export TYPE=xc
+export IPV=420.69 # ha ha, yes, very funny, self
 
 >${LOG_FILE}
 mkdir build && pushd build

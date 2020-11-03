@@ -153,7 +153,7 @@ ifeq ($(ARCH),ppc)
 CROSS_COMPILE = ppc_8xx-
 endif
 ifeq ($(ARCH),arm)
-CROSS_COMPILE = arm-linux-
+CROSS_COMPILE = arm-none-eabi-
 endif
 ifeq ($(ARCH),i386)
 CROSS_COMPILE = i386-linux-
@@ -3024,7 +3024,7 @@ grsim_leon2_config : unconfig
 
 #========================================================================
 # picoChip Platforms
-#========================================================================       
+#========================================================================
 picochiphdp203_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc mpc85xx hdp203 picochip
 
@@ -3033,13 +3033,13 @@ picochipcpe20x_config :	unconfig
 
 picochipsvb302_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm926ejs svb302 picochip pc302
-        
+
 picochippc7302_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm926ejs pc7302 picochip pc302
-        
+
 picochippc7802_config :	unconfig
-	@$(MKCONFIG) $(@:_config=) arm arm926ejs pc7802 picochip pc20x                
- 
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs pc7802 picochip pc20x
+
 #########################################################################
 #########################################################################
 #########################################################################
