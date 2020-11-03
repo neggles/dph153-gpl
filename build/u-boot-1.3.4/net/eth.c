@@ -1,3 +1,7 @@
+/*****************************************************************************
+ * BSP Version: 3.2.4, RevisionID: ac30f57, Date: 20100223 17:42:05
+ *****************************************************************************/
+ 
 /*
  * (C) Copyright 2001-2004
  * Wolfgang Denk, DENX Software Engineering, wd@denx.de.
@@ -41,6 +45,14 @@ int board_eth_init(bd_t *bis) __attribute((weak, alias("__def_eth_init")));
 
 #ifdef CFG_GT_6426x
 extern int gt6426x_eth_initialize(bd_t *bis);
+#endif
+
+#if defined (CONFIG_PICOCHIP_PC20X)
+extern int pc20x_eth_initialize(bd_t *bis);
+#endif
+
+#if defined (CONFIG_PICOCHIP_PC302)
+extern int pc302_eth_initialize(bd_t *bis);
 #endif
 
 extern int au1x00_enet_initialize(bd_t*);
@@ -289,6 +301,14 @@ int eth_initialize(bd_t *bis)
 #if defined(CONFIG_AT91CAP9) || defined(CONFIG_AT91SAM9260) || \
     defined(CONFIG_AT91SAM9263)
 	at91sam9_eth_initialize(bis);
+#endif
+
+#if defined(CONFIG_PICOCHIP_PC20X)
+        pc20x_eth_initialize(bis);
+#endif
+
+#if defined(CONFIG_PICOCHIP_PC302)
+        pc302_eth_initialize(bis);
 #endif
 
 	if (!eth_devices) {

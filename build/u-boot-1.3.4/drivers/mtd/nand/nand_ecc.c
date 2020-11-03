@@ -7,7 +7,7 @@
  * Copyright (C) 2000-2004 Steven J. Hill (sjhill@realitydiluted.com)
  *                         Toshiba America Electronics Components, Inc.
  *
- * $Id: nand_ecc.c,v 1.14 2004/06/16 15:34:37 gleixner Exp $
+ * Copyright (C) 2006 Thomas Gleixner <tglx@linutronix.de>
  *
  * This file is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -37,9 +37,21 @@
 
 #include <common.h>
 
-#if defined(CONFIG_CMD_NAND) && !defined(CFG_NAND_LEGACY)
+/* XXX U-BOOT XXX */
+#if 0
+#include <linux/types.h>
+#include <linux/kernel.h>
+#include <linux/module.h>
+#include <linux/mtd/nand_ecc.h>
+#endif
 
-#include<linux/mtd/mtd.h>
+#include <asm/errno.h>
+#include <linux/mtd/mtd.h>
+
+/* The PPC4xx NDFC uses Smart Media (SMC) bytes order */
+#ifdef CONFIG_NAND_NDFC
+#define CONFIG_MTD_NAND_ECC_SMC
+#endif
 
 /*
  * NAND-SPL has no sofware ECC for now, so don't include nand_calculate_ecc(),
@@ -128,6 +140,10 @@ int nand_calculate_ecc(struct mtd_info *mtd, const u_char *dat,
 
 	return 0;
 }
+/* XXX U-BOOT XXX */
+#if 0
+EXPORT_SYMBOL(nand_calculate_ecc);
+#endif
 #endif /* CONFIG_NAND_SPL */
 
 static inline int countbits(uint32_t byte)
@@ -194,7 +210,10 @@ int nand_correct_data(struct mtd_info *mtd, u_char *dat,
 	if(countbits(s0 | ((uint32_t)s1 << 8) | ((uint32_t)s2 <<16)) == 1)
 		return 1;
 
-	return -1;
+	return -EBADMSG;
 }
 
+/* XXX U-BOOT XXX */
+#if 0
+EXPORT_SYMBOL(nand_correct_data);
 #endif

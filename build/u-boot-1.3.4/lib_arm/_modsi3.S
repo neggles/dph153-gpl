@@ -70,6 +70,7 @@
 .endm
 
 	.align	5
+
 .globl __modsi3
 __modsi3:
 	cmp	r1, #0
@@ -88,9 +89,7 @@ __modsi3:
 
 10:	cmp	ip, #0
 	rsbmi	r0, r0, #0
-	mov	pc, lr
-
-
+        bx      lr
 Ldiv0:
 
 	str	lr, [sp, #-4]!

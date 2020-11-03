@@ -31,12 +31,16 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdint.h>
 
 #ifdef MTD_OLD
 # include <linux/mtd/mtd.h>
 #else
 # define  __user	/* nothing */
 # include <mtd/mtd-user.h>
+  /* Include the config from the U-Boot image, but don't include ethaddr. */
+# include "config.h"
+# undef CONFIG_ETHADDR
 #endif
 
 #include "fw_env.h"
@@ -59,7 +63,10 @@ static int curdev;
 #define ENVSIZE(i)    envdevices[(i)].env_size
 #define DEVESIZE(i)   envdevices[(i)].erase_size
 
+#ifdef CONFIG_FILE
+#undef CFG_ENV_SIZE
 #define CFG_ENV_SIZE ENVSIZE(curdev)
+#endif /* CONFIG_FILE */
 
 #define ENV_SIZE      getenvsize()
 
@@ -321,6 +328,7 @@ int fw_setenv (int argc, char *argv[])
 	 * Delete any existing definition
 	 */
 	if (oldval) {
+#ifndef CONFIG_ENV_OVERWRITE
 		/*
 		 * Ethernet Address and serial# can be set only once
 		 */
@@ -329,6 +337,7 @@ int fw_setenv (int argc, char *argv[])
 			fprintf (stderr, "Can't overwrite \"%s\"\n", name);
 			return (EROFS);
 		}
+#endif /* CONFIG_ENV_OVERWRITE */
 
 		if (*++nxt == '\0') {
 			*env = '\0';
@@ -394,6 +403,64 @@ int fw_setenv (int argc, char *argv[])
 	return (0);
 }
 
+/* 
+ * Break down a read from Flash into smaller pieces to kernel driver does not
+ * need to allocate such a big buffer.
+ */
+static int flash_read (int fd, char *buf, int len)
+{
+    const int FLASH_READ_CHUNK = 2048;
+    int remaining;
+
+    remaining = len;
+    while (remaining > 0) {
+        int n;
+        int rc;
+        if (remaining >= FLASH_READ_CHUNK) {
+            n = FLASH_READ_CHUNK;
+        } else {
+            n = remaining;
+        }
+
+        rc = read (fd, buf, n);
+        if (rc != n) {
+            return rc;
+        }
+
+        buf += n;
+        remaining -= n;
+    }
+    return len;
+} /* flash_read() */
+
+
+static int flash_write (int fd, const char *buf, int len)
+{
+    const int FLASH_WRITE_CHUNK = 2048;
+    int remaining;
+
+    remaining = len;
+    while (remaining > 0) {
+        int n;
+        int rc;
+        if (remaining >= FLASH_WRITE_CHUNK) {
+            n = FLASH_WRITE_CHUNK;
+        } else {
+            n = remaining;
+        }
+
+        rc = write (fd, buf, n);
+        if (rc != n) {
+            return rc;
+        }
+
+        buf += n;
+        remaining -= n;
+    }
+
+    return len;
+} /* flash_write() */
+
 static int flash_io (int mode)
 {
 	int fd, fdr, rc, otherdev, len, resid;
@@ -441,10 +508,13 @@ static int flash_io (int mode)
 
 		printf ("Done\n");
 		resid = DEVESIZE (otherdev) - CFG_ENV_SIZE;
+#ifdef ENV_DEBUG
+                fprintf(stderr, "devsize %u cfg_env %u", DEVESIZE (otherdev), CFG_ENV_SIZE);
+#endif /* ENV_DEBUG */
 		if (resid) {
 			if ((data = malloc (resid)) == NULL) {
 				fprintf (stderr,
-					"Cannot malloc %d bytes: %s\n",
+					"Cannot malloc %u bytes: %s\n",
 					resid,
 					strerror (errno));
 				return (-1);
@@ -456,7 +526,7 @@ static int flash_io (int mode)
 					strerror (errno));
 				return (-1);
 			}
-			if ((rc = read (fdr, data, resid)) != resid) {
+			if ((rc = flash_read (fdr, data, resid)) != resid) {
 				fprintf (stderr,
 					"read error on %s: %s\n",
 					DEVNAME (otherdev),
@@ -485,20 +555,20 @@ static int flash_io (int mode)
 				DEVNAME (otherdev), strerror (errno));
 			return (-1);
 		}
-		if (write (fdr, &environment, len) != len) {
+		if (flash_write (fdr, &environment, len) != len) {
 			fprintf (stderr,
 				"CRC write error on %s: %s\n",
 				DEVNAME (otherdev), strerror (errno));
 			return (-1);
 		}
-		if (write (fdr, environment.data, ENV_SIZE) != ENV_SIZE) {
+		if (flash_write (fdr, environment.data, ENV_SIZE) != ENV_SIZE) {
 			fprintf (stderr,
 				"Write error on %s: %s\n",
 				DEVNAME (otherdev), strerror (errno));
 			return (-1);
 		}
 		if (resid) {
-			if (write (fdr, data, resid) != resid) {
+			if (flash_write (fdr, data, resid) != resid) {
 				fprintf (stderr,
 					"write error on %s: %s\n",
 					DEVNAME (curdev), strerror (errno));
@@ -514,7 +584,7 @@ static int flash_io (int mode)
 					DEVNAME (curdev), strerror (errno));
 				return (-1);
 			}
-			if (write (fd, &obsolete_flag, sizeof (obsolete_flag)) !=
+			if (flash_write (fd, &obsolete_flag, sizeof (obsolete_flag)) !=
 				sizeof (obsolete_flag)) {
 				fprintf (stderr,
 					"Write error on %s: %s\n",
@@ -548,13 +618,13 @@ static int flash_io (int mode)
 				DEVNAME (curdev), strerror (errno));
 			return (-1);
 		}
-		if (read (fd, &environment, len) != len) {
+		if (flash_read (fd, &environment, len) != len) {
 			fprintf (stderr,
 				"CRC read error on %s: %s\n",
 				DEVNAME (curdev), strerror (errno));
 			return (-1);
 		}
-		if ((rc = read (fd, environment.data, ENV_SIZE)) != ENV_SIZE) {
+		if ((rc = flash_read (fd, environment.data, ENV_SIZE)) != ENV_SIZE) {
 			fprintf (stderr,
 				"Read error on %s: %s\n",
 				DEVNAME (curdev), strerror (errno));
@@ -618,8 +688,27 @@ static int env_init (void)
 		return (errno);
 	}
 
+#ifdef ENV_DEBUG
+    fprintf(stderr, "env_size = %u\n", ENV_SIZE);
+#endif /* ENV_DEBUG */
+
 	crc1_ok = ((crc1 = crc32 (0, (uint8_t *) environment.data, ENV_SIZE))
 			   == environment.crc);
+#if 0
+	printf("\n");
+	  
+	{
+		int i;
+
+		for(i=0; i<ENV_SIZE; i++)
+		{
+			printf("%c", environment.data[i]);
+		}
+	}
+	
+	printf("\n");
+#endif
+
 	if (!HaveRedundEnv) {
 		if (!crc1_ok) {
 			fprintf (stderr,
@@ -737,6 +826,11 @@ static int parse_config ()
 			DEVNAME (1), strerror (errno));
 		return 1;
 	}
+
+#ifdef ENV_DEBUG
+        fprintf(stderr, "devname= %s offset= %x size= %x esize= %x\n", DEVNAME (0), DEVOFFSET (0), ENVSIZE (0), DEVESIZE (0));
+#endif /* ENV_DEBUG */
+
 	return 0;
 }
 

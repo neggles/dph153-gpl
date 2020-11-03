@@ -1596,6 +1596,9 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_XDACOMET             1603
 #define MACH_TYPE_DEXFLEX2             1604
 #define MACH_TYPE_SFFSDR               1657
+#define MACH_TYPE_PC7302               2220
+#define MACH_TYPE_PC7802               2436
+#define MACH_TYPE_PC72052_I10_REVB     9997
 
 #ifdef CONFIG_ARCH_EBSA110
 # ifdef machine_arch_type
@@ -20603,6 +20606,42 @@ extern unsigned int __machine_arch_type;
 # define machine_is_dexflex2()	(machine_arch_type == MACH_TYPE_DEXFLEX2)
 #else
 # define machine_is_dexflex2()	(0)
+#endif
+
+#ifdef CONFIG_MACH_PC7302
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_PC7302
+# endif
+# define machine_is_pc7302()	(machine_arch_type == MACH_TYPE_PC7302)
+#else
+# define machine_is_pc7302()	(0)
+#endif
+
+#ifdef CONFIG_MACH_PC7802
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_PC7802
+# endif
+# define machine_is_pc7802()	(machine_arch_type == MACH_TYPE_PC7802)
+#else
+# define machine_is_pc7802()	(0)
+#endif
+
+#ifdef CONFIG_MACH_PC72052_I10_REVB
+# ifdef machine_arch_type
+#  undef machine_arch_type
+#  define machine_arch_type	__machine_arch_type
+# else
+#  define machine_arch_type	MACH_TYPE_PC72052_I10_REVB
+# endif
+# define machine_is_pc72052_i10_revb()	(machine_arch_type == MACH_TYPE_PC72052_I10_REVB)
+#else
+# define machine_is_pc72052_i10_revb()	(0)
 #endif
 
 /*

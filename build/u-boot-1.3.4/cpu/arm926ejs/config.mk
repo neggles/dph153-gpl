@@ -21,14 +21,21 @@
 # MA 02111-1307 USA
 #
 
+ifeq ($(PC7302_THUMB), Y) 
+PLATFORM_RELFLAGS += -fno-strict-aliasing  -fno-common -ffixed-r7 \
+	             -msoft-float
+PLATFORM_CPPFLAGS += -mthumb -mthumb-interwork                     
+else
 PLATFORM_RELFLAGS += -fno-strict-aliasing  -fno-common -ffixed-r8 \
-	-msoft-float
+	             -msoft-float
+endif                                          
 
-PLATFORM_CPPFLAGS += -march=armv4
+PLATFORM_CPPFLAGS += -march=armv5t
+
 # =========================================================================
 #
 # Supply options according to compiler version
 #
 # =========================================================================
-PLATFORM_CPPFLAGS +=$(call cc-option,-mapcs-32,-mabi=apcs-gnu)
+PLATFORM_CPPFLAGS +=$(call cc-option,-mapcs-32)
 PLATFORM_RELFLAGS +=$(call cc-option,-mshort-load-bytes,$(call cc-option,-malignment-traps,))

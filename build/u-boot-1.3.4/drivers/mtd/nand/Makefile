@@ -25,14 +25,26 @@ include $(TOPDIR)/config.mk
 
 LIB	:= $(obj)libnand.a
 
+ifdef CONFIG_CMD_NAND
+ifndef CONFIG_NAND_LEGACY
 COBJS-y += nand.o
 COBJS-y += nand_base.o
-COBJS-y += nand_ids.o
-COBJS-y += nand_ecc.o
 COBJS-y += nand_bbt.o
+COBJS-y += nand_ecc.o
+COBJS-y += nand_ids.o
 COBJS-y += nand_util.o
+endif
 
-COBJS-y += fsl_upm.o
+COBJS-$(CONFIG_NAND_ATMEL) += atmel_nand.o
+COBJS-$(CONFIG_DRIVER_NAND_BFIN) += bfin_nand.o
+COBJS-$(CONFIG_NAND_DAVINCI) += davinci_nand.o
+COBJS-$(CONFIG_NAND_FSL_ELBC) += fsl_elbc_nand.o
+COBJS-$(CONFIG_NAND_FSL_UPM) += fsl_upm.o
+COBJS-$(CONFIG_NAND_NOMADIK) += nomadik.o
+COBJS-$(CONFIG_NAND_S3C2410) += s3c2410_nand.c
+COBJS-$(CONFIG_NAND_S3C64XX) += s3c64xx.o
+COBJS-$(CONFIG_NAND_OMAP_GPMC) += omap_gpmc.o
+endif
 
 COBJS	:= $(COBJS-y)
 SRCS	:= $(COBJS:.o=.c)

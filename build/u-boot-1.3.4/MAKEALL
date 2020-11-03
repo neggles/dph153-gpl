@@ -365,6 +365,7 @@ LIST_85xx="		\
 	TQM8548		\
 	TQM8555		\
 	TQM8560		\
+        picochiphdp203  \
 "
 
 #########################################################################
@@ -495,6 +496,10 @@ LIST_ARM9="			\
 	davinci_schmoogie	\
 	davinci_sffsdr		\
 	davinci_sonata		\
+        picochipcpe20x          \  
+        picochipsvb302          \
+        picochippc7302          \
+        picochippc7802          \
 "
 
 #########################################################################

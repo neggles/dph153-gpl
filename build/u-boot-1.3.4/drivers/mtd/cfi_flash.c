@@ -1870,7 +1870,19 @@ ulong flash_get_size (ulong base, int banknum)
 		info->size = 1 << qry.dev_size;
 		/* multiply the size by the number of chips */
 		info->size *= size_ratio;
-		info->buffer_size = 1 << le16_to_cpu(qry.max_buf_write_size);
+		/* The write buffer size is limited by the chip width as you have to write the number
+		   words/bytes you are going to program as part of the programming sequence.
+		   For example, if the chip width is 8 bits then maximum buffer size is 256 bytes.
+		   See data sheet for Numonyx M29EW for an example of the issue.
+		*/
+		if ( (info->chipwidth * 8) < le16_to_cpu(qry.max_buf_write_size))
+		{
+			info->buffer_size = 1 << (info->chipwidth * 8);
+		}
+		else
+		{
+			info->buffer_size = 1 << le16_to_cpu(qry.max_buf_write_size);
+		}
 		tmp = 1 << qry.block_erase_timeout_typ;
 		info->erase_blk_tout = tmp *
 			(1 << qry.block_erase_timeout_max);

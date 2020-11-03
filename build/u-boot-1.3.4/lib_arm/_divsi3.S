@@ -94,7 +94,8 @@
 
 .endm
 
-	.align	5
+	.align 5
+        
 .globl __divsi3
 __divsi3:
 	cmp	r1, #0
@@ -114,23 +115,23 @@ __divsi3:
 
 	cmp	ip, #0
 	rsbmi	r0, r0, #0
-	mov	pc, lr
+        bx      lr
 
 10:	teq	ip, r0				@ same sign ?
 	rsbmi	r0, r0, #0
-	mov	pc, lr
+        bx      lr
 
 11:	movlo	r0, #0
 	moveq	r0, ip, asr #31
 	orreq	r0, r0, #1
-	mov	pc, lr
+        bx      lr
 
 12:	ARM_DIV2_ORDER r1, r2
 
 	cmp	ip, #0
 	mov	r0, r3, lsr r2
 	rsbmi	r0, r0, #0
-	mov	pc, lr
+        bx      lr
 
 Ldiv0:
 

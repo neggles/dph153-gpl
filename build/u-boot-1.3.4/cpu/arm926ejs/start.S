@@ -141,7 +141,16 @@ reset:
 	 */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 	bl	cpu_init_crit
-#endif
+
+#if defined (CONFIG_PICOCHIP_PC20X) || defined (CONFIG_PICOCHIP_PC302)
+        bl      remap_flash
+#endif     
+
+#if defined (CONFIG_PICOCHIP_PC20X)
+        bl      ddr2_dummy_access
+#endif        
+
+#endif /* CONFIG_SKIP_LOWLEVEL_INIT */
 
 #ifndef CONFIG_SKIP_RELOCATE_UBOOT
 relocate:				/* relocate U-Boot to RAM	    */
@@ -160,6 +169,47 @@ copy_loop:
 	stmia	r1!, {r3-r10}		/* copy to   target address [r1]    */
 	cmp	r0, r2			/* until source end addreee [r2]    */
 	ble	copy_loop
+
+#ifndef CONFIG_SKIP_VERIFY_RELOCATE_UBOOT
+        /* verify the copy worked */
+        adr	r0, _start
+	ldr	r1, _TEXT_BASE	
+	ldr	r2, _armboot_start
+	ldr	r3, _bss_start
+        sub	r2, r3, r2
+        add	r2, r0, r2
+
+verify_loop:
+	ldmia	r0!, {r3-r6}		
+	ldmia	r1!, {r7-r10} 
+        cmp     r3,r7
+        bne     verify_error		
+        cmp     r4,r8
+        bne     verify_error		
+        cmp     r5,r9
+        bne     verify_error		
+        cmp     r6,r10
+        bne     verify_error		
+	cmp	r0,r2			
+	ble	verify_loop
+        
+#endif  /* CONFIG_SKIP_VERIFY_RELOCATE_UBOOT */
+
+        /* If we've got here the verify has worked so jump over the error loop */
+                      
+        b       stack_setup 
+
+#ifndef CONFIG_SKIP_VERIFY_RELOCATE_UBOOT
+verify_error:   
+        /* Oops, we've had a verify error... */        
+        bl assertBootError
+        
+verify_error_loop:
+        /* No recovery from this... */
+        b      verify_error_loop  
+
+#endif  /* CONFIG_SKIP_VERIFY_RELOCATE_UBOOT */
+                                     
 #endif	/* CONFIG_SKIP_RELOCATE_UBOOT */
 
 	/* Set up the stack						    */
@@ -214,10 +264,12 @@ cpu_init_crit:
 	 * disable MMU stuff and caches
 	 */
 	mrc	p15, 0, r0, c1, c0, 0
-	bic	r0, r0, #0x00002300	/* clear bits 13, 9:8 (--V- --RS) */
+	/* bic	r0, r0, #0x00002300	 *//* clear bits 13, 9:8 (--V- --RS) */
+        bic	r0, r0, #0x00000300     /* Leave vectors high, for now */
 	bic	r0, r0, #0x00000087	/* clear bits 7, 2:0 (B--- -CAM) */
 	orr	r0, r0, #0x00000002	/* set bit 2 (A) Align */
-	orr	r0, r0, #0x00001000	/* set bit 12 (I) I-Cache */
+	/*orr	r0, r0, #0x00001000*/     /* set bit 12 (I) I-Cache enable */
+	bic	r0, r0, #0x00001000     /* clear bit 12 (I) I-Cache disable */
 	mcr	p15, 0, r0, c1, c0, 0
 
 	/*

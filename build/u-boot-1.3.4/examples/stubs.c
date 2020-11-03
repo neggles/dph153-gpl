@@ -38,6 +38,32 @@ gd_t *global_data;
 "	bctr\n"				\
 	: : "i"(offsetof(gd_t, jt)), "i"(XF_ ## x * sizeof(void *)) : "r11");
 #elif defined(CONFIG_ARM)
+#ifdef BUILD_FOR_THUMB
+/*
+ * r7 holds the pointer to the global_data in a Thumb build,
+ * ip is a call-clobbered register
+ */
+#define EXPORT_FUNC(x) \
+	asm volatile (			\
+        ".globl " #x       "\n"		\
+        "@ Enter ARM mode   \n"         \
+        "push   {r6}        \n"         \
+        "adr    r6,2f       \n"         \
+        "bx     r6          \n"         \
+        ".align             \n"         \
+        ".arm               \n"         \
+        "2:                 \n"         \
+#x                        ":\n"		\
+        "ldr	ip, [r7, %0]\n"		\
+        "ldr	pc, [ip, %1]\n"		\
+        "@ Enter Thumb mode \n"         \
+        "adr    r6,3f + 1   \n"         \
+        "bx     r6          \n"         \
+        ".thumb             \n"         \
+        "3:                 \n"         \
+        "pop    {r6}        \n"         \
+	: : "i"(offsetof(gd_t, jt)), "i"(XF_ ## x * sizeof(void *)) : "ip");
+#else
 /*
  * r8 holds the pointer to the global_data, ip is a call-clobbered
  * register
@@ -49,6 +75,8 @@ gd_t *global_data;
 "	ldr	ip, [r8, %0]\n"		\
 "	ldr	pc, [ip, %1]\n"		\
 	: : "i"(offsetof(gd_t, jt)), "i"(XF_ ## x * sizeof(void *)) : "ip");
+#endif
+
 #elif defined(CONFIG_MIPS)
 /*
  * k0 ($26) holds the pointer to the global_data; t9 ($25) is a call-

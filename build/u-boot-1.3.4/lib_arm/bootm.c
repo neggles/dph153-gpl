@@ -1,4 +1,6 @@
 /*
+ * BSP Version: 3.2.4, RevisionID: ac30f57, Date: 20100223 17:42:05
+ *
  * (C) Copyright 2002
  * Sysgo Real-Time Solutions, GmbH <www.elinos.com>
  * Marius Groeger <mgroeger@sysgo.de>
@@ -28,6 +30,11 @@
 #include <asm/byteorder.h>
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#if defined (CONFIG_PICOCHIP_PC20X)
+/* We need to call this before going to the kernel on PC20X platforms */
+void emac_set_mac_for_addr(u8 *addr);
+#endif
 
 #if defined (CONFIG_SETUP_MEMORY_TAGS) || \
     defined (CONFIG_CMDLINE_TAG) || \
@@ -106,6 +113,15 @@ void do_bootm_linux (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[],
 
 	debug ("## Transferring control to Linux (at address %08lx) ...\n",
 	       (ulong) theKernel);
+               
+#if defined (CONFIG_PICOCHIP_PC20X)
+    /* We need to setup the MAC address in the ethernet MAC for the PC20X
+     * processors. These processors do not have a MAC storred anywhere.
+     * Also, the kernel driver looks at the setup of the MAC and uses 
+     * any address that is already programmed.
+     */
+    emac_set_mac_for_addr(bd->bi_enetaddr);
+#endif               
 
 #if defined (CONFIG_SETUP_MEMORY_TAGS) || \
     defined (CONFIG_CMDLINE_TAG) || \

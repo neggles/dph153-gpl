@@ -38,6 +38,36 @@ DECLARE_GLOBAL_DATA_PTR;
 #endif
 
 /* read co-processor 15, register #1 (control register) */
+#ifdef BUILD_FOR_THUMB
+static unsigned long read_p15_c1 (void)
+{
+	unsigned long value;
+
+	__asm__ __volatile__(
+		"@ Enter ARM mode   \n"
+                "push   {r6}        \n"
+                "adr    r6,2f       \n"
+                "bx     r6          \n"
+                ".align             \n"
+                ".arm               \n"
+                "2:                 \n"
+                "mrc	p15, 0, %0, c1, c0, 0   @ read control reg\n"
+                "@ Enter Thumb mode \n"
+                "adr    r6,3f + 1   \n"
+                "bx     r6          \n"
+                "3:                 \n"
+		".thumb             \n"
+                "pop    {r6}        \n"
+                : "=r" (value)
+		:
+		: "memory");
+
+#ifdef MMU_DEBUG
+	printf ("p15/c1 is = %08lx\n", value);
+#endif
+	return value;
+}
+#else
 static unsigned long read_p15_c1 (void)
 {
 	unsigned long value;
@@ -53,8 +83,36 @@ static unsigned long read_p15_c1 (void)
 #endif
 	return value;
 }
+#endif
 
 /* write to co-processor 15, register #1 (control register) */
+#ifdef BUILD_FOR_THUMB
+static void write_p15_c1 (unsigned long value)
+{
+#ifdef MMU_DEBUG
+	printf ("write %08lx to p15/c1\n", value);
+#endif
+	__asm__ __volatile__(
+		"@ Enter ARM mode   \n"
+		"push   {r6}        \n"
+                "adr    r6,2f       \n"
+                "bx     r6          \n"
+                ".align             \n"
+                ".arm               \n"
+                "2:                 \n"
+                "mcr	p15, 0, %0, c1, c0, 0   @ write it back\n"
+                "@ Enter Thumb mode \n"
+                "adr    r6,3f + 1   \n"
+                "bx     r6          \n"
+                ".thumb             \n"
+                "3:                 \n"
+		"pop    {r6}        \n"
+                :
+		: "r" (value)
+		: "memory");
+	read_p15_c1 ();
+}
+#else
 static void write_p15_c1 (unsigned long value)
 {
 #ifdef MMU_DEBUG
@@ -68,6 +126,7 @@ static void write_p15_c1 (unsigned long value)
 
 	read_p15_c1 ();
 }
+#endif
 
 static void cp_delay (void)
 {
@@ -101,6 +160,78 @@ int cpu_init (void)
 	return 0;
 }
 
+#ifdef BUILD_FOR_THUMB
+int cleanup_before_linux (void)
+{
+	/*
+	 * this function is called just before we call linux
+	 * it prepares the processor for linux
+	 *
+	 * we turn off caches etc ...
+	 */
+
+	unsigned long i;
+
+	disable_interrupts ();
+
+	/* turn off I/D-cache */
+
+	__asm__ __volatile__ (
+		"@ Enter ARM mode   \n"
+                "push   {r6}        \n"
+                "adr    r6,2f       \n"
+                "bx     r6          \n"
+                ".align             \n"
+                ".arm               \n"
+                "2:                 \n"
+                "mrc p15, 0, %0, c1, c0, 0\n"
+                "@ Enter Thumb mode \n"
+                "adr    r6,3f + 1   \n"
+                "bx     r6          \n"
+                ".thumb             \n"
+                "3:                 \n"
+                "pop    {r6}        \n"
+                :"=r" (i));
+	i &= ~(C1_DC | C1_IC);
+        __asm__ __volatile__ (
+		"@ Enter ARM mode   \n"
+                "push   {r6}        \n"
+                "adr    r6,2f       \n"
+                "bx     r6          \n"
+                ".align             \n"
+                ".arm               \n"
+                "2:                 \n"
+                "mcr p15, 0, %0, c1, c0, 0\n"
+                "@ Enter Thumb mode \n"
+                "adr    r6,3f + 1   \n"
+                "bx     r6          \n"
+                "3:                 \n"
+                ".thumb             \n"
+                "pop    {r6}        \n"
+                : :"r" (i));
+
+	/* flush I/D-cache */
+	i = 0;
+        __asm__ __volatile__ (
+		"@ Enter ARM mode   \n"
+                "push   {r6}        \n"
+                "adr    r6,2f       \n"
+                "bx     r6          \n"
+                ".align             \n"
+                ".arm               \n"
+                "2:                 \n"
+                "mcr p15, 0, %0, c7, c7, 0\n"
+                "@ Enter Thumb mode \n"
+                "adr    r6,3f + 1   \n"
+                "bx     r6          \n"
+                ".thumb             \n"
+                "3:                 \n"
+                "pop    {r6}        \n"
+                : :"r" (i));
+
+	return (0);
+}
+#else
 int cleanup_before_linux (void)
 {
 	/*
@@ -125,6 +256,7 @@ int cleanup_before_linux (void)
 
 	return (0);
 }
+#endif
 
 int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 {

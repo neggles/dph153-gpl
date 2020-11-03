@@ -75,6 +75,18 @@ endif
 # the object files are placed in the source directory.
 #
 
+ifeq ("$(TYPE)", "")
+#Nothing
+else
+IPA_FF_TYPE=$(TYPE)
+endif
+
+ifeq ("$(IPV)", "")
+#Nothing
+else
+IPA_VER=$(IPV)
+endif
+
 ifdef O
 ifeq ("$(origin O)", "command line")
 BUILD_DIR := $(O)
@@ -463,7 +475,8 @@ CHANGELOG:
 unconfig:
 	@rm -f $(obj)include/config.h $(obj)include/config.mk \
 		$(obj)board/*/config.tmp $(obj)board/*/*/config.tmp \
-		$(obj)include/autoconf.mk $(obj)include/autoconf.mk.dep
+		$(obj)include/autoconf.mk $(obj)include/autoconf.mk.dep \
+		$(obj)include/ipa_config.h
 
 #========================================================================
 # PowerPC
@@ -2268,6 +2281,19 @@ MPC8641HPCN_config:    unconfig
 sbc8641d_config:	unconfig
 	@$(MKCONFIG) $(@:_config=) ppc mpc86xx sbc8641d
 
+ipaccessip202ff_config : unconfig
+	echo "ipa board type is $(IPA_FF_TYPE) and version id $(IPA_VER)"
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs ip202ff ipaccess pc20x $(IPA_FF_TYPE) $(IPA_VER)
+
+ipaccessip302ff_config : unconfig
+	echo "ipa board type is $(IPA_FF_TYPE) and version id $(IPA_VER)"
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs ip302ff ipaccess pc302 $(IPA_FF_TYPE) $(IPA_VER)
+
+# Nano-8
+ipaccess217_config : unconfig
+	echo "ipa board type is $(IPA_FF_TYPE) and version id $(IPA_VER)"
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs ip302ff ipaccess pc302 $(IPA_FF_TYPE) $(IPA_VER)
+
 #########################################################################
 ## 74xx/7xx Systems
 #########################################################################
@@ -2996,6 +3022,24 @@ grsim_config : unconfig
 grsim_leon2_config : unconfig
 	@$(MKCONFIG) $(@:_config=) sparc leon2 grsim_leon2 gaisler
 
+#========================================================================
+# picoChip Platforms
+#========================================================================       
+picochiphdp203_config:	unconfig
+	@$(MKCONFIG) $(@:_config=) ppc mpc85xx hdp203 picochip
+
+picochipcpe20x_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs cpe20x picochip pc20x
+
+picochipsvb302_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs svb302 picochip pc302
+        
+picochippc7302_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs pc7302 picochip pc302
+        
+picochippc7802_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs pc7802 picochip pc20x                
+ 
 #########################################################################
 #########################################################################
 #########################################################################

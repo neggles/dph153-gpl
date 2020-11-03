@@ -441,7 +441,17 @@ void main_loop (void)
 			reset_cmd_timeout();
 		}
 #endif
-		len = readline (CFG_PROMPT);
+
+#if defined(CONFIG_PC302_SIMULATION)
+/* We are running in RTL simulation land */
+                
+                /* If we get here then the simulation is a success, so just stop and report 'pass' */
+                *(volatile unsigned int *)(0x58000004) = 0x00000004;
+                for (;;);   /* Just idle here until testbench is stopped */
+
+#endif /* CONFIG_PC302_SIMULATION */                
+                
+                len = readline (CFG_PROMPT);
 
 		flag = 0;	/* assume no special flags for now */
 		if (len > 0)

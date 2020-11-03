@@ -64,6 +64,10 @@ typedef	struct	global_data {
 #define	GD_FLG_POSTSTOP	0x00010		/* POST seqeunce aborted		*/
 #define	GD_FLG_LOGINIT	0x00020		/* Log Buffer has been initialized	*/
 
+#ifdef BUILD_FOR_THUMB
+#define DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm ("r7")
+#else
 #define DECLARE_GLOBAL_DATA_PTR     register volatile gd_t *gd asm ("r8")
+#endif
 
 #endif /* __ASM_GBL_DATA_H */

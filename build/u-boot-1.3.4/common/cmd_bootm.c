@@ -106,6 +106,9 @@ int do_bootelf (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 #if defined(CONFIG_ARTOS) && defined(CONFIG_PPC)
 static boot_os_fn do_bootm_artos;
 #endif
+#if defined(CONFIG_VERIFY_KERNEL)
+extern int do_verify_kernel(ulong start, ulong end);
+#endif
 
 ulong load_addr = CFG_LOAD_ADDR;	/* Default Load Address */
 static bootm_headers_t images;		/* pointers to os/initrd/fdt images */
@@ -297,6 +300,14 @@ int do_bootm (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
 	puts ("OK\n");
 	debug ("   kernel loaded at 0x%08lx, end = 0x%08lx\n", load_start, load_end);
 	show_boot_progress (7);
+
+#ifdef CONFIG_VERIFY_KERNEL
+	if (do_verify_kernel(load_start, load_end))
+	{
+		show_boot_progress(-201);
+		return 1;
+	}
+#endif
 
 	if ((load_start < image_end) && (load_end > image_start)) {
 		debug ("image_start = 0x%lX, image_end = 0x%lx\n", image_start, image_end);

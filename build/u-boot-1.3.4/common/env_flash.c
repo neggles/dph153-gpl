@@ -83,6 +83,18 @@ static ulong end_addr_new = CFG_ENV_ADDR_REDUND + CFG_ENV_SECT_SIZE - 1;
 
 #define ACTIVE_FLAG   1
 #define OBSOLETE_FLAG 0
+
+#ifdef CONFIG_FALLBACK_TO_NONREDUND_ENV
+/* Backwards compatiblity for non-redundant environment */
+/* WARNING: This is hard-coded to the known old env format */
+#define OLD_ENV_SIZE    (0x10000 - 4)
+struct old_env {
+    unsigned long	crc;		/* CRC32 over data bytes	*/
+    unsigned char	data[OLD_ENV_SIZE]; /* Environment data		*/
+};
+static struct old_env *old_env = (struct old_env*)CFG_ENV_ADDR;
+#endif /* CONFIG_FALLBACK_TO_NONREDUND_ENV */
+
 #endif /* CFG_ENV_ADDR_REDUND */
 
 extern uchar default_environment[];
@@ -117,8 +129,17 @@ int  env_init(void)
 		gd->env_addr  = addr2;
 		gd->env_valid = 1;
 	} else if (! crc1_ok && ! crc2_ok) {
-		gd->env_addr  = addr_default;
-		gd->env_valid = 0;
+#ifdef CONFIG_FALLBACK_TO_NONREDUND_ENV
+		/* Try to read non-redundant environment */
+		if (crc32(0, old_env->data, OLD_ENV_SIZE) == old_env->crc) {
+			gd->env_addr  = (ulong)&(old_env->data);
+			gd->env_valid = 3;
+		} else
+#endif /* CONFIG_FALLBACK_TO_NONREDUND_ENV */
+        {
+            gd->env_addr  = addr_default;
+            gd->env_valid = 0;
+        }
 	} else if (flag1 == ACTIVE_FLAG && flag2 == OBSOLETE_FLAG) {
 		gd->env_addr  = addr1;
 		gd->env_valid = 1;
@@ -267,7 +288,7 @@ int saveenv(void)
 	int	len, rc;
 	ulong	end_addr;
 	ulong	flash_sect_addr;
-#if defined(CFG_ENV_SECT_SIZE) && (CFG_ENV_SECT_SIZE > CFG_ENV_SIZE)
+#if defined(CFG_ENV_SECT_SIZE) && (CFG_ENV_SECT_SIZE > CFG_ENV_SIZE)  && defined(IPA_NEVER_DEFINED) 
 	ulong	flash_offset;
 	uchar	env_buffer[CFG_ENV_SECT_SIZE];
 #else
@@ -275,8 +296,9 @@ int saveenv(void)
 #endif	/* CFG_ENV_SECT_SIZE */
 	int rcode = 0;
 
-#if defined(CFG_ENV_SECT_SIZE) && (CFG_ENV_SECT_SIZE > CFG_ENV_SIZE)
+#if defined(CFG_ENV_SECT_SIZE) && (CFG_ENV_SECT_SIZE > CFG_ENV_SIZE)  && defined(IPA_NEVER_DEFINED) 
 
+    puts("\nTesting...\n");
 	flash_offset    = ((ulong)flash_addr) & (CFG_ENV_SECT_SIZE-1);
 	flash_sect_addr = ((ulong)flash_addr) & ~(CFG_ENV_SECT_SIZE-1);
 
@@ -309,15 +331,19 @@ int saveenv(void)
 	debug ("Protect off %08lX ... %08lX\n",
 		(ulong)flash_sect_addr, end_addr);
 
-	if (flash_sect_protect (0, flash_sect_addr, end_addr))
+    puts("Before flash portect\n");
+
+/*	if (flash_sect_protect (0, flash_sect_addr, end_addr))*/
+	if (flash_sect_protect (0, flash_sect_addr, flash_sect_addr + CFG_ENV_SECT_SIZE -1))
 		return 1;
 
-	puts ("Erasing Flash...");
-	if (flash_sect_erase (flash_sect_addr, end_addr))
+	puts ("Erasing Flash...\n");
+/*	if (flash_sect_erase (flash_sect_addr, end_addr)) */
+    if (flash_sect_erase (flash_sect_addr, flash_sect_addr + CFG_ENV_SECT_SIZE -1))
 		return 1;
 
-	puts ("Writing to Flash... ");
-	rc = flash_write((char *)env_buffer, flash_sect_addr, len);
+	puts ("Writing to Flash...\n");
+	rc = flash_write((char *)env_buffer, flash_sect_addr, len); 
 	if (rc != 0) {
 		flash_perror (rc);
 		rcode = 1;
@@ -326,7 +352,8 @@ int saveenv(void)
 	}
 
 	/* try to re-protect */
-	(void) flash_sect_protect (1, flash_sect_addr, end_addr);
+/*	(void) flash_sect_protect (1, flash_sect_addr, end_addr); */
+    (void) flash_sect_protect (1, flash_sect_addr, flash_sect_addr + CFG_ENV_SECT_SIZE -1);
 	return rcode;
 }
 
@@ -338,6 +365,24 @@ void env_relocate_spec (void)
 {
 #if !defined(ENV_IS_EMBEDDED) || defined(CFG_ENV_ADDR_REDUND)
 #ifdef CFG_ENV_ADDR_REDUND
+
+#ifdef CONFIG_FALLBACK_TO_NONREDUND_ENV
+	/* Fix up environment from old format */
+	if (gd->env_valid == 3) {
+		int copylen;
+		puts("Converting old environment\n");
+		copylen = OLD_ENV_SIZE;
+		if (copylen > ENV_SIZE) copylen = ENV_SIZE;
+		memset (env_ptr, 0, sizeof(env_t));
+		memcpy (env_ptr->data, old_env->data, copylen);
+		env_ptr->flags = 0xFF;
+		env_crc_update ();
+		gd->env_valid = 1;
+		return;
+	}
+#endif /* CONFIG_FALLBACK_TO_NONREDUND_ENV */
+
+
 	if (gd->env_addr != (ulong)&(flash_addr->data)) {
 		env_t * etmp = flash_addr;
 		ulong ltmp = end_addr;

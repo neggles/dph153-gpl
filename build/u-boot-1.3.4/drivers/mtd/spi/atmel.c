@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 Atmel Corporation
  */
-#define DEBUG
+
 #include <common.h>
 #include <malloc.h>
 #include <spi_flash.h>
@@ -39,9 +39,10 @@ struct atmel_spi_flash_params {
 	const char	*name;
 };
 
+/* spi_flash needs to be first so upper layers can free() it */
 struct atmel_spi_flash {
-	const struct atmel_spi_flash_params *params;
 	struct spi_flash flash;
+	const struct atmel_spi_flash_params *params;
 };
 
 static inline struct atmel_spi_flash *
@@ -51,6 +52,54 @@ to_atmel_spi_flash(struct spi_flash *flash)
 }
 
 static const struct atmel_spi_flash_params atmel_spi_flash_table[] = {
+	{
+		.idcode1		= 0x22,
+		.l2_page_size		= 8,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 16,
+		.nr_sectors		= 4,
+		.name			= "AT45DB011D",
+	},
+	{
+		.idcode1		= 0x23,
+		.l2_page_size		= 8,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 16,
+		.nr_sectors		= 8,
+		.name			= "AT45DB021D",
+	},
+	{
+		.idcode1		= 0x24,
+		.l2_page_size		= 8,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 32,
+		.nr_sectors		= 8,
+		.name			= "AT45DB041D",
+	},
+	{
+		.idcode1		= 0x25,
+		.l2_page_size		= 8,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 32,
+		.nr_sectors		= 16,
+		.name			= "AT45DB081D",
+	},
+	{
+		.idcode1		= 0x26,
+		.l2_page_size		= 9,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 32,
+		.nr_sectors		= 16,
+		.name			= "AT45DB161D",
+	},
+	{
+		.idcode1		= 0x27,
+		.l2_page_size		= 9,
+		.pages_per_block	= 8,
+		.blocks_per_sector	= 64,
+		.nr_sectors		= 64,
+		.name			= "AT45DB321D",
+	},
 	{
 		.idcode1		= 0x28,
 		.l2_page_size		= 10,
@@ -66,28 +115,21 @@ static int at45_wait_ready(struct spi_flash *flash, unsigned long timeout)
 	struct spi_slave *spi = flash->spi;
 	unsigned long timebase;
 	int ret;
-	u8 cmd = CMD_AT45_READ_STATUS;
 	u8 status;
 
 	timebase = get_timer(0);
-
-	ret = spi_xfer(spi, 8, &cmd, NULL, SPI_XFER_BEGIN);
-	if (ret)
-		return -1;
-
 	do {
-		ret = spi_xfer(spi, 8, NULL, &status, 0);
+		ret = spi_flash_cmd(spi, CMD_AT45_READ_STATUS, &status, sizeof(status));
 		if (ret)
 			return -1;
 
-		if (status & AT45_STATUS_READY)
+		if ((status & AT45_STATUS_READY) == 0)
 			break;
+
 	} while (get_timer(timebase) < timeout);
 
-	/* Deactivate CS */
-	spi_xfer(spi, 0, NULL, NULL, SPI_XFER_END);
 
-	if (status & AT45_STATUS_READY)
+	if ((status & AT45_STATUS_READY) == 0)
 		return 0;
 
 	/* Timed out */

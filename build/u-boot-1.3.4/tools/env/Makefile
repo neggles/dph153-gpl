@@ -1,5 +1,5 @@
 #
-# (C) Copyright 2002-2006
+# (C) Copyright 2002
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
 #
 # See file CREDITS for list of people who contributed to this
@@ -21,32 +21,36 @@
 # MA 02111-1307 USA
 #
 
-include $(TOPDIR)/config.mk
+#CROSS_COMPILE = arm-none-linux-gnueabi-
+#CC = arm-none-linux-gnueabi-gcc
 
-SRCS	:= $(obj)crc32.c  fw_env.c  fw_env_main.c
-HEADERS	:= fw_env.h
+SOURCES := crc32.c  fw_env.c  fw_env_main.c
+HEADERS := fw_env.h
 
-CPPFLAGS := -Wall -DUSE_HOSTCC -I$(SRCTREE)/include
+CPPFLAGS := -Wall -DUSE_HOSTCC
+CPPFLAGS := -g -Wall -DUSE_HOSTCC -I ../../include -I .-idirafter 
 
 ifeq ($(MTD_VERSION),old)
 CPPFLAGS += -DMTD_OLD
 endif
 
-all:	$(obj)fw_printenv
 
-$(obj)fw_printenv:	$(SRCS) $(HEADERS)
-	$(CROSS_COMPILE)gcc $(CPPFLAGS) $(SRCS) -o $(obj)fw_printenv
+all:	fw_printenv
+
+fw_printenv:	$(SOURCES) $(HEADERS)
+	$(CROSS_COMPILE)gcc $(CPPFLAGS) $(SOURCES) -o fw_printenv
 
 clean:
-	rm -f $(obj)fw_printenv $(obj)crc32.c
+	rm -f fw_printenv crc32.c
 
-$(obj)crc32.c:
-	ln -s $(src)../../lib_generic/crc32.c $(obj)crc32.c
+crc32.c:
+	ln -s ../../lib_generic/crc32.c crc32.c
 
 #########################################################################
 
-include $(TOPDIR)/rules.mk
+.depend:	Makefile $(SOURCES)
+		$(CROSS_COMPILE)gcc -M $(HOST_CFLAGS) $(CPPFLAGS) -I ../../include -I .  -g  -DUSE_HOSTCC $(SOURCES) > $@
 
-sinclude $(obj).depend
+sinclude .depend
 
 #########################################################################

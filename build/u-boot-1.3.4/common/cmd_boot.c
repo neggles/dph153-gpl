@@ -71,8 +71,18 @@ U_BOOT_CMD(
 
 extern int do_reset (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[]);
 
+/*
+ * Wrapper round do_reset which clears bootcount if board is reset from the command line.
+ */
+int do_reset_cmd (cmd_tbl_t *cmdtp, int flag, int argc, char *argv[])
+{
+	bootcount_store (0);
+	do_reset(cmdtp, flag, argc, argv);
+        return 0;
+}
+
 U_BOOT_CMD(
-	reset, 1, 0,	do_reset,
-	"reset   - Perform RESET of the CPU\n",
+	reset, 1, 0,	do_reset_cmd,
+	"reset   - Clear bootcount, and perform RESET of the CPU\n",
 	NULL
 );

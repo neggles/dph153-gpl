@@ -37,6 +37,7 @@ COBJS-y	+= bootm.o
 COBJS-y	+= cache.o
 COBJS-y	+= div0.o
 COBJS-y	+= interrupts.o
+COBJS-y	+= muldi3.o
 
 SRCS	:= $(SOBJS-y:.o=.S) $(COBJS-y:.o=.c)
 OBJS	:= $(addprefix $(obj),$(SOBJS-y) $(COBJS-y))

@@ -11,6 +11,8 @@
 APPEND=no	# Default: Create new config file
 BOARD_NAME=""	# Name to print in make output
 
+echo "args $1 $2 $3 $4 $5 $6 $7 $8"
+
 while [ $# -gt 0 ] ; do
 	case "$1" in
 	--) shift ; break ;;
@@ -23,7 +25,13 @@ done
 [ "${BOARD_NAME}" ] || BOARD_NAME="$1"
 
 [ $# -lt 4 ] && exit 1
-[ $# -gt 6 ] && exit 1
+[ $# -gt 8 ] && exit 1
+
+if [ "$7" = "" ]
+then
+  echo "IPA board type is not set try with for e.g TYPE=xb"
+  exit 1
+fi
 
 echo "Configuring for ${BOARD_NAME} board..."
 
@@ -81,7 +89,33 @@ then
 else
 	> config.h		# Create new config file
 fi
+
 echo "/* Automatically generated - do not edit */" >>config.h
+
+echo "IPA board type is set to $7"
+touch ipa_config.h
+
+echo "/* Automatically generated - do not edit */" >>ipa_config.h
+
+type=""
+case "$7" in
+    "xb")
+        echo "#define IPA_BOARD_TYPE_XB 1 " >>ipa_config.h
+        ;;
+    "xbplus")
+        echo "#define IPA_BOARD_TYPE_XBPLUS 1" >>ipa_config.h
+        ;;
+    "xc")
+        echo "#define IPA_BOARD_TYPE_XC 1" >>ipa_config.h
+        ;;
+    "xcminus")
+        echo "#define IPA_BOARD_TYPE_XCMINUS 1" >>ipa_config.h
+        ;;
+esac
+
+echo "#define CONFIG_IDENT_STRING \" $4-$7-$8\"" >>ipa_config.h
+echo "#define CONFIG_SILENT_CONSOLE" >>ipa_config.h
+echo "#include <ipa_config.h>" >>config.h
 echo "#include <configs/$1.h>" >>config.h
 
 exit 0

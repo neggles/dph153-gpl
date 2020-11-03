@@ -39,6 +39,9 @@
 #ifdef CONFIG_LPC2292
 #include <asm/arch/hardware.h>
 #endif
+#ifdef CONFIG_PICOCHIP_PC302
+#include <asm/arch/pc302_gpio.h>
+#endif
 #include <i2c.h>
 
 #if defined(CONFIG_SOFT_I2C)

@@ -43,4 +43,4 @@ __ashrdi3:
 	movpl	al, ah, asr r3
 	orrmi	al, al, ah, lsl ip
 	mov	ah, ah, asr r2
-	mov	pc, lr
+        bx      lr

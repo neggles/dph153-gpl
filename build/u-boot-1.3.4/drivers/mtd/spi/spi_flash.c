@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2008 Atmel Corporation
  */
-#define DEBUG
+
 #include <common.h>
 #include <malloc.h>
 #include <spi.h>
@@ -101,7 +101,7 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 	struct spi_slave *spi;
 	struct spi_flash *flash;
 	int ret;
-	u8 idcode[3];
+	u8 idcode[5];
 
 	spi = spi_setup_slave(bus, cs, max_hz, spi_mode);
 	if (!spi) {
@@ -120,8 +120,8 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 	if (ret)
 		goto err_read_id;
 
-	debug("SF: Got idcode %02x %02x %02x\n", idcode[0],
-			idcode[1], idcode[2]);
+	debug("SF: Got idcode %02x %02x %02x %02x %02x\n", idcode[0],
+			idcode[1], idcode[2], idcode[3], idcode[4]);
 
 	switch (idcode[0]) {
 #ifdef CONFIG_SPI_FLASH_SPANSION
@@ -129,9 +129,26 @@ struct spi_flash *spi_flash_probe(unsigned int bus, unsigned int cs,
 		flash = spi_flash_probe_spansion(spi, idcode);
 		break;
 #endif
+#ifdef CONFIG_SPI_FLASH_EON
+	case 0x1C:
+		flash = spi_flash_probe_eon(spi, idcode);
+		break;
+#endif
 #ifdef CONFIG_SPI_FLASH_ATMEL
 	case 0x1F:
 		flash = spi_flash_probe_atmel(spi, idcode);
+		break;
+#endif
+#ifdef CONFIG_SPI_FLASH_STMICRO
+	case 0x20:
+		flash = spi_flash_probe_stmicro(spi, idcode);
+		break;
+#endif
+#ifdef CONFIG_SPI_FLASH_AMIC
+	case 0x37:
+                /* Fall through intentional */
+        case 0x7F:
+		flash = spi_flash_probe_amic(spi, idcode);
 		break;
 #endif
 	default:
@@ -158,5 +175,5 @@ err_claim_bus:
 void spi_flash_free(struct spi_flash *flash)
 {
 	spi_free_slave(flash->spi);
-	free(flash);
+        free(flash);
 }
