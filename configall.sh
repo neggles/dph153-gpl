@@ -131,6 +131,7 @@ patch -p1 <linux-2.6.28-local-patch-224
 make oldconfig
 #make | tee -a ../../${LOG_FILE}
 popd
+
 echo -e "\nsrc package iptables-1.4.2.tar.bz2..." | tee -a ../${LOG_FILE}
 echo "________________________________________________________________________________" | tee -a ../${LOG_FILE}
 pushd iptables-1.4.2
