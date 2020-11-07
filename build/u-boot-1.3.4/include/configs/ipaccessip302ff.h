@@ -517,7 +517,7 @@
 #define CONFIG_EXTRA_ENV_SETTINGS                                               \
    "othbootargs=panic=1 " MK_STR (OTHERBOOTARGS) "\0"                           \
    "netdev=eth0\0"                                                              \
-   "consoledev=/dev/null\0"                                                     \
+   "consoledev=/dev/console\0"                                                  \
    "bootlimit=" MK_STR(CONFIG_BOOTCOUNT_LIMIT) "\0"                             \
    "kernel_nand_offset=" MK_STR(NAND_KERNEL_OFFSET) "\0"                        \
    "mtdparts=physmap-flash.0:" MTDPARTS_DEFAULT "\0"                            \
@@ -526,7 +526,7 @@
    " console=$consoledev,$baudrate $othbootargs mtdparts=$mtdparts;\0"          \
    "fixed_nfs=run nfs_args; tftp; bootm\0"                                      \
    "nand_jffs2=run nand_jffs2_args; nboot $loadaddr 0 "                         \
-   "$kernel_nand_offset; bootm $loaddddr\0"                                     \
+   "$kernel_nand_offset; bootm $loadaddr\0"                                     \
    "nand_jffs2_args=setenv bootargs root=/dev/mtdblock6 rw rootfstype=jffs2 "   \
    "ip=$ipaddr:$serverip:$gatewayip:$netmask:$hostname:$netdev:any "            \
    "console=$consoledev,$baudrate $othbootargs;\0"                              \
@@ -544,8 +544,7 @@
    " run flash_args; bootm $kernel_addr || run altbootcmd\0"                    \
    "altbootcmd=run check_bank;"                                                 \
    " if test $bank -eq 1; then run set_args_2; else run set_args_1; fi;"        \
-   " run flash_args; bootm $kernel_addr || set_led red\0"                       \
-   "silent=on\0"
+   " run flash_args; bootm $kernel_addr || set_led red\0"
 
 #define CONFIG_NFSBOOTCOMMAND                                           \
    "setenv bootargs root=/dev/nfs rw "                                  \

@@ -21,7 +21,8 @@
 # MA 02111-1307 USA
 #
 
-BIN_FILES	= img2srec$(SFX) mkimage$(SFX) envcrc$(SFX) ubsha1$(SFX) gen_eth_addr$(SFX) bmp_logo$(SFX) ubootenv$(SFX)
+BIN_FILES	= img2srec$(SFX) mkimage$(SFX) envcrc$(SFX) ubsha1$(SFX) gen_eth_addr$(SFX) bmp_logo$(SFX) ubootenv$(SFX) mkenvimage$(SFX)
+
 
 OBJ_LINKS	= environment.o crc32.o md5.o sha1.o image.o
 OBJ_FILES	= img2srec.o mkimage.o envcrc.o ubsha1.o gen_eth_addr.o bmp_logo.o ubootenv.o
