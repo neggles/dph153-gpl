@@ -3,7 +3,7 @@ LOG_FILE="logs/buildall.log"
 
 export ARCH=arm
 export CROSS_COMPILE=/opt/arm-2014.05/bin/arm-none-linux-gnueabi-
-export TYPE=xc
+export TYPE=a
 export IPV=420.69 # ha ha, yes, very funny, self
 
 >${LOG_FILE}
